@@ -279,6 +279,9 @@ echo "  Lang:  $LANG_PICK"
 echo
 echo "Next steps:"
 echo "  cd $TARGET"
+echo "  Read CLAUDE.md's 'Operating contract' FIRST — these are gates to execute,"
+echo "    not reference to skim. Then run the 'First-session bootstrap' checklist"
+echo "    (esp. the chatlog-home transition — one-time, easy to silently skip)."
 echo "  cat USE.md"
 case "$LANG_PICK" in
     python)

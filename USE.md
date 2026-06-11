@@ -174,6 +174,23 @@ Follow the conventions in `CONVENTIONS.md`:
 After ship, archive prior RFCs to `docs/archive/<series>/` and link from
 `HISTORY.md`.
 
+## Hand-off: the spawned Claude's first session
+
+When a Claude Code instance first opens the spawned project, its FIRST action
+should be reading `CLAUDE.md`'s **Operating contract** and running the
+**First-session bootstrap** checklist there — above all the **chatlog-home
+transition** (`/srv/projects/pkplab/chatlogs/<project>/` subdir + `PROJECTS.txt` line). That
+step is one-time and easy to silently skip; skipping it loses the project's
+session history. Don't assume it ran — verify the subdir exists.
+
+The Operating contract also carries the most important thing about this
+template: **it's a starting point.** The gates (four-leg review, RFC → spec →
+implement, lane discipline) are the operational floor. Evolving them into a
+workflow that fits *this* project is normal and expected — as long as the
+evolution is a conscious, recorded decision, not a silent slide back to
+generic defaults. The contract names that distinction explicitly, because a
+prior instance regressed by sliding rather than deciding.
+
 ---
 
 **Supplementary examples.** For worked examples of the patterns this template

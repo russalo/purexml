@@ -3,6 +3,128 @@
 This file provides guidance to Claude Code (claude.ai/code) when working
 with code in this repository.
 
+## Operating contract — read this first, every session
+
+**This file is operational, not reference.** It is a set of GATES you execute
+and verify at — not background you read once and absorbed. That distinction is
+the whole point of everything below it.
+
+**The #1 failure mode of an instance spawned from this template is silent
+default-reversion:** running generic Claude-Code behavior — read the task, do
+it, use whatever tools fire automatically, ship — and consulting this overlay
+only when something forces you to. It is a real, documented failure. A prior
+template-spawned instance drifted exactly this way: it ran the four-leg review
+as one-and-a-half legs (skipped the in-house swarm and the Gemini cross-model
+leg on minor releases that mandate all four), never performed the chatlog-home
+setup, opened a PR for an RFC *draft*, re-introduced design elements that had
+been explicitly excluded, and — under an explicit read-only / verify-first
+order — treated agreement on a plan's *intent* as authorization to *execute*
+and began writing. **None of it registered AS deviation in the moment**, because
+the actions were never held against these requirements at the gate where each
+occurred. Its own diagnosis: "silent unawareness, not a conscious shortcut —
+the harder kind to catch."
+
+If you are not actively checking your actions against the gates in this file,
+**you are already drifting** — you just don't feel it yet. The lighter path
+always feels sufficient mid-session; in a fast, design-heavy session, process
+scaffolding reads as skippable overhead while things appear to be going fine.
+**That feeling is the failure mode, not a signal that you're fine.** This will
+override even direct in-conversation corrections unless you operationalize the
+gates into active checks.
+
+### This is a STARTING POINT — evolving away from it is normal and expected
+
+These gates are your **operational floor, not a cage.** Every real project
+evolves its own workflow: it drops a gate that doesn't fit its domain, adds one
+the template never imagined, reshapes the RFC flow around what it actually
+builds. **That evolution is healthy and expected** — the russalo way is "fluid
+early, structured as value emerges." This template is where you *start*, not
+where you stay.
+
+The line that matters is **conscious evolution vs. silent regression:**
+
+- **Evolution (good):** you *decide* to change how this project works, you say
+  so to Russell, and you record it (`Known decisions` below / `CONVENTIONS.md`).
+  The deviation is a choice with a paper trail.
+- **Regression (bad):** you *slide* off a gate without noticing — default-
+  reversion. No decision, no record, no awareness. This is the failure this
+  contract exists to prevent.
+
+So deviating from the template is fine. Deviating **without noticing** is the
+failure. When you find yourself about to skip a gate, that is the moment to
+either run it or make an explicit, recorded decision not to — never the moment
+to quietly proceed.
+
+## First-session bootstrap (one-time, do before real work)
+
+When this project is freshly spawned, run this checklist BEFORE substantive
+work. These are one-time setup steps the template cannot perform for you:
+
+- [ ] **Chatlog home.** Perform the chatlog-home transition: create
+  `/srv/projects/pkplab/chatlogs/<this-project>/`, move this project's session
+  jsonl(s) there, symlink back, and add the one `<encoded>\t<project>` line to
+  `/srv/projects/pkplab/chatlogs/PROJECTS.txt`. (Recipe:
+  `/srv/projects/pkplab/chatlogs/TRANSITION.md`.)
+  Skipping this silently loses the project's entire session history — a prior
+  instance missed exactly this. Verify the live jsonl still grows after the move.
+- [ ] **Review apparatus wired.** Confirm `scratch/review/` exists with the
+  auditor adapter (`auditor_GEMINI.md` filled in from the skeleton). The shared
+  wrappers live at `/srv/projects/review-kit/`.
+- [ ] **Read the ledgers.** Read `Known decisions` AND `Excluded decisions`
+  below before proposing anything — so you don't re-introduce something already
+  ruled out.
+- [ ] **Fill or track the TODOs.** The `What this is` / `Architecture` / version
+  sections ship as TODO placeholders. Fill them or note where the real content
+  is tracked.
+
+## Decision gates (STOP and verify — do not proceed past these on autopilot)
+
+Run the relevant checklist AT the moment, not from memory of having read it.
+
+**Before you execute ANY plan or write ANY file:**
+- [ ] Am I in *execute* mode or *discuss* mode? **Agreement on a plan's intent
+  is NOT authorization to execute it.** Repeating a plan back is not permission
+  to do it. Under a read-only / verify-first order, stay read-only until Russell
+  explicitly says execute.
+- [ ] Is what I'm about to write inside my lane? (See Lane discipline.)
+
+**Before finalizing/approving an RFC:**
+- [ ] Is this a *draft* or an *approved spec*? Drafts are reviewed in
+  conversation — they do NOT get a PR. The PR belongs at implementation.
+- [ ] Have I locked specifics into the spec that the draft stage should still be
+  shaking out (e.g. a concrete visual/design choice)? The draft stage exists to
+  prevent exactly the rip-it-out-later failure.
+
+**Before opening a PR (minors+):**
+- [ ] Did the three *pre-open* review legs run — in-house swarm, Gemini
+  cross-model, repo-clone/empirical sweep? (The fourth leg, PR bots, fires *on
+  PR open* — it's checked at the before-merge gate, not here.) "Subset on
+  patches per scope" is a decision you make and record, not a default you slide
+  into.
+- [ ] Are those findings logged in `scratch/review/`?
+- [ ] Is this implementation (PR-worthy), not a draft (conversation)?
+- [ ] Did I re-introduce anything in `Excluded decisions`?
+
+**Before merge (minors):**
+- [ ] Did the PR-bot leg fire (Codex / Gemini Code Assist / Copilot), and are
+  its findings addressed or grounded-and-declined?
+- [ ] Compliance report written? CI green? Review comments addressed/grounded?
+
+## Where this project diverges from your generic defaults
+
+Default-reversion strikes precisely at these divergence points — so they are
+named here to make them catchable. Where your base Claude-Code instinct and this
+project disagree, **this project wins** (until you consciously evolve it):
+
+| Your default instinct | This project's gate |
+|---|---|
+| Read the task, do it, ship | Minors go RFC → spec → implement → compliance |
+| Review = whatever fires (PR bots) | Four legs, all of them on minors+, findings logged |
+| Agreement means proceed | Agreement on *intent* ≠ authorization to *execute* |
+| Session logs live wherever the CLI writes them | Transitioned to `/srv/projects/pkplab/chatlogs/<project>/` (bootstrap) |
+| Write where the work is | Lane discipline — read-only outside your lane |
+| A draft is ready to PR | Drafts live in conversation; PRs are for implementation |
+
 ## What this is
 
 **TODO: Replace with a one-paragraph description of the project.** Anchor on the
@@ -25,7 +147,9 @@ Claude instance operates inside a documented lane. **Role map:**
   That includes `scratch/` (gitignored working notes), `docs/` (promoted
   outputs), and the project's own state / data dirs.
 - **Read + write** within `/srv/projects/pkplab/chatlogs/<this-project>/` —
-  the unified per-project Claude session-jsonl tree (documented exception).
+  the unified per-project Claude session-jsonl tree (documented exception). If
+  that subdir doesn't exist yet, the **First-session bootstrap** chatlog step
+  hasn't run — do it.
 - **You may store your own records** for the project's own reference —
   decisions, state snapshots, integration notes, anything the project itself
   needs to function or remember. Blueprint is the canonical *cross-project*
@@ -101,6 +225,17 @@ Blueprint Claude, Tailnet Claude…), all Claudes on this node, or Claudes
 other than yourself. No bare "Claude Code does X" — Russell can't follow
 which instance you mean.
 
+### Agreement on intent is not authorization to execute
+
+When Russell agrees with a *plan* or its *intent*, that is not by itself
+permission to start writing files or running state-changing commands —
+especially under an explicit read-only / verify-first order. Repeating the plan
+back is not the same as being told to do it. Confirm you're in **execute** mode,
+not **discuss** mode, before you act. (This is the first item in the
+**Decision gates** "before you execute anything" checklist — it's here too
+because it's an authorization boundary, and a prior instance broke it moments
+after repeating the order back.)
+
 ### When unsure
 
 Ask Russell. The cost of pausing for confirmation on a possibly-cross-lane
@@ -171,6 +306,10 @@ The reason: RFCs are expensive (review, approval, compliance). Patches that
 fix bugs in an already-approved design don't earn that overhead; their record
 belongs in the version history, not a parallel spec doc.
 
+> **Gate:** before finalizing an RFC or opening a PR, run the matching
+> checklist in **Decision gates** above. A draft is reviewed in conversation,
+> never PR'd; the PR is for implementation.
+
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
@@ -214,6 +353,17 @@ blame`.
 - TODO: Second decision goes here.
 - TODO: ...
 
+## Excluded decisions (do NOT re-introduce)
+
+The counterpart to `Known decisions`: things Russell has **explicitly ruled
+out.** Record each one here the moment it's excluded, so a later session (or a
+reset instance) can check against it before proposing — re-introducing an
+excluded element is a documented failure mode of this template. Pattern:
+"**X** — excluded <date>, because Y. Do not bring back without re-opening with
+Russell."
+
+- TODO: First exclusion goes here, when one is made.
+
 ## Test fixtures
 
 Tests live in `tests/`. Fixtures (sample inputs, golden outputs, edge cases)
@@ -227,6 +377,12 @@ This project uses the **four-leg decorrelated code review** apparatus that
 the russalo ecosystem has converged on. The originating principle: *a
 reviewer's value is its decorrelation from the author.* Builder bias applies
 to the AI too — review must come from where the author didn't think.
+
+> **Gate:** "run all four on minors+" is a requirement, not a suggestion.
+> Running fewer is a decision you make and *record* (in the PR / findings log),
+> not a default you slide into. Before opening a PR, run the **Decision gates**
+> "before opening a PR" checklist. A prior instance ran this as one-and-a-half
+> legs without noticing — the silent-regression failure this whole contract guards.
 
 The four legs (run all on minors+; subset on patches per scope):
 
