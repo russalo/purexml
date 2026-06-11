@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "{{project_name}}"
+version = "0.1.0"
+description = "TODO: one-line description of what this project does."
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "TODO"}
+authors = [
+    {name = "TODO", email = "TODO@example.com"},
+]
+keywords = []
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+# Start empty. Add real runtime deps as the project grows; prefer stdlib first.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/TODO/{{project_name}}"
+Repository = "https://github.com/TODO/{{project_name}}"
+Issues = "https://github.com/TODO/{{project_name}}/issues"
+
+# If/when this project ships a CLI, declare it here:
+# [project.scripts]
+# {{project_name}} = "{{project_name}}.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+# Only collect the project's own tests. Prevents `pytest` from walking the repo
+# root and importing test files inside scratch/ or any harvested corpora — that
+# both errors on collection AND writes __pycache__/*.pyc into shared dirs.
+testpaths = ["tests"]
+pythonpath = ["src"]

@@ -1,0 +1,14 @@
+# golangci-lint v1.x config. Pinned in CI to the version in
+# .github/workflows/tests.yml.
+run:
+  timeout: 5m
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck # unchecked errors
+    - govet # vet (replaces a standalone `go vet` step)
+    - ineffassign # ineffectual assignments
+    - staticcheck # SA* correctness checks
+    - unused # unused code
+    - gosimple # simplifications

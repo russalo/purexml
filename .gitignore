@@ -1,0 +1,102 @@
+# =============================================================================
+# Universal (always active — every russalo project ignores these)
+# =============================================================================
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Env / secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Claude Code local state (per-developer permissions + session locks)
+.claude/settings.local.json
+
+# Local scratch notes — SCRATCH.md is a top-level inbox (single file).
+# scratch/ is the broader internal-process tree (drafts, review findings,
+# measurement prototypes). Both are gitignored. See scratch/README.md.
+SCRATCH.md
+scratch/
+
+# Local tmp / scratch build dirs
+/tmp/
+
+# Review-apparatus canonical-tree marker (committed, but never tracked as
+# generated — see STACK.md "two-tripwire review guard").
+# .review-canonical is intentionally committed; NOT listed here.
+
+
+# =============================================================================
+# Python (active by default — delete this section if your project is not Python)
+# =============================================================================
+
+# Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / build
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# pytest / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# mypy / ruff caches
+.mypy_cache/
+.ruff_cache/
+
+
+# =============================================================================
+# Go (commented out — uncomment if your project is Go-based)
+# =============================================================================
+
+# Binary output dir. The leading slash anchors this to the repo root so it
+# DOES NOT match a `cmd/bin/` source directory or any nested `bin/` package.
+# /bin/
+
+# Single-binary build output at repo root (e.g. `go build -o {{project_name}}`).
+# The leading slash ensures we don't accidentally ignore a `{{project_name}}/`
+# package directory under `internal/` or `cmd/`.
+# /{{project_name}}
+
+# Windows binaries
+# *.exe
+
+# Vendored dependencies. Leave commented unless you've made an explicit
+# decision to vendor (most russalo Go projects don't — they rely on the
+# module cache + go.sum for reproducibility). If you DO vendor, comment
+# this back IN to ignore `vendor/` instead — vendoring means committing
+# the tree, so the rule flips. Actually: if you vendor, DELETE this line
+# entirely; the comment is here as a reminder to make the call deliberately.
+# vendor/
+
+
+# =============================================================================
+# Node (placeholder — uncomment if your project adds Node tooling)
+# =============================================================================
+
+# node_modules/
+# npm-debug.log*
+# yarn-debug.log*
+# yarn-error.log*
+# .pnpm-debug.log*
+# dist/        # NOTE: already covered by Python section if both active

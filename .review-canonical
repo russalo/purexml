@@ -1,0 +1,2 @@
+# This file marks the canonical repo for the russalo decorrelated-review apparatus (gem-review.sh tripwire).
+# Its presence MUST refuse write-capable Gemini extensions running here; they should only run against a /tmp snapshot. Do not delete.
