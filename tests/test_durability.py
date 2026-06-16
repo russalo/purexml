@@ -11,10 +11,12 @@ import purexml
 from conftest import requires_oracle
 
 
-def test_runtime_meets_safe_floor():
-    """The corpus assumes a safe runtime; assert it (CI matrix is all >= floor)."""
-    assert purexml.expat_is_secure(), (
-        "runtime libexpat %s below safe floor %s"
+def test_runtime_meets_functional_floor():
+    """The corpus assumes the functional floor (2.6.0) — where the major DoS classes
+    are mitigated. (The default secure check is the stricter RECOMMENDED floor; the
+    corpus only needs the functional one.)"""
+    assert purexml.expat_is_secure(purexml.SAFE_EXPAT_VERSION), (
+        "runtime libexpat %s below functional floor %s"
         % (purexml.EXPAT_VERSION, purexml.SAFE_EXPAT_VERSION)
     )
 

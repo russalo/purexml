@@ -17,13 +17,20 @@ def test_floors_are_documented_constants():
     assert purexml.RECOMMENDED_EXPAT_VERSION == (2, 7, 2)
 
 
-def test_expat_is_secure_on_this_runtime():
-    # CI matrix (3.10–3.13) bundles libexpat >= the safe floor.
-    assert purexml.expat_is_secure() is True
+def test_functional_floor_met_on_this_runtime():
+    # CI matrix (3.10–3.13) bundles libexpat >= the functional floor (2.6.0).
+    assert purexml.expat_is_secure(purexml.SAFE_EXPAT_VERSION) is True
 
 
-def test_assert_expat_secure_passes_here():
-    purexml.assert_expat_secure()  # must not raise on a supported runtime
+def test_default_check_uses_conservative_floor():
+    # PR#3 Codex: the default secure check is fail-safe (RECOMMENDED, not SAFE).
+    assert purexml.expat_is_secure() == (
+        purexml.EXPAT_VERSION >= purexml.RECOMMENDED_EXPAT_VERSION
+    )
+
+
+def test_assert_expat_secure_functional_floor_passes():
+    purexml.assert_expat_secure(purexml.SAFE_EXPAT_VERSION)  # functional floor met on CI
 
 
 def test_assert_expat_secure_raises_below_floor():
@@ -34,3 +41,15 @@ def test_assert_expat_secure_raises_below_floor():
 def test_expat_is_secure_custom_minimum():
     assert purexml.expat_is_secure(minimum=(0, 0, 0)) is True
     assert purexml.expat_is_secure(minimum=(99, 0, 0)) is False
+
+
+def test_version_argument_accepts_string():
+    # PR#3 Gemini: a "x.y.z" string must work, not raise TypeError.
+    assert purexml.expat_is_secure("2.6.0") == purexml.expat_is_secure((2, 6, 0))
+    assert purexml.expat_is_secure("99.0.0") is False
+
+
+def test_assert_expat_secure_string_message_well_formed():
+    with pytest.raises(RuntimeError) as exc:
+        purexml.assert_expat_secure("99.0.0")
+    assert "99.0.0" in str(exc.value)  # not malformed char-split "9...9...0"
