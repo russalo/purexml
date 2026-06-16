@@ -1,20 +1,23 @@
 # purexml Public Contract
 
-> **If your project has no stable public surface, delete this file.** Examples
-> of "no public surface": internal scripts, experiments, prototypes, services
-> with no documented external API. Examples of "has a public surface": a
-> library other projects import, a CLI other projects script against, a
-> server with a documented HTTP contract, a tool that emits a documented
-> output format.
+> **⚠️ NOT YET BINDING — purexml is pre-1.0 (currently v0.1.1).** No public
+> contract is frozen. The de-facto surface today is a single call,
+> `purexml.fromstring(text) -> xml.etree.ElementTree.Element`, behaviorally
+> equivalent to `defusedxml.ElementTree.fromstring` at its defaults — but until
+> v1.0 it may still change. The tables below are the **skeleton to fill at the
+> v1.0 freeze**; they are intentionally not populated yet (pinning a contract
+> pre-1.0 would be a false promise). The contract binds, and this file is
+> completed, **at v1.0** — which is gated on the still-deferred adoption-model
+> decision (see `CLAUDE.md` *Known decisions*).
 
 This document defines what **consumers** of purexml's output / API
 can rely on. It is the stability commitment from purexml to
 downstream systems.
 
-> **This contract is binding as of v{X.0}.** The stability commitments below
-> are obligations, not intentions. Fields / endpoints marked stable will not
-> be removed, renamed, or change type without a MAJOR version bump. See the
-> backward compatibility and deprecation policies below.
+> **This contract is binding as of v1.0** (not yet reached). The stability
+> commitments below are obligations, not intentions. Fields / functions marked
+> stable will not be removed, renamed, or change type without a MAJOR version
+> bump. See the backward compatibility and deprecation policies below.
 
 ---
 

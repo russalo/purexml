@@ -335,13 +335,16 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
-- **v0.1.0** *(RFC approved 2026-06-16; implementation pending)* — first slice:
-  the whole consumer contract (C1 safe-parse + C2 safe-failure) via a single
-  hardened `fromstring`, behaviorally equivalent to `defusedxml` defaults.
-  Approved spec:
-  [`docs/v0.1.0_RFC_Specification.md`](docs/v0.1.0_RFC_Specification.md)
-  (`COMPLIANCE-v0.1.md` due before merge). SCHEMA n/a; LOGIC introduced
-  (mitigation set v0.1).
+- **v0.1.1** *(shipped 2026-06-16, PR #2)* — **patch**: lower runtime floor to
+  Python **3.10** (was 3.12) so purexml never binds a consumer's floor; CI matrix
+  tests 3.10–3.13. No logic/behavior change. SCHEMA n/a; LOGIC unchanged (v0.1).
+  _HISTORY only, no RFC._
+- **v0.1.0** *(shipped 2026-06-16, PR #1)* — first slice: the whole consumer
+  contract (C1 safe-parse + C2 safe-failure) via a single hardened `fromstring`,
+  behaviorally equivalent to `defusedxml` defaults. Spec:
+  [`docs/v0.1.0_RFC_Specification.md`](docs/v0.1.0_RFC_Specification.md);
+  compliance: [`docs/COMPLIANCE-v0.1.md`](docs/COMPLIANCE-v0.1.md); four-leg
+  review complete. SCHEMA n/a; LOGIC introduced (mitigation set v0.1).
 
 ## Stack
 
@@ -363,16 +366,33 @@ knowledge.
 
 ## Architecture
 
-**No implementation code exists yet** — `src/purexml/__init__.py` is empty and
-`tests/` holds only a smoke test. The design is owned by the RFC, not yet the
-code; the v0.1.0 first task is *measure-first* (enumerate `defusedxml`'s
-mitigations on the `fromstring` path before writing anything). Update this
-section with the real module tour once the first slice lands. Expected seam
-(per the RFC): a single hardened-parse entrypoint
-(`purexml.fromstring(text) -> Element`) that configures the stdlib parser
-(`xml.etree` / `pyexpat`) to refuse the §3 attack classes, plus a falsify-first
-test battery under `tests/` validating both same-parse equivalence and
-same-attack-blocked equivalence against `defusedxml` as a dev/test oracle.
+Tiny by design (~200 lines of `src/`). The whole public surface is one call.
+
+- **`src/purexml/__init__.py`** — public exports: `fromstring`, the exception
+  hierarchy, `ParseError` (re-exported from stdlib), `__version__`.
+- **`src/purexml/_parser.py`** — the engine. `fromstring(text)` →
+  `_HardenedParser`, built **directly on `xml.parsers.expat` + a
+  `xml.etree.ElementTree.TreeBuilder`** (NOT by subclassing `xml.etree`'s
+  `XMLParser` — the CPython C accelerator doesn't expose the expat handler hooks;
+  see Known decisions). It mirrors the stdlib `XMLParser` expat→tree glue
+  (namespace separator `"}"`, `ordered_attributes`, `buffer_text`, `_fixname`
+  Clark-notation, undefined-entity handling) so the returned `Element` is
+  byte-identical to the stdlib's, then installs the defusedxml-default blocking
+  handlers (`EntityDeclHandler`/`UnparsedEntityDeclHandler` → `EntitiesForbidden`;
+  `ExternalEntityRefHandler` → `ExternalReferenceForbidden`; no
+  `StartDoctypeDeclHandler`, so an entity-free DTD is allowed). `feed_close`
+  breaks the parser↔self reference cycle in a `finally`.
+- **`src/purexml/errors.py`** — `PureXMLError(ValueError)` ←
+  `EntitiesForbidden`, `ExternalReferenceForbidden`. Malformed input raises the
+  stdlib `ParseError` unchanged.
+- **`tests/`** — the falsify-first battery: `test_equivalence.py` (C14N
+  same-parse vs the defusedxml oracle, str+bytes, + the exact consumer surface),
+  `test_attacks.py` (attack battery + the no-fetch/no-read proof harness in
+  `conftest.py`), `test_misc.py` (malformed parity, version-sync, zero-dep guard,
+  the reference-cycle regression). Run on CPython ≥3.10.
+- **Out of `src/` (gitignored):** `scratch/review/corpus_sweep.py` — the
+  empirical same-parse sweep over file-observer's real corpus (read-only;
+  not committed). `scratch/measure/` — the measure-first findings.
 
 ## Known decisions
 
@@ -392,9 +412,29 @@ blame`.
   for a consumer.
 - **CPython + pyexpat assumption, recorded explicitly** — the hardening assumes
   CPython's stdlib `expat`. Runtimes without pyexpat would need a separate code
-  path; see Excluded (IronPython/Jython out of scope). Stay PyPy-portable; floor
-  as low as practical (≥3.8 feasible) even though `pyproject.toml` currently pins
-  ≥3.12 — revisit the floor against the anchor consumer.
+  path; see Excluded (IronPython/Jython out of scope). Stay PyPy-portable.
+- **Runtime floor = Python 3.10** (set in v0.1.1, 2026-06-16) — lowered from 3.12
+  so purexml never binds a consumer's floor (target spec §4; file-observer's real
+  floor is ~3.10). **CI-grounded**: the matrix tests 3.10–3.13 on every push, so
+  the floor is verified, not asserted. The src uses only long-stable stdlib.
+- **Built directly on `xml.parsers.expat` + `TreeBuilder`** (measure-first F5) —
+  NOT by subclassing `xml.etree`'s `XMLParser` (CPython's C accelerator hides the
+  expat handler hooks), and NOT via defusedxml's fragile pure-Python module
+  surgery. The expat→tree glue is a faithful mirror of the stdlib `XMLParser` so
+  the `Element` is byte-identical. Don't "modernize" away the mirroring — it is
+  the equivalence guarantee.
+- **Block exceptions subclass `ValueError`** (measure-first F4) — mirrors
+  defusedxml's `DefusedXmlException(ValueError)` MRO so a consumer narrowing to
+  `except ValueError` stays equivalent. Malformed input raises the stdlib
+  `ParseError` (NOT a `PureXMLError`). Do not reparent these to `ParseError`.
+- **Equivalence is proven via `ET.canonicalize` (C14N)** — "same parse" is defined
+  as C14N-equal to the defusedxml oracle, not ad-hoc tree comparison. Verified on
+  340 real inputs (0 disagreements) + the synthetic battery. Keep the oracle a
+  **dev/test-only** dep.
+- **External-DTD nuance (measure-first F2)** — an *unresolved* external-DTD
+  declaration is **allowed** (parses, no fetch); only *attempted* external
+  resolution is blocked. Over-blocking it would break equivalence. Don't "harden"
+  by raising on the mere presence of an external DTD.
 - **v0.1.0 surface is a single `fromstring`** — the whole consumer contract
   (C1+C2) ships in one slice because value is only realized when "same parses
   succeed" and "same attacks blocked" hold *together* (RFC §1). Small surface,

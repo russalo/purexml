@@ -1,90 +1,67 @@
 # Security Policy
 
+purexml **is a security control** — its job is to safely parse untrusted XML.
+That raises the bar on this policy: a defect here is a security defect.
+
 ## Scope
 
-TODO: Describe what this project **does** and **does not** do, with security
-implications. Be explicit about the trust model.
+purexml exposes one call, `fromstring(text) -> xml.etree.ElementTree.Element`,
+behaviorally equivalent to `defusedxml.ElementTree.fromstring` at its defaults.
+On **fully untrusted** XML input (the caller is trusted; the XML is the
+attacker-controlled surface) it:
 
-For an observation-only tool, the shape is:
+- **blocks** entity-expansion bombs (billion-laughs / quadratic), XXE via
+  external entities (local file + network), and external reference resolution —
+  raising a catchable exception **at the entity declaration, before any
+  expansion or resolution** (independent of the system libexpat version);
+- **never** fetches external resources, reads local files referenced by the XML,
+  expands an entity bomb, hangs, consumes unbounded CPU/memory, or crashes the
+  host process. Blocked/malformed input always yields a catchable exception.
 
-> purexml is an **observation-only** tool. It reads files and emits
-> metadata. It never:
-> - Executes file content
-> - Modifies source files
-> - Opens network connections
-> - Runs embedded scripts, macros, or code found in inputs
+It is stdlib-only (`xml.parsers.expat` + `xml.etree`) with **zero runtime
+dependencies**, so the host process inherits no third-party parser attack surface.
 
-Adapt to your project. For a web service: what auth boundaries, what state
-changes, what side effects. For a CLI: what it touches on the filesystem.
-For a library: what surface area the host process inherits.
+## Reporting vulnerabilities
 
-## Reporting Vulnerabilities
+The repo is private (russalo tailnet). Report privately to the maintainer —
+**russalo@gmail.com**. **Do not** open a public issue. Russalo default
+acknowledgement: 48 hours / initial assessment 7 days.
 
-If you discover a security issue, please report it privately:
+When reporting, include the **exact input** that triggers the issue (a parse that
+should have been blocked but wasn't, an unexpected fetch/read, a crash/hang, or a
+divergence from `defusedxml`) — purexml's whole contract is grounded in
+constructable failing inputs.
 
-- **Email:** TODO@example.com *(replace with the project's security contact)*
-- **Do not** open a public GitHub issue for security vulnerabilities
+## Supported versions
 
-We will acknowledge receipt within {{N}} hours and provide an initial
-assessment within {{N}} days. *(Russalo default: 48 hours / 7 days.)*
-
-## Supported Versions
-
-TODO: Replace with the project's supported-versions table. Russalo
-convention: support the current minor with full backports, the previous
-minor with security fixes only, anything older is unsupported (please
-upgrade).
+Pre-1.0: the current minor is supported; older is not (please upgrade).
 
 | Version | Supported |
 |---|---|
-| {{X.Y}}.x | Yes (current) |
-| {{X.Y-1}}.x | Security fixes only |
-| < {{X.Y-1}} | No |
+| 0.1.x | Yes (current) |
+| < 0.1 | No |
 
-## Dependency Security
+## Dependency security
 
-TODO: Document the project's optional / runtime / build dependencies and
-their security posture. Use a table of dependency / role / risk mitigation.
-Note which deps are **optional** (with a fallback path) and which are
-**required** (no fallback).
-
-| Dependency | Role | Risk mitigation |
+| Dependency | Role | Posture |
 |---|---|---|
-| TODO | TODO | TODO |
+| *(none)* | runtime | **Zero runtime dependencies** — stdlib only. No third-party parser/native code in the import path; nothing to compromise via the dependency surface. |
+| `defusedxml` | dev/test **oracle** | Never shipped, never imported under `src/` (guarded by a test). Used only to validate equivalence. |
+| `pytest` | dev/test | test runner only |
 
-Russalo convention: optional deps gate their callers via extras; if absent,
-the code path falls through gracefully or emits a documented error code.
-New dependencies — especially native / parser deps — must be added with
-the **bounded-observation discipline** below: every new parser path
-inherits the project's existing caps, fail-closed defaults, and
-degraded-record-not-crash contract.
+## The bounds any change must preserve
 
-## Bounded Observation
+purexml's security guarantees are a **checklist for every change**, not a
+one-time setup. Any new code path (especially a new parse mode) MUST inherit:
 
-*Delete this section if not relevant to the project.*
+- **proactive blocking** of entity declarations and external resolution (never
+  rely on libexpat's amplification cap — a sub-cap bomb expands without it);
+- **no I/O on untrusted input** — no socket, no file open, no external fetch
+  (the test battery proves this with a socket/open/urlopen trip-wire);
+- **catchable failure** — a `PureXMLError` (a `ValueError`) or stdlib
+  `ParseError`, never an uncatchable error or host crash;
+- **behavioral equivalence to the `defusedxml` oracle** — verified by the C14N
+  same-parse sweep; do not over-block (it breaks equivalence) or under-block.
 
-TODO: If the project bounds its observation (sample reads, decompression
-caps, time budgets), document the bounds here so consumers and reviewers can
-verify them. Typical shape:
-
-> All extractors operate within declared bounds:
-> - **Default sample:** small fixed read from file head (e.g. 8KB)
-> - **Per-format deviations:** declared and bounded (e.g. 128KB for
->   container formats that need the central directory)
-> - **Decompression caps:** every decompression call gated by a wrapper
->   with a strict output cap (e.g. 64MB)
-> - **Traversal validation:** path components validated against traversal
->   attacks
-> - **In-tree containment:** symlinks resolving outside the source directory
->   are skipped
-> - **Degraded records, not crashes:** a single unreadable input produces a
->   record + error, never an aborted run
-
-**The discipline is universal: any new parser / IO path added to the
-project must inherit these bounds.** A real cautionary tale: a new parser
-path shipped without inheriting existing caps, and the red-team round had
-to retrofit them — a small adversarial input that expanded to multiple
-GB of RSS was caught only because the review pass specifically went
-looking for places the discipline hadn't been carried through. Every new
-IO surface is a place this bug class can re-emerge; the bounds are a
-checklist, not a one-time setup.
+A new IO/parse surface is exactly where this bug class re-emerges; the
+falsify-first battery + corpus sweep are the gate.

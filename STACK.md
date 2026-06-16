@@ -1,155 +1,92 @@
-# STACK.md — language-variant adaptations for purexml
+# STACK.md — purexml
 
-This template ships scaffolding for **both Python and Go side-by-side** so
-a new project can pick its stack and delete the other half. The russalo
-ecosystem's *process* conventions (review apparatus, scratch/, HISTORY.md,
-PUBLIC_CONTRACT.md, the CLAUDE.md agent-instructions file) are
-language-agnostic and stay in place regardless. This file documents what
-to keep, what to delete, and which CI shape to use.
+The canonical record of purexml's language, runtime, dependencies, and build/CI
+shape. (Forked from the russalo universal template, which shipped Python+Go
+scaffolding side-by-side; the Go half was deleted when purexml chose Python.)
 
-> Replace `purexml` everywhere with your project's short name.
-> Keep it lowercase + hyphen-free — it becomes the Python import name
-> and/or the Go binary name.
+## Language & runtime
 
-## What this template ships by default
+- **Python, CPython ≥ 3.10** (PyPI floor `requires-python = ">=3.10"`).
+  PyPy-portable. The floor is **CI-grounded** — the test matrix runs 3.10/3.11/
+  3.12/3.13 on every push, so the declared floor is verified, not asserted.
+- **Why 3.10 and not higher:** purexml must never become a consumer's binding
+  Python floor (target spec §4). file-observer's real floor is ~3.10; the src
+  uses only long-stable stdlib, so 3.10 is safe. Lowering further (≥3.8 is
+  feasible per the spec) is deferred — untested here, and 3.10 already clears the
+  anchor consumer.
+- **pyexpat assumption:** the hardening is built on CPython's stdlib `expat`
+  (`xml.parsers.expat`). A runtime *without* pyexpat (IronPython/Jython) would
+  need a separate code path and is **out of scope** (no .NET/JVM consumer).
 
-| Slot | Python boilerplate | Go boilerplate |
-| --- | --- | --- |
-| Manifest | `pyproject.toml` | `go.mod` |
-| Source layout | `src/purexml/` | `cmd/purexml/main.go` + `internal/` |
-| Task runner | direct `pytest` / `pip install -e .` | `justfile` |
-| CI workflow | `.github/workflows/tests.yml` (tag-pinned `@v6` actions) | `.github/workflows/ci.yml` (digest-pinned actions) |
-| Lint | (none default) | `.golangci.yml` |
-| gitignore | Python section active by default | Go section commented out — uncomment when adopting |
+## Dependencies
 
-Pick one stack, delete the other. The shared scaffolding (CLAUDE.md,
-docs/, scratch/, .review-canonical, HISTORY.md, etc.) stays put.
+- **Runtime: ZERO.** Standard library only — `xml.parsers.expat` +
+  `xml.etree.ElementTree` (`TreeBuilder`, `ParseError`). This is a hard contract
+  (target spec §4); a `src/`-level import of any third party is a test failure
+  (`tests/test_misc.py::test_no_runtime_dependency_on_defusedxml`).
+- **Dev/test: `pytest` + `defusedxml`.** `defusedxml` is the **oracle** purexml
+  is validated against — never a runtime dependency, never imported under `src/`.
+  Declared in `pyproject.toml` `[project.optional-dependencies].dev`.
 
----
+## Source layout
 
-## Python
+- `src/purexml/` — the `src` layout (not a flat package) is load-bearing: it
+  forces an explicit editable install (`pip install -e .`) and prevents accidental
+  import of the working tree. Modules: `__init__.py` (public surface),
+  `_parser.py` (the expat-based engine), `errors.py` (exception hierarchy).
+- `tests/` at repo root, plain `pytest` (no `tests/__init__.py` — flat layout so
+  `conftest.py` imports cleanly). See **Architecture** in `CLAUDE.md`.
 
-**pyproject.toml shape.** PEP-621 `[project]` table, `requires-python =
-">=3.12"`, optional-deps named by purpose (e.g. `dev = [...]`), setuptools
-build-backend. The top-level keys you'll edit are `name`, `version`,
-`description`, `dependencies`, `[project.scripts]`, and `[project.urls]`.
+## Commands / dev environment
 
-**Source layout.** `src/purexml/` with an `__init__.py` and your
-module files. The `src/` layout (rather than a flat `purexml/`
-at repo root) is load-bearing — it prevents accidental import of the
-working tree before `pip install -e .` and forces editable installs to be
-explicit. CLI entry points wire through `[project.scripts]` into
-`purexml.cli:main` (or wherever your `main()` lives).
-
-**Testing.** `tests/` at repo root, plain `pytest` — no `setup.cfg` or
-`pytest.ini` needed until you need it. Run `python -m pytest tests/ -q`.
-
-**CI.** Use `.github/workflows/tests.yml`: `actions/checkout@v6` +
-`actions/setup-python@v6` (tag-pinned, not digest-pinned — Python
-projects move fast enough on the action surface that tag-pinning is the
-right tradeoff). Install with `pip install -e ".[dev]"`, run
-`python -m pytest tests/ -q`.
-
-**Dependencies on system packages** (e.g. `libmagic1` for `python-magic`)
-go in an `apt-get install` step BEFORE the pip install — the install step
-needs the system library present, or the wheel build fails opaquely.
-
----
-
-## Go
-
-**Module path.** russalo Go modules live under `github.com/russalo/`:
-
-```
-module github.com/russalo/purexml
+```bash
+python -m venv .venv && . .venv/bin/activate   # .venv is gitignored
+pip install -e ".[dev]"                         # pytest + defusedxml oracle
+python -m pytest tests/ -q
 ```
 
-Even if the repo is private or the GitHub org is elsewhere, keep the
-canonical `github.com/russalo/purexml` path — internal tooling and
-the Blueprint KB assume it.
+No CLI — the surface is the library call `purexml.fromstring(text)`.
 
-**Source layout.** `cmd/purexml/main.go` for the binary entry
-point + `internal/` for packages, one package per concern
-(`internal/server`, `internal/db`, etc.). Tests live alongside the code
-(`*_test.go`), not in a separate `tests/` tree.
+## CI
 
-**Task runner.** `justfile` is the russalo-wide command runner. Standard
-recipes: `just build`, `just test`, `just run`. Include a defensive
-`export PATH := ...` line at the top of the justfile so recipes resolve
-the right toolchain in non-interactive shells (cron, CI, sudo, deploy
-hooks). A real deploy-no-op was caused by exactly this subshell-PATH
-issue — `just deploy` succeeded but ran a stale binary because `PATH`
-was unset and the wrong `go`/`docker` was on the fallback path. Without
-this line, the class recurs.
+`.github/workflows/tests.yml`: a **matrix over Python 3.10–3.13** (grounds the
+floor), tag-pinned actions (`actions/checkout@v6`, `actions/setup-python@v6`),
+`pip install -e ".[dev]"` then `python -m pytest tests/ -q`. Tag-pinning (vs
+digest-pinning) is the right tradeoff for a pure-Python project on a small action
+surface.
 
-**CI.** Use `.github/workflows/ci.yml`: lint + test jobs,
-**digest-pinned actions** (`actions/checkout@<sha>  # v4.3.1` form),
-`go-version-file: go.mod`, build cache enabled. Go projects are more
-cgo-/toolchain-sensitive than Python, and a silent action update can
-break a release path — digest pinning is the conservative default.
+## Packaging / distribution
 
-**golangci-lint.** Ship `.golangci.yml` with `install-mode: goinstall` in
-the CI step — this is **load-bearing**, not stylistic. The prebuilt
-golangci-lint binary is compiled against a specific Go version and will
-refuse to lint a module that targets a newer Go in `go.mod`.
-`install-mode: goinstall` builds it from source with the runner's
-toolchain, avoiding the mismatch.
+**Deferred to v1.0.** The vendor-vs-first-party adoption model — and with it PyPI
+publishing, claiming the `purexml` name, and the license — is deliberately
+unmade until v1.0 (see `CLAUDE.md` *Known decisions* and
+`scratch/packaging_and_naming_notes.md`). Until then purexml ships as the
+`src/purexml/` package in the private repo only; a vendorable single-file
+amalgamation, if wanted, comes at the 1.0 adoption decision.
 
 ---
 
-## Node (placeholder)
+## The two-tripwire review guard (universal russalo convention)
 
-TBD. When a russalo Node project ships, lift its `package.json` shape,
-its task-runner choice (likely `npm run` or `just`), and its CI workflow
-shape into this section. Slot reserved.
+purexml participates in the **four-leg decorrelated review apparatus** (in-house
+swarm + Gemini cross-model + corpus sweep + PR bots). The kit lives at
+**`/srv/projects/review-kit/`**; per-project adapters live in this project's
+gitignored `scratch/review/`. Two safety tripwires gate the write-capable (yolo)
+leg:
 
----
-
-## Rust (placeholder)
-
-TBD. Same as Node — first russalo Rust project to ship gets to document
-the conventions here. Slot reserved.
-
----
-
-## The two-tripwire review guard (universal)
-
-Regardless of language, every russalo project participates in the
-**four-leg decorrelated review apparatus** (in-house swarm + Gemini
-cross-model + corpus sweep + PR bots). The kit lives at
-**`/srv/projects/review-kit/`**; per-project adapters live in this
-project's gitignored `scratch/review/`.
-
-Two safety tripwires gate the **write-capable (yolo) leg** of the review
-apparatus, and both are universal russalo conventions:
-
-1. **`.review-canonical` marker file at the repo root.** Empty file,
-   committed. Sourced from review-kit's `_review_guard.sh`: if a review
-   tool finds this marker at cwd or any ancestor, it refuses to run.
-   Protects the canonical working tree from a yolo agent writing into it.
-2. **Snapshot-root backstop.** `_review_guard.sh` also refuses to run
-   anywhere outside `REVIEW_SNAPSHOT_ROOT` (default `/tmp`) — so even if
-   the marker is missing, the yolo agent can only ever write into the
-   disposable snapshot area.
-
-Drop an empty `.review-canonical` at the repo root the moment you fork
-this template. The review-kit script does the rest.
-
----
+1. **`.review-canonical` marker** at the repo root (empty, committed). The yolo
+   review wrappers refuse to run anywhere this marker is found at cwd/ancestor —
+   protecting the canonical tree from a write-capable agent.
+2. **Snapshot-root backstop.** `_review_guard.sh` also refuses to run outside
+   `REVIEW_SNAPSHOT_ROOT` (default `/tmp`), so even without the marker the yolo
+   agent can only write into the disposable snapshot area.
 
 ## The .gitignore stack toggle
 
-The shipped `.gitignore` covers **both Python and Go**. Layout:
-
-- **Universal section** (always active) — editor files, .DS_Store, .env,
-  `.claude/settings.local.json`, `SCRATCH.md`, `scratch/`, `/tmp/`.
-- **Python section** (active by default) — `__pycache__/`, `*.py[cod]`,
-  `.pytest_cache/`, `.venv/`, `dist/`, `build/`, `*.egg-info/`,
-  `.coverage`, `htmlcov/`.
-- **Go section** (commented out) — `/bin/`, `/purexml`,
-  `vendor/`, `*.exe`. Uncomment when adopting Go; delete the Python
-  section if you're not using Python.
-
-The leading slash on `/bin/` and `/purexml` is load-bearing —
-without it, the patterns would also match `cmd/bin/` or a `purexml/`
-package directory. See the inline comment in the gitignore.
+The shipped `.gitignore` is the Python section (Go section deleted): editor
+files, `.env`, `.claude/settings.local.json`, `scratch/`, `/tmp/`,
+`__pycache__/`, `*.py[cod]`, `.pytest_cache/`, `.venv/`, `dist/`, `build/`,
+`*.egg-info/`, `.coverage`, `htmlcov/`. The local `.venv` and the entire
+`scratch/` tree (working notes, review adapters, corpus sweep, measure-first
+findings) are gitignored — confirm before committing that neither appears in
+`git status`.

@@ -12,11 +12,15 @@ format reader; correctness is validated oracle-gated against `defusedxml`.
 
 ## Status
 
-**Early development — v0.1.0 RFC approved (2026-06-16); implementation pending.**
-No public contract is frozen. Design lives in the approved RFC
-(`docs/v0.1.0_RFC_Specification.md`) and the capability north star
-(`docs/TARGET_SPECIFICATION.md`); implementation has not landed. Not published —
-see *License* on the open adoption model.
+**Working — v0.1.1 shipped (2026-06-16).** The hardened `fromstring` is
+implemented, stdlib-only, and validated against `defusedxml` as an oracle (C14N
+same-parse equivalence over a real corpus + an adversarial attack battery). Runs
+on CPython ≥3.10. No public contract is frozen yet, and it is **not published**:
+the vendor-vs-first-party adoption model (and with it PyPI/name/license) is
+deliberately deferred to v1.0 — see *License*. Spec + audit:
+[`docs/v0.1.0_RFC_Specification.md`](docs/v0.1.0_RFC_Specification.md),
+[`docs/COMPLIANCE-v0.1.md`](docs/COMPLIANCE-v0.1.md); north star:
+[`docs/TARGET_SPECIFICATION.md`](docs/TARGET_SPECIFICATION.md).
 
 ## Stack
 
@@ -50,10 +54,10 @@ element = fromstring(untrusted_xml_text)   # raises on bomb / XXE / external DTD
 
 ## License
 
-**Undecided — tracked, not yet chosen.** The license is tied to the open
-**adoption model** (vendor into file-observer vs. ship as a first-party
-dependency — see `scratch/packaging_and_naming_notes.md`), which is not yet
-decided. The russalo default for a distributable library is AGPL-3.0 + dual
-commercial; a vendored unit would inherit the host project's terms instead. To
-be set with Russell when the adoption model is chosen — do not publish before
-then.
+**Deferred to v1.0.** The license rides on the **adoption model** (vendor into
+file-observer vs. ship as a first-party dependency — see
+`scratch/packaging_and_naming_notes.md`), which is deliberately deferred to v1.0
+(decided 2026-06-16). The russalo default for a distributable library is AGPL-3.0
++ dual commercial; a vendored unit would inherit the host project's terms
+instead. Until 1.0: package-only in the private repo, no PyPI, no name claim, no
+license set.
