@@ -1,4 +1,4 @@
-# {{project_name}} Conventions
+# purexml Conventions
 
 This project has two kinds of conventions:
 

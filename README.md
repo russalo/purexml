@@ -1,13 +1,22 @@
-# {{project_name}}
+# purexml
 
-> **TODO: One-line description.** Replace with a short, plain sentence
-> about what this project does. Save the qualifiers for the second paragraph.
+> Safely parse untrusted XML using only the Python standard library.
+
+purexml is a pure-Python, zero-runtime-dependency replacement for `defusedxml`:
+it returns the same parse result the stdlib parser would (an
+`xml.etree.ElementTree.Element`) while blocking the known XML attack classes —
+entity-expansion bombs, external-entity resolution (XXE), and external DTD
+retrieval — exactly as `defusedxml` does. The whole consumer surface is one
+hardened call, `fromstring(text) -> Element`. It is a security control, not a
+format reader; correctness is validated oracle-gated against `defusedxml`.
 
 ## Status
 
-**TODO: Status placeholder.** Replace with one of: *early development*, *alpha*,
-*beta*, *v1.0 (stable contract)*, etc. If the project has a public contract
-that has been frozen, note the version and date here.
+**Early development — v0.1.0 RFC approved (2026-06-16); implementation pending.**
+No public contract is frozen. Design lives in the approved RFC
+(`docs/v0.1.0_RFC_Specification.md`) and the capability north star
+(`docs/TARGET_SPECIFICATION.md`); implementation has not landed. Not published —
+see *License* on the open adoption model.
 
 ## Stack
 
@@ -17,18 +26,16 @@ Go `justfile`, etc.). All stack-specific commands live there.
 
 ## Quickstart
 
-**TODO: Quickstart placeholder.** Depends on stack. Typical shapes:
-
 ```bash
-# Python project
-pip install -e ".[dev]"
-{{cli_name}} --help
+pip install -e ".[dev]"   # editable install + pytest (the defusedxml oracle is dev-only)
+python -m pytest tests/ -q
+```
 
-# Go project
-just run
+There is no CLI. Intended use is a single library call (once v0.1.0 lands):
 
-# Other
-{{language-specific bootstrap}}
+```python
+from purexml import fromstring
+element = fromstring(untrusted_xml_text)   # raises on bomb / XXE / external DTD / malformed
 ```
 
 ## Documentation
@@ -43,6 +50,10 @@ just run
 
 ## License
 
-**TODO: License placeholder.** Replace with the project's license. The russalo
-default for distributable libraries/CLIs is AGPL-3.0 + dual commercial; for
-internal-only projects pick whatever fits.
+**Undecided — tracked, not yet chosen.** The license is tied to the open
+**adoption model** (vendor into file-observer vs. ship as a first-party
+dependency — see `scratch/packaging_and_naming_notes.md`), which is not yet
+decided. The russalo default for a distributable library is AGPL-3.0 + dual
+commercial; a vendored unit would inherit the host project's terms instead. To
+be set with Russell when the adoption model is chosen — do not publish before
+then.

@@ -31,7 +31,7 @@ new-project /srv/projects/foo --lang go --git
 The script:
 - Strips the other stack's files when `--lang` selects one
 - Renames `src/example` → `src/<name>` (Python) and `cmd/app` → `cmd/<name>` (Go)
-- Substitutes `{{project_name}}` everywhere it appears
+- Substitutes `purexml` everywhere it appears
 - Drops the template-development scratch (`scratch/notes.md`, `scratch/blog_go_*.md`)
 - Removes itself from the spawned project (so it doesn't pollute downstream)
 - Optionally `git init` + initial commit with `--git`
@@ -63,7 +63,7 @@ See `STACK.md` for the language-variant guide. Two stacks are pre-wired:
 ```bash
 rm -rf cmd internal justfile .golangci.yml go.mod go.sum
 # Open .gitignore: uncomment the Python section, delete the Go section.
-mv src/example src/{{your_package_name}}
+mv src/example src/purexml
 # Open pyproject.toml — set name, description, dependencies.
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
@@ -74,14 +74,14 @@ pip install -e ".[dev]"
 ```bash
 rm -rf pyproject.toml tests src
 # Open .gitignore: comment out the Python section, uncomment the Go section.
-mv cmd/app cmd/{{your_binary_name}}
-go mod init github.com/russalo/{{name}}
+mv cmd/app cmd/purexml
+go mod init github.com/russalo/purexml
 go mod tidy
 ```
 
 ## Step 3 — Fill in the placeholders
 
-Walk these files and replace `{{project_name}}` / TODO blocks / «...» blocks
+Walk these files and replace `purexml` / TODO blocks / «...» blocks
 with project specifics:
 
 - `README.md` — what it is, install, basic use. Public-facing.
@@ -146,7 +146,7 @@ don't delete it.
 If you need to run a whole-codebase red-team:
 
 ```bash
-cp -r src tests /tmp/{{project_name}}_audit && cd /tmp/{{project_name}}_audit
+cp -r src tests /tmp/purexml_audit && cd /tmp/purexml_audit
 git init -q -b main && git add -A && git commit -qm snapshot
 /srv/projects/review-kit/gem-review.sh -p "/maestro:security-audit Proceed AUTONOMOUSLY using Approach 2 …"
 ```

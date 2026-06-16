@@ -3,18 +3,24 @@ requires = ["setuptools>=65", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "{{project_name}}"
+name = "purexml"
 version = "0.1.0"
-description = "TODO: one-line description of what this project does."
+description = "Safely parse untrusted XML using only the Python standard library — a zero-dependency defusedxml replacement."
 readme = "README.md"
 requires-python = ">=3.12"
+# License UNDECIDED — tied to the open adoption model (vendor vs first-party dep);
+# see README.md "License" and scratch/packaging_and_naming_notes.md. Do not publish
+# before this is set with Russell.
 license = {text = "TODO"}
 authors = [
-    {name = "TODO", email = "TODO@example.com"},
+    {name = "Russell Pfister", email = "russalo@gmail.com"},
 ]
-keywords = []
+keywords = ["xml", "security", "defusedxml", "xxe", "billion-laughs", "stdlib", "hardening"]
 classifiers = [
     "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Security",
+    "Topic :: Text Processing :: Markup :: XML",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -23,16 +29,20 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest"]
+# defusedxml is the dev/test ORACLE only (RFC §3/§5) — never a runtime dependency,
+# never imported under src/. It is the incumbent purexml is validated against.
+dev = ["pytest", "defusedxml"]
 
+# URLs PROVISIONAL — repo home not confirmed (adoption model open; may be vendored
+# rather than published). russalo convention path shown; revisit when publishing is decided.
 [project.urls]
-Homepage = "https://github.com/TODO/{{project_name}}"
-Repository = "https://github.com/TODO/{{project_name}}"
-Issues = "https://github.com/TODO/{{project_name}}/issues"
+Homepage = "https://github.com/russalo/purexml"
+Repository = "https://github.com/russalo/purexml"
+Issues = "https://github.com/russalo/purexml/issues"
 
 # If/when this project ships a CLI, declare it here:
 # [project.scripts]
-# {{project_name}} = "{{project_name}}.cli:main"
+# purexml = "purexml.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -66,17 +66,15 @@ htmlcov/
 
 
 # =============================================================================
-# Go (commented out — uncomment if your project is Go-based)
-# =============================================================================
 
 # Binary output dir. The leading slash anchors this to the repo root so it
 # DOES NOT match a `cmd/bin/` source directory or any nested `bin/` package.
 # /bin/
 
-# Single-binary build output at repo root (e.g. `go build -o {{project_name}}`).
-# The leading slash ensures we don't accidentally ignore a `{{project_name}}/`
+# Single-binary build output at repo root (e.g. `go build -o purexml`).
+# The leading slash ensures we don't accidentally ignore a `purexml/`
 # package directory under `internal/` or `cmd/`.
-# /{{project_name}}
+# /purexml
 
 # Windows binaries
 # *.exe
@@ -90,8 +88,6 @@ htmlcov/
 # vendor/
 
 
-# =============================================================================
-# Node (placeholder — uncomment if your project adds Node tooling)
 # =============================================================================
 
 # node_modules/

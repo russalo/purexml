@@ -60,22 +60,26 @@ to quietly proceed.
 When this project is freshly spawned, run this checklist BEFORE substantive
 work. These are one-time setup steps the template cannot perform for you:
 
-- [ ] **Chatlog home.** Perform the chatlog-home transition: create
-  `/srv/projects/pkplab/chatlogs/<this-project>/`, move this project's session
-  jsonl(s) there, symlink back, and add the one `<encoded>\t<project>` line to
+- [x] **Chatlog home.** DONE 2026-06-16. Chatlog home is
+  `/srv/projects/pkplab/chatlogs/purexml/`; the encoded dir
+  (`~/.claude/projects/-srv-projects-pkplab-purexml/`) now holds symlinks back
+  to it, and `-srv-projects-pkplab-purexml\tpurexml` is registered in
   `/srv/projects/pkplab/chatlogs/PROJECTS.txt`. (Recipe:
-  `/srv/projects/pkplab/chatlogs/TRANSITION.md`.)
-  Skipping this silently loses the project's entire session history — a prior
-  instance missed exactly this. Verify the live jsonl still grows after the move.
-- [ ] **Review apparatus wired.** Confirm `scratch/review/` exists with the
-  auditor adapter (`auditor_GEMINI.md` filled in from the skeleton). The shared
-  wrappers live at `/srv/projects/review-kit/`.
-- [ ] **Read the ledgers.** Read `Known decisions` AND `Excluded decisions`
-  below before proposing anything — so you don't re-introduce something already
-  ruled out.
-- [ ] **Fill or track the TODOs.** The `What this is` / `Architecture` / version
-  sections ship as TODO placeholders. Fill them or note where the real content
-  is tracked.
+  `/srv/projects/pkplab/chatlogs/TRANSITION.md`.) Future sessions land a fresh
+  jsonl at the old path; `chatlogs/sync.sh` migrates them.
+- [x] **Review apparatus wired.** DONE 2026-06-16. `scratch/review/` exists;
+  `auditor_GEMINI.md` adapter filled (project "What this project is", blocker
+  definition, and a live Python XML-hardening footgun list — Go list flagged
+  N/A). Shared wrappers at `/srv/projects/review-kit/`. Still TODO as the project
+  ships: `corpus_sweep.py`, baseline, per-release findings logs.
+- [x] **Read the ledgers.** DONE 2026-06-16 — read and populated `Known
+  decisions` + `Excluded decisions` below from the target spec, RFC, and
+  packaging notes.
+- [x] **Fill or track the TODOs.** DONE 2026-06-16. Filled `What this is`,
+  `Architecture` (noting no code yet), version/axes section, README, and
+  `pyproject.toml` from the target spec. Genuine open decisions (license,
+  PyPI publishing, repo URLs) are *tracked as pending the adoption-model
+  decision*, not guessed.
 
 ## Decision gates (STOP and verify — do not proceed past these on autopilot)
 
@@ -127,10 +131,19 @@ project disagree, **this project wins** (until you consciously evolve it):
 
 ## What this is
 
-**TODO: Replace with a one-paragraph description of the project.** Anchor on the
-*role* the project plays (observation layer / web server / job runner / library
-for X), not the surface (it's "Go" / it's "Python"). The surface lives in
-`STACK.md`. Keep it short — agents read this first, every session.
+purexml is a **pure-Python, zero-runtime-dependency security control for parsing
+untrusted XML** — a drop-in replacement for the `defusedxml` library so consumers
+can drop that third-party dependency with **zero functionality loss** (same
+parses succeed, same attacks blocked). The key insight: `defusedxml` is not an
+open-ended parser, it is a *finite, closed set of hardening behaviors* layered on
+the standard library's own XML parser — so purexml delivers those same
+protections on the stdlib (`xml.etree`, which builds on CPython's `pyexpat`),
+directly. The consumer surface is a single hardened call: `fromstring(text) ->
+xml.etree.ElementTree.Element`. The anchor consumer is **file-observer**. This is
+a *security control*, not a format reader — owning it means owning the audit
+burden, which is why the adversarial review leg carries extra weight here. Full
+capability spec: [`docs/TARGET_SPECIFICATION.md`](docs/TARGET_SPECIFICATION.md)
+(the 1.0 north star); first slice: [`docs/v0.1.0_RFC_Specification.md`](docs/v0.1.0_RFC_Specification.md).
 
 ## Lane discipline
 
@@ -310,12 +323,25 @@ belongs in the version history, not a parallel spec doc.
 > checklist in **Decision gates** above. A draft is reviewed in conversation,
 > never PR'd; the PR is for implementation.
 
+**Version axes for this project** (per [`CONVENTIONS.md`](CONVENTIONS.md) §1):
+RELEASE_VERSION is mandatory (`pyproject.toml`). SCHEMA_VERSION is **n/a** —
+purexml returns a standard `xml.etree.ElementTree.Element`, not a custom wire
+shape, so there is no schema to version. LOGIC_VERSION tracks the **hardening
+mitigation set** (which attack classes are blocked, on which path); it bumps if
+the same input would parse-or-block differently than before. The matched
+`defusedxml` mitigation list (enumerated in the v0.1.0 measure-first task) is the
+contract LOGIC must hold.
+
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
-- **v{X.Y.Z}** — TODO: one-line summary of the release. Reference the RFC for
-  minors, or just "_HISTORY only_" for patches. Note version-axis changes
-  (e.g. SCHEMA 1.x → 1.y; LOGIC unchanged).
+- **v0.1.0** *(RFC approved 2026-06-16; implementation pending)* — first slice:
+  the whole consumer contract (C1 safe-parse + C2 safe-failure) via a single
+  hardened `fromstring`, behaviorally equivalent to `defusedxml` defaults.
+  Approved spec:
+  [`docs/v0.1.0_RFC_Specification.md`](docs/v0.1.0_RFC_Specification.md)
+  (`COMPLIANCE-v0.1.md` due before merge). SCHEMA n/a; LOGIC introduced
+  (mitigation set v0.1).
 
 ## Stack
 
@@ -324,23 +350,29 @@ dependencies, and any template-variant adaptations.
 
 ## Commands
 
-Stack-dependent. Both shapes are baked into this template; delete the one you
-don't use:
+This is a **Python** project (Go half of the template deleted). Install + test:
 
-- **Go projects:** task runner is **`just`** (russalo-wide standard). List
-  recipes with `just`; run with `just <name>`. See [`justfile`](justfile).
-- **Python projects:** install + run via [`pyproject.toml`](pyproject.toml).
-  Typical shape: `pip install -e ".[dev]"` then `{{cli_name}} --help` and
-  `python -m pytest`.
+```bash
+pip install -e ".[dev]"
+python -m pytest tests/ -q
+```
 
-If the project grows commands the runner doesn't cover, document them in
-`STACK.md` or a `Commands` section here — not in tribal knowledge.
+There is no CLI — the surface is the library call `purexml.fromstring(text)`. If
+the project grows commands, document them in `STACK.md` or here, not in tribal
+knowledge.
 
 ## Architecture
 
-**TODO: Replace with a short tour of the codebase.** One paragraph per major
-seam (entrypoint, request flow, data layer, background work). Reference
-modules by relative path. Agents use this to orient before reading code.
+**No implementation code exists yet** — `src/purexml/__init__.py` is empty and
+`tests/` holds only a smoke test. The design is owned by the RFC, not yet the
+code; the v0.1.0 first task is *measure-first* (enumerate `defusedxml`'s
+mitigations on the `fromstring` path before writing anything). Update this
+section with the real module tour once the first slice lands. Expected seam
+(per the RFC): a single hardened-parse entrypoint
+(`purexml.fromstring(text) -> Element`) that configures the stdlib parser
+(`xml.etree` / `pyexpat`) to refuse the §3 attack classes, plus a falsify-first
+test battery under `tests/` validating both same-parse equivalence and
+same-attack-blocked equivalence against `defusedxml` as a dev/test oracle.
 
 ## Known decisions
 
@@ -349,9 +381,30 @@ A running list of things future-you (and future agents) will want to know
 choice gets locked in — anti-pattern is finding the decision only by `git
 blame`.
 
-- TODO: First decision goes here. (Pattern: "**X** — why we picked it over Y.")
-- TODO: Second decision goes here.
-- TODO: ...
+- **Behavioral equivalence to `defusedxml`, not a fresh design** — the design
+  contract is "match what `defusedxml` does on the `fromstring` path," validated
+  oracle-gated (target spec §6). We don't invent hardening; we enumerate
+  `defusedxml`'s closed mitigation set and match it. This is what makes the
+  dependency-removal a clean kill rather than a reimplementation gamble.
+- **Stdlib-only, zero runtime deps** — `xml.etree` / `pyexpat`, no third-party
+  runtime dependency. `defusedxml` is allowed *only* as a dev/test oracle, never
+  shipped (target spec §4). purexml must never become the binding Python floor
+  for a consumer.
+- **CPython + pyexpat assumption, recorded explicitly** — the hardening assumes
+  CPython's stdlib `expat`. Runtimes without pyexpat would need a separate code
+  path; see Excluded (IronPython/Jython out of scope). Stay PyPy-portable; floor
+  as low as practical (≥3.8 feasible) even though `pyproject.toml` currently pins
+  ≥3.12 — revisit the floor against the anchor consumer.
+- **v0.1.0 surface is a single `fromstring`** — the whole consumer contract
+  (C1+C2) ships in one slice because value is only realized when "same parses
+  succeed" and "same attacks blocked" hold *together* (RFC §1). Small surface,
+  load-bearing correctness.
+- **Adoption model is OPEN — do not publish to PyPI yet** — file-observer may
+  *vendor* purexml (its leaning) or take it as a *first-party dependency*; the
+  choice is unmade. The name `purexml` is provisional and confirmed free on PyPI
+  (checked 2026-06-15), recorded so the decision isn't blocked later — **not** a
+  decision to publish. See `scratch/packaging_and_naming_notes.md`. Don't claim
+  the name or set up publishing until the adoption model is chosen.
 
 ## Excluded decisions (do NOT re-introduce)
 
@@ -362,7 +415,29 @@ excluded element is a documented failure mode of this template. Pattern:
 "**X** — excluded <date>, because Y. Do not bring back without re-opening with
 Russell."
 
-- TODO: First exclusion goes here, when one is made.
+> Note: these originate as **scope boundaries set by the target spec / RFC**
+> (authored by the file-observer instance), not yet as in-conversation Russell
+> rulings. They function identically — re-introducing one is the documented
+> failure mode — so they are recorded here. Re-opening any of them is a
+> conscious decision to make *with* Russell, not a quiet expansion of scope.
+
+- **IronPython / Jython support** — out of scope (target spec §4). No .NET/JVM
+  consumer exists; their non-pyexpat XML parsers would need a separate hardening
+  path. Do not add without a real consumer + re-opening with Russell.
+- **XML writing / serialization** — out of scope (RFC §5). purexml is parse-only;
+  it is a hardened *reader*, never a writer.
+- **Parse modes beyond `fromstring`** (`iterparse`, SAX, `parse`-from-file) —
+  out of scope for v0.1.0 (RFC §6). file-observer needs only `fromstring`. Add
+  later *only* if a consumer actually needs them, as its own slice.
+- **Configurable hardening flags** (`forbid_dtd` / `forbid_entities` /
+  `forbid_external` knobs) — out of scope for v0.1.0 (RFC §6), excluded
+  2026-06-16 in the cross-instance review round. v0.1.0 hardcodes the
+  defusedxml-default behavior; the consumer needs exactly one behavior, and a
+  tunable security control is a misconfiguration surface. Do not add knobs
+  without re-opening with Russell.
+- **Publishing to PyPI / claiming the `purexml` name** — explicitly held until
+  the adoption model (vendor vs first-party dep) is decided. Free-name status is
+  recorded, not acted on. (Cross-reference: Known decisions, last bullet.)
 
 ## Test fixtures
 

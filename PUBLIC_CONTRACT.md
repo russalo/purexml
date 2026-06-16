@@ -1,4 +1,4 @@
-# {{project_name}} Public Contract
+# purexml Public Contract
 
 > **If your project has no stable public surface, delete this file.** Examples
 > of "no public surface": internal scripts, experiments, prototypes, services
@@ -7,8 +7,8 @@
 > server with a documented HTTP contract, a tool that emits a documented
 > output format.
 
-This document defines what **consumers** of {{project_name}}'s output / API
-can rely on. It is the stability commitment from {{project_name}} to
+This document defines what **consumers** of purexml's output / API
+can rely on. It is the stability commitment from purexml to
 downstream systems.
 
 > **This contract is binding as of v{X.0}.** The stability commitments below

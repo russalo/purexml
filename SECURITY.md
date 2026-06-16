@@ -7,7 +7,7 @@ implications. Be explicit about the trust model.
 
 For an observation-only tool, the shape is:
 
-> {{project_name}} is an **observation-only** tool. It reads files and emits
+> purexml is an **observation-only** tool. It reads files and emits
 > metadata. It never:
 > - Executes file content
 > - Modifies source files

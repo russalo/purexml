@@ -1,6 +1,6 @@
 # Limitations
 
-{{project_name}} reports what it can see / do, within declared bounds,
+purexml reports what it can see / do, within declared bounds,
 deterministically. This document states plainly what it does **not** do, so
 consumers can apply their own judgment on top of its output.
 
@@ -12,7 +12,7 @@ that they are **observations, not assessments**. Shape:
 
 > Safety flags are **structural observations, not threat assessments**. A
 > flag means "this structure was observed," not "this file is dangerous."
-> {{project_name}} never quarantines, scores, or verdicts an input. Apply
+> purexml never quarantines, scores, or verdicts an input. Apply
 > your own threat model to the observations.
 
 ## It observes within bounds — null means "not seen here," not "not present"
@@ -37,7 +37,7 @@ TODO: Be explicit about what this project is **adjacent to** but **not**.
 The principle: a project does one job well, neighbours do related jobs.
 Shape:
 
-> {{project_name}} is not a parser or full-content extractor. Specialist
+> purexml is not a parser or full-content extractor. Specialist
 > tools extract **envelopes and structural signals** on a best-effort basis
 > within their budget. Does not guarantee:
 > - complete or correct extraction of document bodies,

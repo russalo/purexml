@@ -1,4 +1,4 @@
-# {{project_name}} Version History
+# purexml Version History
 
 This is the running index of all versions, their specifications, and their
 compliance reports. Use this as the **entry point** when orienting on the
@@ -24,7 +24,7 @@ below.
 
 | Version | Schema | Date | Notable | Spec | Compliance |
 |---|---|---|---|---|---|
-| 0.1.0 | n/a | YYYY-MM-DD | TODO: one-line summary of what this release adds / fixes. Note version-axis changes (e.g. SCHEMA n/a → 0.1; LOGIC introduced). | _(no RFC — pre-1.0 looser formatting)_ | _(no compliance report)_ |
+| 0.1.0 | n/a | _unreleased_ | First slice: hardened `fromstring` — C1 safe-parse + C2 safe-failure, behaviorally equivalent to `defusedxml` defaults, stdlib-only. SCHEMA n/a (returns stdlib `Element`); LOGIC introduced (hardening mitigation set v0.1). | [v0.1.0_RFC_Specification.md](docs/v0.1.0_RFC_Specification.md) _(approved 2026-06-16; implementation pending)_ | [COMPLIANCE-v0.1.md](docs/COMPLIANCE-v0.1.md) _(due before merge)_ |
 | 1.0.0 | 1.0 | YYYY-MM-DD | **Schema freeze.** Public contract binding. Backward compatibility policy in effect. No new features — governance declaration on a validated codebase. | [v1.0.0_RFC_Specification.md](docs/v1.0.0_RFC_Specification.md) | [COMPLIANCE-v1.0.md](docs/COMPLIANCE-v1.0.md) |
 | 1.0.1 | 1.0 | YYYY-MM-DD | **Patch release** — example shape. Bug fix in {component}. SCHEMA unchanged. _(part of v1.0; HISTORY only, no RFC.)_ | _(no RFC — patch)_ | _(part of v1.0)_ |
 
@@ -32,11 +32,12 @@ below.
 
 ## Drafts in Flight
 
-TODO: List any RFCs currently in draft (`docs/v{X.Y.Z}_RFC_DRAFT.md`). When
-none are open, state so explicitly rather than deleting the section — the
-empty-but-named state is the signal:
+List any RFCs currently in draft (`docs/v{X.Y.Z}_RFC_DRAFT.md`). When none are
+open, state so explicitly rather than deleting the section — the empty-but-named
+state is the signal:
 
-> No drafts in flight.
+> No drafts in flight. (The v0.1.0 RFC was approved 2026-06-16 and promoted to
+> `docs/v0.1.0_RFC_Specification.md`; implementation is the next step.)
 
 ---
 

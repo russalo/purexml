@@ -1,4 +1,4 @@
-# STACK.md — language-variant adaptations for {{project_name}}
+# STACK.md — language-variant adaptations for purexml
 
 This template ships scaffolding for **both Python and Go side-by-side** so
 a new project can pick its stack and delete the other half. The russalo
@@ -7,7 +7,7 @@ PUBLIC_CONTRACT.md, the CLAUDE.md agent-instructions file) are
 language-agnostic and stay in place regardless. This file documents what
 to keep, what to delete, and which CI shape to use.
 
-> Replace `{{project_name}}` everywhere with your project's short name.
+> Replace `purexml` everywhere with your project's short name.
 > Keep it lowercase + hyphen-free — it becomes the Python import name
 > and/or the Go binary name.
 
@@ -16,7 +16,7 @@ to keep, what to delete, and which CI shape to use.
 | Slot | Python boilerplate | Go boilerplate |
 | --- | --- | --- |
 | Manifest | `pyproject.toml` | `go.mod` |
-| Source layout | `src/{{project_name}}/` | `cmd/{{project_name}}/main.go` + `internal/` |
+| Source layout | `src/purexml/` | `cmd/purexml/main.go` + `internal/` |
 | Task runner | direct `pytest` / `pip install -e .` | `justfile` |
 | CI workflow | `.github/workflows/tests.yml` (tag-pinned `@v6` actions) | `.github/workflows/ci.yml` (digest-pinned actions) |
 | Lint | (none default) | `.golangci.yml` |
@@ -34,12 +34,12 @@ docs/, scratch/, .review-canonical, HISTORY.md, etc.) stays put.
 build-backend. The top-level keys you'll edit are `name`, `version`,
 `description`, `dependencies`, `[project.scripts]`, and `[project.urls]`.
 
-**Source layout.** `src/{{project_name}}/` with an `__init__.py` and your
-module files. The `src/` layout (rather than a flat `{{project_name}}/`
+**Source layout.** `src/purexml/` with an `__init__.py` and your
+module files. The `src/` layout (rather than a flat `purexml/`
 at repo root) is load-bearing — it prevents accidental import of the
 working tree before `pip install -e .` and forces editable installs to be
 explicit. CLI entry points wire through `[project.scripts]` into
-`{{project_name}}.cli:main` (or wherever your `main()` lives).
+`purexml.cli:main` (or wherever your `main()` lives).
 
 **Testing.** `tests/` at repo root, plain `pytest` — no `setup.cfg` or
 `pytest.ini` needed until you need it. Run `python -m pytest tests/ -q`.
@@ -61,14 +61,14 @@ needs the system library present, or the wheel build fails opaquely.
 **Module path.** russalo Go modules live under `github.com/russalo/`:
 
 ```
-module github.com/russalo/{{project_name}}
+module github.com/russalo/purexml
 ```
 
 Even if the repo is private or the GitHub org is elsewhere, keep the
-canonical `github.com/russalo/{{project_name}}` path — internal tooling and
+canonical `github.com/russalo/purexml` path — internal tooling and
 the Blueprint KB assume it.
 
-**Source layout.** `cmd/{{project_name}}/main.go` for the binary entry
+**Source layout.** `cmd/purexml/main.go` for the binary entry
 point + `internal/` for packages, one package per concern
 (`internal/server`, `internal/db`, etc.). Tests live alongside the code
 (`*_test.go`), not in a separate `tests/` tree.
@@ -146,10 +146,10 @@ The shipped `.gitignore` covers **both Python and Go**. Layout:
 - **Python section** (active by default) — `__pycache__/`, `*.py[cod]`,
   `.pytest_cache/`, `.venv/`, `dist/`, `build/`, `*.egg-info/`,
   `.coverage`, `htmlcov/`.
-- **Go section** (commented out) — `/bin/`, `/{{project_name}}`,
+- **Go section** (commented out) — `/bin/`, `/purexml`,
   `vendor/`, `*.exe`. Uncomment when adopting Go; delete the Python
   section if you're not using Python.
 
-The leading slash on `/bin/` and `/{{project_name}}` is load-bearing —
-without it, the patterns would also match `cmd/bin/` or a `{{project_name}}/`
+The leading slash on `/bin/` and `/purexml` is load-bearing —
+without it, the patterns would also match `cmd/bin/` or a `purexml/`
 package directory. See the inline comment in the gitignore.
