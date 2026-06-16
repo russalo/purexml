@@ -24,6 +24,7 @@ below.
 
 | Version | Schema | Date | Notable | Spec | Compliance |
 |---|---|---|---|---|---|
+| 0.2.0 | n/a | _RFC approved; unreleased_ | Complete the non-streaming `defusedxml.ElementTree` surface: `parse`, `fromstringlist`, `XML`/`tostring`, exposed `XMLParser`, the `forbid_*` knobs (+ new `DTDForbidden`), under a canonical `purexml.ElementTree` namespace. SCHEMA n/a; LOGIC mitigation set extended (`forbid_dtd` path), default behavior unchanged. | [v0.2.0_RFC_Specification.md](docs/v0.2.0_RFC_Specification.md) _(approved 2026-06-16; implementation pending)_ | [COMPLIANCE-v0.2.md](docs/COMPLIANCE-v0.2.md) _(due before merge)_ |
 | 0.1.1 | n/a | 2026-06-16 | **Patch** — lower runtime floor to Python **3.10** (was 3.12) so purexml never binds a consumer's Python floor (target spec §4); add a CI matrix (3.10–3.13) to test the declared floor rather than only 3.12. No logic/behavior change; SCHEMA n/a, LOGIC unchanged (v0.1). _(HISTORY only, no RFC — part of v0.1.)_ | _(no RFC — patch)_ | _(part of v0.1; see [COMPLIANCE-v0.1.md](docs/COMPLIANCE-v0.1.md))_ |
 | 0.1.0 | n/a | 2026-06-16 | First slice: hardened `fromstring` — C1 safe-parse + C2 safe-failure, behaviorally equivalent to `defusedxml` defaults, stdlib-only. SCHEMA n/a (returns stdlib `Element`); LOGIC introduced (hardening mitigation set v0.1). Merged via PR #1; four-leg review complete. | [v0.1.0_RFC_Specification.md](docs/v0.1.0_RFC_Specification.md) | [COMPLIANCE-v0.1.md](docs/COMPLIANCE-v0.1.md) |
 | 1.0.0 | 1.0 | YYYY-MM-DD | **Schema freeze.** Public contract binding. Backward compatibility policy in effect. No new features — governance declaration on a validated codebase. | [v1.0.0_RFC_Specification.md](docs/v1.0.0_RFC_Specification.md) | [COMPLIANCE-v1.0.md](docs/COMPLIANCE-v1.0.md) |
@@ -37,8 +38,13 @@ List any RFCs currently in draft (`docs/v{X.Y.Z}_RFC_DRAFT.md`). When none are
 open, state so explicitly rather than deleting the section — the empty-but-named
 state is the signal:
 
-> No drafts in flight. (v0.1.0 shipped 2026-06-16 — RFC approved, implemented, and
-> merged via PR #1.)
+> No drafts in flight. The **v0.2.0 RFC is approved** (2026-06-16) and awaiting
+> implementation — [`docs/v0.2.0_RFC_Specification.md`](docs/v0.2.0_RFC_Specification.md)
+> (complete the non-streaming `defusedxml.ElementTree` surface). See
+> [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md).
+>
+> (v0.1.0 shipped 2026-06-16 — RFC approved, implemented, merged via PR #1;
+> v0.1.1 patch lowered the floor to 3.10.)
 
 ---
 

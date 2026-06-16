@@ -439,6 +439,23 @@ blame`.
   (C1+C2) ships in one slice because value is only realized when "same parses
   succeed" and "same attacks blocked" hold *together* (RFC §1). Small surface,
   load-bearing correctness.
+- **1.0 identity = complete drop-in for `defusedxml.ElementTree`** (ratified
+  2026-06-16, grounded by `/deep-research` — see `scratch/research/2026-06-16_1.0-scope-research.md`
+  and `docs/ROADMAP-to-1.0.md`). Scope = the ElementTree family (`fromstring`,
+  `parse`, `iterparse`, `fromstringlist`, `XMLParser`, `XML`/`tostring`,
+  `ParseError`); minidom/sax/pulldom/xmlrpc/lxml **deferred, not excluded**.
+  purexml's value beyond a 1:1 mirror: it *tracks current CPython/libexpat
+  mitigations* defusedxml (frozen 2021, abandoned) never got.
+- **`forbid_*` knobs are IN scope** (re-opened 2026-06-16; was Excluded for
+  v0.1.0). A true drop-in must accept defusedxml's parameterized signature
+  (`forbid_dtd`/`forbid_entities`/`forbid_external`, identical defaults). They
+  land in v0.2. (See the tombstone in Excluded decisions.)
+- **Posture = behavioral mirror + bounded, opt-in defense-in-depth** — mirror
+  defusedxml's *defaults* for compatibility, but add what defusedxml lacks:
+  runtime `pyexpat.EXPAT_VERSION` assertion, reparse-deferral awareness
+  (CVE-2023-52425), amplification-limit awareness, optional `forbid_dtd=True`
+  strict mode (OWASP). At 1.0 freeze the mirror surface STABLE, keep the novel
+  defense-in-depth PROVISIONAL (moving libexpat landscape).
 - **Adoption model DEFERRED TO v1.0** (decided 2026-06-16) — file-observer may
   *vendor* purexml (its leaning) or take it as a *first-party dependency*; the
   choice is **deliberately not made until v1.0.** Everything that rides on it is
@@ -473,11 +490,13 @@ Russell."
   out of scope for v0.1.0 (RFC §6). file-observer needs only `fromstring`. Add
   later *only* if a consumer actually needs them, as its own slice.
 - **Configurable hardening flags** (`forbid_dtd` / `forbid_entities` /
-  `forbid_external` knobs) — out of scope for v0.1.0 (RFC §6), excluded
-  2026-06-16 in the cross-instance review round. v0.1.0 hardcodes the
-  defusedxml-default behavior; the consumer needs exactly one behavior, and a
-  tunable security control is a misconfiguration surface. Do not add knobs
-  without re-opening with Russell.
+  `forbid_external` knobs) — ~~out of scope for v0.1.0~~ **RE-OPENED 2026-06-16
+  for the 1.0 general-replacement scope** (ratified by Russell). Originally
+  excluded when the only consumer was file-observer (one fixed behavior; a tunable
+  control is a misconfiguration surface). The 1.0 scope changed to "complete
+  drop-in for `defusedxml.ElementTree`," which *requires* matching defusedxml's
+  parameterized signature. The knobs are now **in scope** — see Known decisions.
+  Tombstone kept so the reversal is a recorded decision, not a silent regression.
 - **Publishing to PyPI / claiming the `purexml` name** — explicitly held until
   the adoption model (vendor vs first-party dep) is decided. Free-name status is
   recorded, not acted on. (Cross-reference: Known decisions, last bullet.)
