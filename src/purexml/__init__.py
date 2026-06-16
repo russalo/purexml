@@ -14,7 +14,7 @@ from xml.etree.ElementTree import ParseError
 from ._parser import fromstring
 from .errors import EntitiesForbidden, ExternalReferenceForbidden, PureXMLError
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "fromstring",
