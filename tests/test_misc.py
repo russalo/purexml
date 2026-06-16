@@ -46,6 +46,25 @@ def test_no_runtime_dependency_on_defusedxml():
     assert _p.__name__.startswith("purexml")
 
 
+def test_no_reference_cycle_after_parse():
+    """Regression (PR#1 Gemini finding): the hardened parser must be reclaimable by
+    refcounting alone — no expat-parser<->self cycle that defers cleanup to GC."""
+    import gc
+    import weakref
+
+    from purexml._parser import _HardenedParser
+
+    gc.disable()
+    try:
+        hp = _HardenedParser()
+        ref = weakref.ref(hp)
+        hp.feed_close("<r><a>x</a></r>")
+        del hp
+        assert ref() is None, "reference cycle: instance not freed by refcounting"
+    finally:
+        gc.enable()
+
+
 def test_public_api_surface():
     assert set(purexml.__all__) >= {
         "fromstring", "PureXMLError", "EntitiesForbidden",

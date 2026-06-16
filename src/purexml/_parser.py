@@ -120,13 +120,21 @@ class _HardenedParser:
 
     def feed_close(self, text):
         try:
-            self.parser.Parse(text, True)
-        except self._error as v:
-            # Only genuine expat parse errors become ParseError. Blocking
-            # exceptions (EntitiesForbidden / ExternalReferenceForbidden) are not
-            # expat.error, so they propagate to the caller unchanged.
-            self._raiseerror(v)
-        return self.target.close()
+            try:
+                self.parser.Parse(text, True)
+            except self._error as v:
+                # Only genuine expat parse errors become ParseError. Blocking
+                # exceptions (EntitiesForbidden / ExternalReferenceForbidden) are
+                # not expat.error, so they propagate to the caller unchanged.
+                self._raiseerror(v)
+            return self.target.close()
+        finally:
+            # Break the reference cycle: the expat parser holds our bound-method
+            # handlers (-> self) and we hold the parser (self.parser). Without this
+            # the instance is reclaimable only by cyclic GC, not refcounting — under
+            # high-volume parsing that defers cleanup. Mirrors stdlib XMLParser.close.
+            self.parser = None
+            self.target = None
 
 
 def fromstring(text):
