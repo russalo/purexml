@@ -3,7 +3,8 @@
 Audit of the v0.1.0 implementation against the approved spec
 [`v0.1.0_RFC_Specification.md`](v0.1.0_RFC_Specification.md). Environment of record:
 CPython 3.12.3, libexpat 2.6.1, defusedxml 0.7.1 (dev/test oracle only). PR
-[#1](https://github.com/russalo/purexml/pull/1), branch `v0.1.0`. Suite: **42 passed.**
+[#1](https://github.com/russalo/purexml/pull/1) — **merged 2026-06-16** (merge commit
+`8d1a94a`). Suite: **42 passed.**
 
 ## Capabilities
 
@@ -58,10 +59,12 @@ CPython 3.12.3, libexpat 2.6.1, defusedxml 0.7.1 (dev/test oracle only). PR
   backstop) — kept, faithful mirrors of stdlib/defusedxml. Not defects.
 
 ## Open items (non-blocking, tracked)
-- Vendor single-file form (scanner #6) — deferred, Russell's call.
+- Vendor single-file form (scanner #6), PyPI publishing, name claim, license — all
+  ride on the adoption model, which is **deferred to v1.0** (decided 2026-06-16).
+  Until 1.0, package-only in the private repo.
 - Runtime floor — `>=3.12`, revisitable.
 
 ## Verdict
 **Compliant.** All capability, equivalence, acceptance-bar, scope, and four-leg-review
 requirements are met with grounded evidence; the single substantiated review finding is
-fixed with a regression test; CI green. Ready to merge.
+fixed with a regression test; CI green. **Merged 2026-06-16 via PR #1** (merge commit `8d1a94a`).

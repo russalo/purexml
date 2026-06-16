@@ -399,12 +399,15 @@ blame`.
   (C1+C2) ships in one slice because value is only realized when "same parses
   succeed" and "same attacks blocked" hold *together* (RFC §1). Small surface,
   load-bearing correctness.
-- **Adoption model is OPEN — do not publish to PyPI yet** — file-observer may
+- **Adoption model DEFERRED TO v1.0** (decided 2026-06-16) — file-observer may
   *vendor* purexml (its leaning) or take it as a *first-party dependency*; the
-  choice is unmade. The name `purexml` is provisional and confirmed free on PyPI
-  (checked 2026-06-15), recorded so the decision isn't blocked later — **not** a
-  decision to publish. See `scratch/packaging_and_naming_notes.md`. Don't claim
-  the name or set up publishing until the adoption model is chosen.
+  choice is **deliberately not made until v1.0.** Everything that rides on it is
+  therefore also deferred: PyPI publishing, claiming the `purexml` name (confirmed
+  free 2026-06-15), the license, and the **vendor single-file form** (scanner #6).
+  Until 1.0, purexml ships as the `src/purexml/` package in the private repo only,
+  consumed via git/path or by vendoring the package as-is. Do **not** publish,
+  claim the name, set a license, or build the single-file amalgamation before the
+  1.0 adoption decision. See `scratch/packaging_and_naming_notes.md`.
 
 ## Excluded decisions (do NOT re-introduce)
 
