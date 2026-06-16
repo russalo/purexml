@@ -24,7 +24,7 @@ below.
 
 | Version | Schema | Date | Notable | Spec | Compliance |
 |---|---|---|---|---|---|
-| 0.1.0 | n/a | _unreleased_ | First slice: hardened `fromstring` — C1 safe-parse + C2 safe-failure, behaviorally equivalent to `defusedxml` defaults, stdlib-only. SCHEMA n/a (returns stdlib `Element`); LOGIC introduced (hardening mitigation set v0.1). | [v0.1.0_RFC_Specification.md](docs/v0.1.0_RFC_Specification.md) _(approved 2026-06-16; implementation pending)_ | [COMPLIANCE-v0.1.md](docs/COMPLIANCE-v0.1.md) _(due before merge)_ |
+| 0.1.0 | n/a | 2026-06-16 | First slice: hardened `fromstring` — C1 safe-parse + C2 safe-failure, behaviorally equivalent to `defusedxml` defaults, stdlib-only. SCHEMA n/a (returns stdlib `Element`); LOGIC introduced (hardening mitigation set v0.1). Merged via PR #1; four-leg review complete. | [v0.1.0_RFC_Specification.md](docs/v0.1.0_RFC_Specification.md) | [COMPLIANCE-v0.1.md](docs/COMPLIANCE-v0.1.md) |
 | 1.0.0 | 1.0 | YYYY-MM-DD | **Schema freeze.** Public contract binding. Backward compatibility policy in effect. No new features — governance declaration on a validated codebase. | [v1.0.0_RFC_Specification.md](docs/v1.0.0_RFC_Specification.md) | [COMPLIANCE-v1.0.md](docs/COMPLIANCE-v1.0.md) |
 | 1.0.1 | 1.0 | YYYY-MM-DD | **Patch release** — example shape. Bug fix in {component}. SCHEMA unchanged. _(part of v1.0; HISTORY only, no RFC.)_ | _(no RFC — patch)_ | _(part of v1.0)_ |
 
@@ -36,8 +36,8 @@ List any RFCs currently in draft (`docs/v{X.Y.Z}_RFC_DRAFT.md`). When none are
 open, state so explicitly rather than deleting the section — the empty-but-named
 state is the signal:
 
-> No drafts in flight. (The v0.1.0 RFC was approved 2026-06-16 and promoted to
-> `docs/v0.1.0_RFC_Specification.md`; implementation is the next step.)
+> No drafts in flight. (v0.1.0 shipped 2026-06-16 — RFC approved, implemented, and
+> merged via PR #1.)
 
 ---
 
