@@ -1,62 +1,66 @@
-"""Hardened XML parse, stdlib-only.
+"""Hardened XML parse engine, stdlib-only.
 
 Built directly on ``xml.parsers.expat`` + ``xml.etree.ElementTree.TreeBuilder``
 (measure-first F5: the CPython C-accelerated ``ElementTree.XMLParser`` does not
 expose its underlying expat parser, so the blocking handlers cannot be installed
-on it — and defusedxml's workaround imports the *pure-Python* parser via fragile
-module surgery, which this avoids).
+on it; defusedxml's workaround imports the *pure-Python* parser via fragile module
+surgery, which this avoids).
 
-The expat→tree glue (namespace separator ``"}"``, ordered attributes, buffered
-text, Clark-notation name fixup, undefined-entity handling) mirrors the stdlib
-``XMLParser`` so the resulting ``Element`` tree is identical to the stdlib's /
-defusedxml's. On top of that glue, three blocking handlers reproduce defusedxml's
-default configuration (``forbid_dtd=False, forbid_entities=True,
-forbid_external=True``):
-
-  * ``EntityDeclHandler`` / ``UnparsedEntityDeclHandler`` -> EntitiesForbidden
-    (any entity declaration, general or parameter — blocked before expansion).
-  * ``ExternalEntityRefHandler`` -> ExternalReferenceForbidden (external
-    resolution actually attempted by expat).
-  * no ``StartDoctypeDeclHandler`` -> an entity-free DOCTYPE / internal DTD is
-    allowed (forbid_dtd is False). An *unresolved* external-DTD declaration
-    therefore parses and triggers no fetch (measure-first F2).
+``XMLParser`` mirrors the stdlib ``XMLParser`` expat→tree glue (namespace separator
+``"}"``, ordered attributes, buffered text, Clark-notation name fixup,
+undefined-entity handling) so the resulting ``Element`` tree is identical to the
+stdlib's / defusedxml's, and installs blocking handlers per the ``forbid_*`` flags
+(defaults match defusedxml: ``forbid_dtd=False, forbid_entities=True,
+forbid_external=True``). It exposes ``feed``/``close`` so it is drop-in for
+``xml.etree.ElementTree.parse(source, parser=...)``.
 """
-
 import xml.parsers.expat as _expat
 from xml.etree.ElementTree import ParseError, TreeBuilder
+from xml.etree.ElementTree import parse as _stdlib_parse
 
-from .errors import EntitiesForbidden, ExternalReferenceForbidden
+from .errors import DTDForbidden, EntitiesForbidden, ExternalReferenceForbidden
 
-__all__ = ["fromstring"]
+__all__ = ["XMLParser", "fromstring", "parse", "fromstringlist"]
 
 
-class _HardenedParser:
-    def __init__(self):
-        parser = _expat.ParserCreate(None, "}")
-        target = TreeBuilder()
+class XMLParser:
+    """Hardened drop-in for ``xml.etree.ElementTree.XMLParser`` / defusedxml's
+    ``DefusedXMLParser``. ``feed()``/``close()`` are compatible with
+    ``xml.etree.ElementTree.parse``.
+    """
+
+    def __init__(self, *, target=None, encoding=None, forbid_dtd=False,
+                 forbid_entities=True, forbid_external=True):
+        parser = _expat.ParserCreate(encoding, "}")
         self.parser = parser
-        self.target = target
+        self.target = target if target is not None else TreeBuilder()
         self._error = _expat.error
-        self._names = {}  # qname memo, as in the stdlib
-        self.entity = {}  # always empty: every entity *declaration* is blocked
+        self._names = {}
+        self.entity = {}  # always empty when forbid_entities (every decl is blocked)
 
         # --- tree-building glue (mirrors stdlib xml.etree XMLParser) ---
         parser.DefaultHandlerExpand = self._default
         parser.StartElementHandler = self._start
         parser.EndElementHandler = self._end
-        parser.CharacterDataHandler = target.data
-        parser.CommentHandler = target.comment
-        parser.ProcessingInstructionHandler = target.pi
+        parser.CharacterDataHandler = self.target.data
+        parser.CommentHandler = self.target.comment
+        parser.ProcessingInstructionHandler = self.target.pi
         parser.buffer_text = 1
         parser.ordered_attributes = 1
 
-        # --- security handlers (defusedxml-default equivalents) ---
-        parser.EntityDeclHandler = self._forbid_entity_decl
-        parser.UnparsedEntityDeclHandler = self._forbid_unparsed_entity_decl
-        parser.ExternalEntityRefHandler = self._forbid_external_ref
-        # forbid_dtd is False by contract -> no StartDoctypeDeclHandler installed.
+        # --- security handlers (defusedxml-equivalent, per the flags) ---
+        if forbid_dtd:
+            parser.StartDoctypeDeclHandler = self._forbid_dtd
+        if forbid_entities:
+            parser.EntityDeclHandler = self._forbid_entity_decl
+            parser.UnparsedEntityDeclHandler = self._forbid_unparsed_entity_decl
+        if forbid_external:
+            parser.ExternalEntityRefHandler = self._forbid_external_ref
 
     # ---- blocking handlers ----
+    def _forbid_dtd(self, name, sysid, pubid, has_internal_subset):
+        raise DTDForbidden(name, sysid, pubid)
+
     def _forbid_entity_decl(self, name, is_parameter_entity, value, base,
                             sysid, pubid, notation_name):
         raise EntitiesForbidden(name, sysid, pubid)
@@ -91,13 +95,12 @@ class _HardenedParser:
         return self.target.end(self._fixname(tag))
 
     def _default(self, text):
-        # Mirrors the stdlib: a reference to an entity that was never defined
-        # raises an undefined-entity error (surfaced as ParseError by feed_close).
-        # Since every declaration is blocked above, self.entity is always empty,
-        # so any non-predefined entity reference lands here and raises — matching
-        # defusedxml's pure-parser behavior. Predefined entities (&amp; etc.) are
-        # resolved by expat directly and never reach this handler. DOCTYPE text
-        # and other default content are ignored (TreeBuilder has no doctype hook).
+        # Mirrors the stdlib: a reference to an entity that was never defined raises
+        # an undefined-entity error (surfaced as ParseError). With forbid_entities,
+        # self.entity is always empty, so any non-predefined entity reference lands
+        # here and raises — matching defusedxml. Predefined entities (&amp; etc.) are
+        # resolved by expat and never reach this handler. DOCTYPE text is ignored
+        # (TreeBuilder has no doctype hook).
         if text[:1] == "&":
             try:
                 self.target.data(self.entity[text[1:-1]])
@@ -118,40 +121,64 @@ class _HardenedParser:
         err.position = (value.lineno, value.offset)
         raise err
 
-    def feed_close(self, text):
+    # ---- feed/close (compatible with xml.etree.ElementTree.parse) ----
+    def feed(self, data):
         try:
-            try:
-                self.parser.Parse(text, True)
-            except self._error as v:
-                # Only genuine expat parse errors become ParseError. Blocking
-                # exceptions (EntitiesForbidden / ExternalReferenceForbidden) are
-                # not expat.error, so they propagate to the caller unchanged.
-                self._raiseerror(v)
+            self.parser.Parse(data, False)
+        except self._error as v:
+            self._raiseerror(v)
+
+    def close(self):
+        try:
+            self.parser.Parse(b"", True)
+        except self._error as v:
+            self._raiseerror(v)
+        try:
             return self.target.close()
         finally:
-            # Break the reference cycle: the expat parser holds our bound-method
-            # handlers (-> self) and we hold the parser (self.parser). Without this
-            # the instance is reclaimable only by cyclic GC, not refcounting — under
-            # high-volume parsing that defers cleanup. Mirrors stdlib XMLParser.close.
+            # Break the expat-parser <-> self cycle (handlers are bound methods of
+            # self) so it's freed by refcounting, not cyclic GC. See v0.1.2.
             self.parser = None
             self.target = None
 
 
-def fromstring(text):
+def fromstring(text, forbid_dtd=False, forbid_entities=True, forbid_external=True):
     """Parse XML *text* into an ``xml.etree.ElementTree.Element``, safely.
 
-    Behaviorally equivalent to ``defusedxml.ElementTree.fromstring`` at its
-    default configuration:
-
-    * entity declarations are blocked at declaration time
-      (``EntitiesForbidden``) — billion-laughs / quadratic / declared-XXE;
-    * external reference *resolution* is blocked (``ExternalReferenceForbidden``)
-      with no fetch and no file read;
-    * an entity-free DOCTYPE / internal DTD is allowed, as is an unresolved
-      external-DTD declaration (no fetch occurs);
-    * malformed input raises ``xml.etree.ElementTree.ParseError``.
-
-    Both refusal types subclass ``ValueError``. Standard library only; no runtime
-    dependency on defusedxml.
+    Behaviorally equivalent to ``defusedxml.ElementTree.fromstring``: entity
+    declarations and external reference resolution are blocked (raising
+    ``EntitiesForbidden`` / ``ExternalReferenceForbidden``, both ``ValueError``
+    subclasses); ``forbid_dtd=True`` additionally blocks any DOCTYPE
+    (``DTDForbidden``); malformed input raises ``xml.etree.ElementTree.ParseError``.
+    Stdlib-only.
     """
-    return _HardenedParser().feed_close(text)
+    parser = XMLParser(forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
+                       forbid_external=forbid_external)
+    parser.feed(text)
+    return parser.close()
+
+
+def parse(source, parser=None, forbid_dtd=False, forbid_entities=True,
+          forbid_external=True):
+    """Parse XML from *source* (a filename or file-like) into a hardened
+    ``ElementTree``. Mirrors ``defusedxml.ElementTree.parse``."""
+    if parser is None:
+        parser = XMLParser(forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
+                           forbid_external=forbid_external)
+    return _stdlib_parse(source, parser)
+
+
+def fromstringlist(sequence, parser=None, forbid_dtd=False, forbid_entities=True,
+                   forbid_external=True):
+    """Parse a *sequence* of XML string fragments into an ``Element``, safely.
+
+    Stdlib-parity addition (``defusedxml.ElementTree`` does not provide
+    ``fromstringlist``); behaves like a hardened ``xml.etree.ElementTree``
+    ``fromstringlist`` — equivalent to ``fromstring("".join(sequence))``.
+    """
+    if parser is None:
+        parser = XMLParser(forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
+                           forbid_external=forbid_external)
+    for text in sequence:
+        parser.feed(text)
+    return parser.close()

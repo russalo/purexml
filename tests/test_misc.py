@@ -52,14 +52,15 @@ def test_no_reference_cycle_after_parse():
     import gc
     import weakref
 
-    from purexml._parser import _HardenedParser
+    from purexml._parser import XMLParser
 
     gc.disable()
     try:
-        hp = _HardenedParser()
-        ref = weakref.ref(hp)
-        hp.feed_close("<r><a>x</a></r>")
-        del hp
+        p = XMLParser()
+        ref = weakref.ref(p)
+        p.feed("<r><a>x</a></r>")
+        p.close()
+        del p
         assert ref() is None, "reference cycle: instance not freed by refcounting"
     finally:
         gc.enable()
