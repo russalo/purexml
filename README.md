@@ -20,10 +20,11 @@ promise is never violated; you get a clean mirror until you ask for more.
 
 ## Status
 
-**Working — current v0.5.0 (2026-06-17); complete `defusedxml.ElementTree`
+**Working — current v0.6.0 (2026-06-17); complete `defusedxml.ElementTree`
 drop-in** (the family completed at v0.3.0). Since then, opt-in mirror-plus:
-v0.4 structural-DoS caps (`Limits`, default-off) and v0.5 the **trust surface**
-(`security_report()` + shipped audit evidence). All ElementTree parse entry points
+v0.4 structural-DoS caps (`Limits`, default-off) and the **trust surface**
+(`security_report()` + shipped audit evidence, v0.5; posture map extended with the
+newer expat DoS classes in v0.6). All ElementTree parse entry points
 are implemented, stdlib-only, and validated against `defusedxml` as an oracle (C14N
 same-parse + event-stream equivalence over a real corpus, an adversarial attack
 battery, seeded differential fuzz, and a 3.10–3.13 CI matrix — see
@@ -32,7 +33,7 @@ CPython ≥3.10. No public contract is frozen yet (binds at v1.0), and it is **n
 published**: the vendor-vs-first-party adoption model (and with it
 PyPI/name/license) is deferred to v1.0 — see *License*. Path to 1.0:
 [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md). Latest spec:
-[`docs/v0.5.0_RFC_Specification.md`](docs/v0.5.0_RFC_Specification.md); north star:
+[`docs/v0.6.0_RFC_Specification.md`](docs/v0.6.0_RFC_Specification.md); north star:
 [`docs/v1.0_TARGET.md`](docs/v1.0_TARGET.md) and the FO floor at
 [`docs/FO_REQUIRED_COMPATIBILITY.md`](docs/FO_REQUIRED_COMPATIBILITY.md).
 

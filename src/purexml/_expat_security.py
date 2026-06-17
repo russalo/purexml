@@ -7,9 +7,10 @@ expat version. defusedxml (frozen 2021) never checked this; purexml exposes it s
 a consumer can verify its runtime is actually safe.
 
 Floor is **provisional** (it moves as expat ships fixes: 2.4.0 billion-laughs cap,
-2.6.0 reparse-deferral / large-tokens, 2.7.2 per current CPython docs). The
-enforce-vs-warn *policy* is a 1.0-freeze decision; v0.1.x only exposes the data +
-an explicit opt-in check, with **no import-time behavior change.**
+2.6.0 reparse-deferral / large-tokens, 2.7.2, and a 2.7.4–2.8.1 DoS train in 2026 —
+recommended-latest is 2.8.1). The enforce-vs-warn *policy* is a 1.0-freeze decision;
+this module only exposes the data + an explicit opt-in check, with **no import-time
+behavior change.**
 """
 import xml.parsers.expat as _expat
 from collections import namedtuple
@@ -55,10 +56,12 @@ SAFE_EXPAT_VERSION = (2, 6, 0)
 #: Per-class fix versions (not this coarse floor) drive the mitigation map.
 RECOMMENDED_EXPAT_VERSION = (2, 8, 1)
 
-#: Per-class fix version for the *disproportionate dynamic memory* class (libexpat
-#: 2.7.2) — kept separate from RECOMMENDED so the mitigation map reports this class
-#: accurately even as the recommended-latest floor moves forward.
+#: Per-class fix versions — each attack class in the mitigation map gates on the
+#: expat release that fixed IT, NOT the moving recommended-latest floor, so the map
+#: stays accurate as RECOMMENDED advances. (See v0.6.0 RFC.)
 _DISPROPORTIONATE_MEMORY_FIXED = (2, 7, 2)
+_CONTENT_TOKEN_OVERFLOW_FIXED = (2, 7, 4)   # CVE-2026-25210 (doContent integer overflow)
+_ATTRIBUTE_COLLISION_FIXED = (2, 8, 1)      # CVE-2026-45186 (quadratic attr-name checks)
 
 
 def _as_version_tuple(v):
@@ -147,7 +150,7 @@ class SecurityReport(namedtuple("SecurityReport", _ReportFields)):
 
     - ``expat_version`` — the runtime libexpat ``(maj, min, micro)`` tuple.
     - ``expat_meets_safe_floor`` — bool vs `SAFE_EXPAT_VERSION` (2.6.0).
-    - ``expat_meets_recommended`` — bool vs `RECOMMENDED_EXPAT_VERSION` (2.7.2).
+    - ``expat_meets_recommended`` — bool vs `RECOMMENDED_EXPAT_VERSION` (2.8.1).
     - ``recommended_limits`` — the `RECOMMENDED_LIMITS` preset (opt-in caps).
     - ``mitigations`` — a mapping ``{attack_class: status}`` where status is one
       of `BLOCKED` / `EXPAT_MITIGATED` / `OPT_IN` / `LIVE`.
@@ -239,6 +242,13 @@ def security_report():
         # version, NOT the moving recommended-latest floor).
         "disproportionate_memory":
             EXPAT_MITIGATED if EXPAT_VERSION >= _DISPROPORTIONATE_MEMORY_FIXED else LIVE,
+        # doContent integer overflow on tag-buffer realloc — expat-layer, fixed 2.7.4.
+        "content_token_overflow_cve_2026_25210":
+            EXPAT_MITIGATED if EXPAT_VERSION >= _CONTENT_TOKEN_OVERFLOW_FIXED else LIVE,
+        # quadratic attribute-name collision check (CWE-407) — expat-layer, fixed 2.8.1.
+        # Opt-in max_attributes also bounds the count this is quadratic in (see notes).
+        "attribute_collision_dos_cve_2026_45186":
+            EXPAT_MITIGATED if EXPAT_VERSION >= _ATTRIBUTE_COLLISION_FIXED else LIVE,
         # structural DoS (depth / attributes / size) — purexml opt-in caps only.
         "structural_dos_depth_attrs_size": OPT_IN,
     }
@@ -248,17 +258,22 @@ def security_report():
         cur = ".".join(map(str, EXPAT_VERSION))
         rec = ".".join(map(str, RECOMMENDED_EXPAT_VERSION))
         live = sorted(k for k, v in mitigations.items() if v == LIVE)
-        # Always surface the recommended-latest gap — newer expat DoS fixes that
-        # are NOT individually tracked in the map above (else a runtime below an
-        # older floor would hear only about the mapped LIVE classes and under-report
-        # the 2.7.4–2.8.1 fixes it is also missing — PR#10 Codex P2).
-        msg = ("libexpat %s is below the recommended-latest floor %s: newer expat "
-               "DoS fixes (2.7.4–2.8.1, e.g. doContent overflow / quadratic "
-               "attribute-name checks) are not on this runtime" % (cur, rec))
+        # Surface the recommended-latest gap — expat DoS fixes NOT individually
+        # tracked in the map above (the mapped classes report their own status; this
+        # covers the rest, e.g. CVE-2026-41080, so a runtime below the floor never
+        # silently under-reports — PR#10 Codex P2).
+        msg = ("libexpat %s is below the recommended-latest floor %s: it may be "
+               "missing expat DoS fixes not individually tracked here (e.g. "
+               "CVE-2026-41080, expat 2.8.0)" % (cur, rec))
         if live:
-            msg += ("; additionally the tracked class(es) %s may be live"
+            msg += ("; the tracked class(es) %s are also live on this runtime"
                     % ", ".join(live))
         notes.append(msg + " — upgrade Python or the system expat.")
+    if mitigations["attribute_collision_dos_cve_2026_45186"] == LIVE:
+        notes.append(
+            "attribute_collision_dos is live on this expat (<2.8.1): opt-in "
+            "max_attributes (e.g. RECOMMENDED_LIMITS) bounds the attribute count it "
+            "is quadratic in, reducing exposure until expat is upgraded.")
     notes.append(
         "structural DoS (deep nesting / attribute floods / giant documents) is "
         "opt-in: pass RECOMMENDED_LIMITS (or your own Limits) to the parse entry "
