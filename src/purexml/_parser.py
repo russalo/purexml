@@ -57,11 +57,17 @@ class XMLParser:
         # --- tree-building glue (mirrors stdlib xml.etree XMLParser) ---
         # Guard the optional target callbacks with hasattr, like the stdlib, so a
         # custom target providing only the core protocol (start/end/data/close)
-        # works (a default TreeBuilder has all of these).
+        # works (a default TreeBuilder has all of these). BUT: depth/attribute caps
+        # are purexml's own accounting and must NOT depend on the target's callbacks
+        # — so install _start/_end whenever a cap needs them, and `_start`/`_end`
+        # call the target only if it provides start/end (PR#7 Codex: a target with
+        # `start` but no `end` otherwise never decremented depth).
+        self._has_start = hasattr(self.target, "start")
+        self._has_end = hasattr(self.target, "end")
         parser.DefaultHandlerExpand = self._default
-        if hasattr(self.target, "start"):
+        if self._has_start or self._max_depth is not None or self._max_attributes is not None:
             parser.StartElementHandler = self._start
-        if hasattr(self.target, "end"):
+        if self._has_end or self._max_depth is not None:
             parser.EndElementHandler = self._end
         if hasattr(self.target, "data"):
             parser.CharacterDataHandler = self.target.data
@@ -109,7 +115,7 @@ class XMLParser:
     def _start(self, tag, attr_list):
         fixname = self._fixname
         tag = fixname(tag)
-        # opt-in structural caps (checked before building the element)
+        # opt-in structural caps — purexml's own accounting, independent of target
         if self._max_attributes is not None and attr_list:
             nattrs = len(attr_list) // 2
             if nattrs > self._max_attributes:
@@ -118,6 +124,8 @@ class XMLParser:
             self._depth += 1
             if self._depth > self._max_depth:
                 raise DepthExceeded(self._depth, self._max_depth)
+        if not self._has_start:  # installed only for cap accounting; nothing to build
+            return None
         attrib = {}
         if attr_list:
             for i in range(0, len(attr_list), 2):
@@ -127,7 +135,9 @@ class XMLParser:
     def _end(self, tag):
         if self._max_depth is not None:
             self._depth -= 1
-        return self.target.end(self._fixname(tag))
+        if self._has_end:
+            return self.target.end(self._fixname(tag))
+        return None
 
     def _start_ns(self, prefix, uri):
         return self.target.start_ns(prefix or "", uri or "")
@@ -223,7 +233,12 @@ class XMLParser:
     # ---- feed/close (compatible with xml.etree.ElementTree.parse) ----
     def feed(self, data):
         if self._max_bytes is not None:
-            self._fed += len(data)
+            # Count true bytes (PR#7 Codex): a str chunk is measured by its UTF-8
+            # byte length, not code-point count, so the documented byte cap can't be
+            # bypassed by multi-byte input. (The str is already materialized by the
+            # caller, so encoding-to-measure adds no new DoS surface.)
+            self._fed += len(data) if isinstance(data, (bytes, bytearray)) \
+                else len(data.encode("utf-8"))
             if self._fed > self._max_bytes:
                 self._cleanup()
                 raise SizeExceeded(self._fed, self._max_bytes)
@@ -275,8 +290,16 @@ def parse(source, parser=None, forbid_dtd=False, forbid_entities=True,
     ``ElementTree``. Mirrors ``defusedxml.ElementTree.parse``. *limits* (opt-in,
     keyword-only) applies only when building the default parser."""
     if parser is None:
+        # We own the parser: guarantee its cycle is broken even if the source read
+        # raises before feed/close run (PR#7 Gemini). When a caller passes `parser`,
+        # they own its lifecycle.
         parser = XMLParser(forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
                            forbid_external=forbid_external, limits=limits)
+        try:
+            return _stdlib_parse(source, parser)
+        finally:
+            if parser.parser is not None:  # not already cleaned by feed/close
+                parser._cleanup()
     return _stdlib_parse(source, parser)
 
 
@@ -290,8 +313,17 @@ def fromstringlist(sequence, parser=None, forbid_dtd=False, forbid_entities=True
     (opt-in, keyword-only) applies only when building the default parser.
     """
     if parser is None:
-        parser = XMLParser(forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
-                           forbid_external=forbid_external, limits=limits)
+        # We own the parser: clean up even if iterating `sequence` raises mid-stream
+        # before close() runs (PR#7 Gemini).
+        own = XMLParser(forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
+                        forbid_external=forbid_external, limits=limits)
+        try:
+            for text in sequence:
+                own.feed(text)
+            return own.close()
+        finally:
+            if own.parser is not None:
+                own._cleanup()
     for text in sequence:
         parser.feed(text)
     return parser.close()

@@ -117,3 +117,66 @@ def test_limit_exceptions_are_purexml_value_errors():
 def test_limits_namedtuple_defaults_to_none():
     assert Limits() == (None, None, None)
     assert Limits(max_depth=5).max_attributes is None
+
+
+# ---- PR#7 bot findings: regressions guarded ----
+def test_depth_accounting_independent_of_target_callbacks():
+    """PR#7 Codex: depth must track regardless of which optional target callbacks
+    exist — a target with `start` but no `end` previously never decremented depth,
+    spuriously raising on wide-but-shallow docs."""
+    from xml.etree.ElementTree import TreeBuilder
+
+    class NoEnd:  # core protocol minus `end` (stdlib XMLParser accepts this)
+        def __init__(self):
+            self._tb = TreeBuilder()
+
+        def start(self, t, a):
+            return self._tb.start(t, a)
+
+        def data(self, d):
+            return self._tb.data(d)
+
+        def close(self):
+            return self._tb.close()
+
+    p = purexml.XMLParser(target=NoEnd(), limits=Limits(max_depth=2))
+    p.feed("<r><a/><b/><c/></r>")  # depth never exceeds 2 — must NOT raise
+    p.close()
+    # and it still enforces genuine over-depth with such a target:
+    p2 = purexml.XMLParser(target=NoEnd(), limits=Limits(max_depth=2))
+    with pytest.raises(DepthExceeded):
+        p2.feed("<r><a><b/></a></r>")  # depth 3
+        p2.close()
+
+
+def test_max_bytes_counts_true_bytes_for_str():
+    """PR#7 Codex: a str cap must measure UTF-8 bytes, not code points, so multi-byte
+    input can't bypass the documented byte limit."""
+    doc = "<r>" + ("\U0001F600" * 100) + "</r>"  # ~407 UTF-8 bytes, ~107 code points
+    assert len(doc.encode("utf-8")) > 350 >= len(doc)
+    with pytest.raises(SizeExceeded):
+        purexml.fromstring(doc, limits=Limits(max_bytes=350))
+
+
+def test_fromstringlist_cleans_up_on_iteration_error():
+    """PR#7 Gemini: an internally-created parser is cleaned up even if iterating the
+    sequence raises before close()."""
+    def boomgen():
+        yield "<r>"
+        raise RuntimeError("gen boom")
+
+    with pytest.raises(RuntimeError):
+        purexml.fromstringlist(boomgen(), limits=Limits(max_depth=10))
+    # (no hang/crash; the finally broke the parser cycle — exercised, not asserted on
+    # the internal parser since it's not exposed.)
+
+
+def test_parse_cleans_up_on_source_read_error():
+    """PR#7 Gemini: parse() with a source that errors on read still breaks the
+    internally-created parser's cycle (no leak/hang)."""
+    class BoomSource:
+        def read(self, n=-1):
+            raise OSError("boom")
+
+    with pytest.raises(OSError):
+        purexml.parse(BoomSource(), limits=Limits(max_depth=10))
