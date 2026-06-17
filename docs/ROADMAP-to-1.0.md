@@ -3,7 +3,7 @@
 > **Status: ratified 2026-06-16** (by Russell). Grounded by `/deep-research` run
 > wf_5ea8ed7c-044 (findings: `scratch/research/2026-06-16_1.0-scope-research.md`,
 > 25/25 claims confirmed vs primary sources). This is the living plan from the
-> shipped v0.1.1 to the 1.0 contract freeze.
+> shipped v0.5.0 to the 1.0 contract freeze.
 
 ## What 1.0 means
 Per the russalo version philosophy, **1.0 = a governance declaration on a
@@ -30,21 +30,35 @@ exist beyond file-observer).
 Stay a behavioral mirror of defusedxml's **defaults** (`forbid_dtd=False,
 forbid_entities=True, forbid_external=True`), and accept defusedxml's
 **parameterized signature** (the `forbid_*` knobs — re-opened 2026-06-16, in v0.2).
-On top, add bounded opt-in defense-in-depth defusedxml never had:
+On top, add bounded opt-in defense-in-depth defusedxml never had (all **shipped**,
+default-off):
 - **Runtime libexpat-version assertion** (`pyexpat.EXPAT_VERSION`) — protection is
   entirely libexpat-version-dependent (Expat <2.7.2 still vulnerable to several
-  classes); unique to purexml.
+  classes); unique to purexml. (v0.1.2; surfaced for adopters by `security_report()` in v0.5.)
 - **Reparse-deferral awareness** (CVE-2023-52425 "large tokens"; Expat 2.6.0;
   CPython 3.13 `Get/SetReparseDeferralEnabled`, reachable via our expat parser).
 - **Amplification-limit awareness** (libexpat 2.4.0 billion-laughs cap).
 - **Optional `forbid_dtd=True` strict mode** (OWASP's strongest: one control for
-  XXE *and* billion-laughs).
+  XXE *and* billion-laughs). (v0.2.)
+- **Opt-in structural-DoS caps** (`Limits` — `max_depth`/`max_attributes`/`max_bytes`;
+  v0.4) — bound the pathological-but-legal inputs neither defusedxml nor the expat cap cover.
+- **Trust surface** (`security_report()`; v0.5) — a read-only posture report mapping
+  each attack class to where it's handled on the runtime. The maintained-successor
+  promise made legible: the living library tells you your posture; the frozen incumbent couldn't.
 
 ## Gates to 1.0
 - **G1 — file-observer trial-adopts purexml** (import swap). The validation 1.0
-  requires. *Critical path, scanner-side.* ⬜ — now appropriate (the ElementTree
-  family is complete; adoption would be the full surface, not a partial swap).
-- **G2 — adoption surfaces real scope** (likely small; equivalence already proven). ⬜
+  requires. *Critical path, scanner-side.* 🟡 **in progress (scanner-side, 2026-06-17).**
+  file-observer has **verified v0.5 consumer-side** — the literal swap holds
+  (`purexml.ElementTree.fromstring`, default still mirrors defusedxml) and confirmed
+  it would take purexml as a **dependency** (publish-first-party; swap shape is
+  unchanged either way). `security_report()` accepted as the right trust surface — to
+  be recorded in scanner's `ScanContext` dep-provenance at adoption.
+- **G2 — adoption surfaces real scope** (likely small; equivalence already proven).
+  🟡 Two remaining validation items — **adversarial soak** + a **2nd independent
+  consumer** — are being built scanner-side as separate file-observer side projects;
+  no purexml action required (per scanner relay 2026-06-17). Consumer-side gate read:
+  *model settled, trust-surface advancing.*
 - **G3 — build the ElementTree family — ✅ COMPLETE (2026-06-16).**
   - **v0.2** ✅ (PR #4) — `parse` + `fromstringlist` + `XML`/`tostring` + `XMLParser`
     + the `forbid_*` knobs.
@@ -110,10 +124,12 @@ the freeze*, ordered by cost-of-getting-it-wrong.
 become 2.0-class mistakes if frozen without an explicit decision.
 
 ## Distance estimate
-**~85% — the build axis is DONE (v0.3 complete the ElementTree family).** Built &
-proven: the full hardened ElementTree surface, C14N + event-stream oracle-gating,
-falsify-first battery + differential fuzz, corpus sweep, durability + version
-awareness, four-leg apparatus. **No build work remains.** What's left for 1.0:
+**~90% — the build axis is DONE (v0.3 completed the ElementTree family) and the
+opt-in defense-in-depth has shipped (v0.4 `Limits`, v0.5 `security_report()`).**
+Built & proven: the full hardened ElementTree surface, C14N + event-stream
+oracle-gating, falsify-first battery + (960-doc) differential fuzz + committed
+equivalence report, corpus sweep, durability + version awareness + the posture API,
+four-leg apparatus. **No build work remains.** What's left for 1.0:
 - **G1/G2** — file-observer adoption validation (the "validated codebase" gate).
 - **G5** — the deferred adoption-model / license / packaging decisions.
 - **G6** — the freeze ceremony (lock the contract surface, fill `PUBLIC_CONTRACT.md`,

@@ -1,14 +1,19 @@
 # purexml Public Contract
 
-> **⚠️ NOT YET BINDING — purexml is pre-1.0 (currently v0.1.1).** No public
-> contract is frozen. The de-facto surface today is a single call,
-> `purexml.fromstring(text) -> xml.etree.ElementTree.Element`, behaviorally
-> equivalent to `defusedxml.ElementTree.fromstring` at its defaults — but until
-> v1.0 it may still change. The tables below are the **skeleton to fill at the
-> v1.0 freeze**; they are intentionally not populated yet (pinning a contract
-> pre-1.0 would be a false promise). The contract binds, and this file is
-> completed, **at v1.0** — which is gated on the still-deferred adoption-model
-> decision (see `CLAUDE.md` *Known decisions*).
+> **⚠️ NOT YET BINDING — purexml is pre-1.0 (currently v0.5.0).** No public
+> contract is frozen. The de-facto surface today is the full
+> `defusedxml.ElementTree` family (`fromstring`, `parse`, `iterparse`,
+> `fromstringlist`, `XML`, `XMLParser`, `tostring`, `ParseError`, the `forbid_*`
+> knobs) under the `purexml.ElementTree` namespace, behaviorally equivalent to
+> `defusedxml` at its defaults — plus **opt-in, default-off** additions (`Limits`
+> structural caps, the `security_report()` posture API). Until v1.0 any of it may
+> still change. The tables below are the **skeleton to fill at the v1.0 freeze**;
+> they are intentionally not populated yet (pinning a contract pre-1.0 would be a
+> false promise). The contract binds, and this file is completed, **at v1.0** —
+> which is gated on the still-deferred adoption-model decision (see `CLAUDE.md`
+> *Known decisions*). At the freeze the mirror surface is STABLE; the opt-in
+> defense-in-depth (`Limits`, `security_report`) is PROVISIONAL (see
+> [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md)).
 
 This document defines what **consumers** of purexml's output / API
 can rely on. It is the stability commitment from purexml to
