@@ -248,17 +248,17 @@ def security_report():
         cur = ".".join(map(str, EXPAT_VERSION))
         rec = ".".join(map(str, RECOMMENDED_EXPAT_VERSION))
         live = sorted(k for k, v in mitigations.items() if v == LIVE)
+        # Always surface the recommended-latest gap — newer expat DoS fixes that
+        # are NOT individually tracked in the map above (else a runtime below an
+        # older floor would hear only about the mapped LIVE classes and under-report
+        # the 2.7.4–2.8.1 fixes it is also missing — PR#10 Codex P2).
+        msg = ("libexpat %s is below the recommended-latest floor %s: newer expat "
+               "DoS fixes (2.7.4–2.8.1, e.g. doContent overflow / quadratic "
+               "attribute-name checks) are not on this runtime" % (cur, rec))
         if live:
-            notes.append(
-                "libexpat %s is below the recommended floor %s: the expat-layer "
-                "class(es) %s may be live on this runtime — upgrade Python or the "
-                "system expat." % (cur, rec, ", ".join(live)))
-        else:
-            notes.append(
-                "libexpat %s is below the recommended-latest floor %s: the classes "
-                "tracked above are mitigated, but newer expat DoS fixes (2.7.4–2.8.1, "
-                "e.g. doContent overflow / quadratic attribute-name checks) are not on "
-                "this runtime — upgrade Python or the system expat." % (cur, rec))
+            msg += ("; additionally the tracked class(es) %s may be live"
+                    % ", ".join(live))
+        notes.append(msg + " — upgrade Python or the system expat.")
     notes.append(
         "structural DoS (deep nesting / attribute floods / giant documents) is "
         "opt-in: pass RECOMMENDED_LIMITS (or your own Limits) to the parse entry "

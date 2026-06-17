@@ -128,8 +128,9 @@ def test_below_recommended_emits_advisory_note(monkeypatch):
     notes = purexml.security_report().notes
     assert isinstance(notes, tuple)
     joined = " ".join(notes)
-    assert "below the recommended floor" in joined
-    # the LIVE classes are named so an adopter knows what is exposed
+    # the recommended-latest gap is ALWAYS surfaced (PR#10 Codex) ...
+    assert "recommended-latest floor" in joined
+    # ... AND the mapped LIVE classes are named so an adopter knows what's exposed
     assert "disproportionate_memory" in joined
     assert "large_tokens_cve_2023_52425" in joined
 

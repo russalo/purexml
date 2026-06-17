@@ -93,6 +93,8 @@ def test_encoding_vector_block_is_encoding_independent():
     UTF-16 bytes — the refusal is at the entity declaration, before decoding matters."""
     src = ('<?xml version="1.0"?><!DOCTYPE lolz [ <!ENTITY lol "lol">'
            '<!ENTITY lol2 "&lol;&lol;&lol;&lol;&lol;"> ]><lolz>&lol2;</lolz>')
-    for arg in (src, src.encode("utf-8")):
+    # UTF-16 bytes carry a BOM → expat auto-detects the encoding; the block still
+    # fires at the entity declaration, before decoding matters.
+    for arg in (src, src.encode("utf-8"), src.encode("utf-16")):
         with pytest.raises(purexml.EntitiesForbidden):
             purexml.fromstring(arg)
