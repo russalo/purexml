@@ -39,12 +39,20 @@ class XMLParser:
         self.entity = {}  # always empty when forbid_entities (every decl is blocked)
 
         # --- tree-building glue (mirrors stdlib xml.etree XMLParser) ---
+        # Guard the optional target callbacks with hasattr, like the stdlib, so a
+        # custom target providing only the core protocol (start/end/data/close)
+        # works (a default TreeBuilder has all of these).
         parser.DefaultHandlerExpand = self._default
-        parser.StartElementHandler = self._start
-        parser.EndElementHandler = self._end
-        parser.CharacterDataHandler = self.target.data
-        parser.CommentHandler = self.target.comment
-        parser.ProcessingInstructionHandler = self.target.pi
+        if hasattr(self.target, "start"):
+            parser.StartElementHandler = self._start
+        if hasattr(self.target, "end"):
+            parser.EndElementHandler = self._end
+        if hasattr(self.target, "data"):
+            parser.CharacterDataHandler = self.target.data
+        if hasattr(self.target, "comment"):
+            parser.CommentHandler = self.target.comment
+        if hasattr(self.target, "pi"):
+            parser.ProcessingInstructionHandler = self.target.pi
         parser.buffer_text = 1
         parser.ordered_attributes = 1
 
@@ -121,25 +129,36 @@ class XMLParser:
         err.position = (value.lineno, value.offset)
         raise err
 
+    def _cleanup(self):
+        # Break the expat-parser <-> self reference cycle (handlers are bound
+        # methods of self) so the parser+tree are freed by refcounting, not cyclic
+        # GC. Must run on EVERY termination path — success or error — or a malformed
+        # / blocked untrusted input leaks the cycle (v0.1.2 fix; regressed and
+        # restored after the v0.2 feed/close split, PR#4 review).
+        self.parser = None
+        self.target = None
+
     # ---- feed/close (compatible with xml.etree.ElementTree.parse) ----
     def feed(self, data):
         try:
             self.parser.Parse(data, False)
         except self._error as v:
+            self._cleanup()
             self._raiseerror(v)
+        except BaseException:
+            # blocking refusals (EntitiesForbidden/...) and anything else
+            self._cleanup()
+            raise
 
     def close(self):
         try:
-            self.parser.Parse(b"", True)
-        except self._error as v:
-            self._raiseerror(v)
-        try:
+            try:
+                self.parser.Parse(b"", True)
+            except self._error as v:
+                self._raiseerror(v)
             return self.target.close()
         finally:
-            # Break the expat-parser <-> self cycle (handlers are bound methods of
-            # self) so it's freed by refcounting, not cyclic GC. See v0.1.2.
-            self.parser = None
-            self.target = None
+            self._cleanup()
 
 
 def fromstring(text, forbid_dtd=False, forbid_entities=True, forbid_external=True):

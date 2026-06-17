@@ -143,3 +143,47 @@ def test_literal_sed_migration():
     # the s/defusedxml/purexml/ promise for the implemented surface
     from purexml.ElementTree import fromstring as xml_fromstring
     assert xml_fromstring("<r/>").tag == "r"
+
+
+# ---------- PR#4 bot findings: regressions guarded ----------
+@pytest.mark.parametrize("bad", ["<r></x>", "<r>", "<!DOCTYPE r [<!ENTITY e 'v'>]><r>&e;</r>"])
+def test_heavy_state_released_on_error_paths(bad):
+    """PR#4: malformed/blocked input must still break the expat-parser<->self cycle
+    so the heavy parser + tree are freed promptly (the v0.2 feed/close split
+    regressed the v0.1.2 fix on error paths). The lightweight XMLParser shell itself
+    lingers in the exception traceback frame — universal Python behavior, not a leak
+    — so we assert the heavy refs are cleared rather than weakref the shell."""
+    from purexml._parser import XMLParser
+
+    p = XMLParser()
+    with pytest.raises(Exception):  # noqa: B017 — ParseError or PureXMLError
+        p.feed(bad)
+        p.close()
+    assert p.parser is None and p.target is None, "heavy parser/tree not released on error"
+
+
+def test_custom_target_without_comment_pi():
+    """PR#4: a custom target providing only the core protocol must work — the
+    comment/pi handlers are optional (guarded by hasattr, like the stdlib)."""
+    from xml.etree.ElementTree import TreeBuilder
+
+    class Minimal:
+        def __init__(self):
+            self._tb = TreeBuilder()
+
+        def start(self, tag, attrs):
+            return self._tb.start(tag, attrs)
+
+        def end(self, tag):
+            return self._tb.end(tag)
+
+        def data(self, d):
+            return self._tb.data(d)
+
+        def close(self):
+            return self._tb.close()
+
+    p = purexml.XMLParser(target=Minimal())  # must not raise AttributeError
+    p.feed("<r><!-- dropped --><a>x</a></r>")
+    root = p.close()
+    assert root.tag == "r" and root.find("a").text == "x"
