@@ -17,13 +17,23 @@
 ![runtime deps: zero](https://img.shields.io/badge/runtime%20deps-zero-brightgreen)
 ![pure standard library](https://img.shields.io/badge/pure-stdlib-blue)
 ![differentially fuzzed](https://img.shields.io/badge/differentially-fuzzed-blueviolet)
-<!-- Honest now (all true today; verified to render): Python matrix is CI-grounded;
-     zero-deps + stdlib-only are structurally-guarded contracts; differential fuzzing
-     runs in CI + an opt-in Atheris harness. Activates when the repo goes public:
-       ![tests](https://img.shields.io/github/actions/workflow/status/russalo/purexml/tests.yml?label=tests)
-     Omitted on purpose — NOT honest yet: PyPI version (unpublished), license
-     (undecided), coverage (no tool wired), downloads (unpublished).
-     [[STRATEGIC: final tagline + publish-time badges are Russell's call.]] -->
+<!-- BADGE ROADMAP — three tiers (honesty discipline: only show what's true today).
+   HAVE NOW (shown above; static, render anywhere, all true today): Python matrix
+     (CI-grounded) · runtime-deps-zero + pure-stdlib (structurally-guarded contracts) ·
+     differentially-fuzzed (CI gate + opt-in Atheris harness).
+   FLIPS ON AT PUBLISH (true already, ~zero effort — just need the public repo / the
+     name+license decisions; uncomment then):
+       tests (GitHub Actions): https://img.shields.io/github/actions/workflow/status/russalo/purexml/tests.yml?label=tests
+       PyPI version · PyPI downloads · license  (once published / license set)
+   EASY TO WORK TOWARDS (earnable; pick up as publish-prep proceeds):
+       coverage  — wire pytest-cov in CI (in-lane, easy) + Codecov badge at publish
+       typed     — add a py.typed marker + a clean mypy run -> "typed" badge
+       linted    — wire ruff in CI -> style badge (cheap)
+       OpenSSF Best Practices / Scorecard — security-cred badges; higher effort,
+         strong signal for a security library (needs public repo + the questionnaire/action)
+   NOT YET (don't fake): anything implying published/licensed state before those land.
+   Full publish-prep tracker: scratch/publish_prep_checklist.md.
+   [[STRATEGIC: final tagline + the publish-time badges are Russell's call.]] -->
 
 purexml hardens Python's standard-library XML parser against the known untrusted-XML
 attack classes — entity-expansion bombs, XXE, external-DTD/entity resolution — and
