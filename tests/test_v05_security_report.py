@@ -110,6 +110,7 @@ _L = purexml.LIVE
     ((2, 6, 1), _M, _L, _L, _L, True,  False),  # between
     ((2, 7, 2), _M, _M, _L, _L, True,  False),  # memory fixed
     ((2, 7, 4), _M, _M, _M, _L, True,  False),  # content fixed (v0.6)
+    ((2, 8, 0), _M, _M, _M, _L, True,  False),  # 41080 fixed but attr still live, < recommended
     ((2, 8, 1), _M, _M, _M, _M, True,  True),   # attr fixed = recommended-latest
     ((2, 9, 0), _M, _M, _M, _M, True,  True),   # above
 ])
@@ -162,6 +163,17 @@ def test_recommended_gap_always_names_unmapped_cve(monkeypatch):
     joined = " ".join(r.notes)
     assert "recommended-latest floor" in joined
     assert "CVE-2026-41080" in joined
+
+    # At 2.8.0, CVE-2026-41080 IS fixed — so the advisory must NOT cite it as a
+    # potential missing fix (precision; PR#11 Gemini). The floor note still fires
+    # (2.8.0 < recommended 2.8.1) and names the still-live tracked class.
+    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 8, 0))
+    r2 = purexml.security_report()
+    assert r2.expat_meets_recommended is False
+    joined2 = " ".join(r2.notes)
+    assert "recommended-latest floor" in joined2
+    assert "CVE-2026-41080" not in joined2
+    assert "attribute_collision_dos_cve_2026_45186" in joined2  # the real live gap
 
 
 def test_attribute_collision_live_surfaces_max_attributes_lever(monkeypatch):

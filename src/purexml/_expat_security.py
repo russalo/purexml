@@ -63,6 +63,12 @@ _DISPROPORTIONATE_MEMORY_FIXED = (2, 7, 2)
 _CONTENT_TOKEN_OVERFLOW_FIXED = (2, 7, 4)   # CVE-2026-25210 (doContent integer overflow)
 _ATTRIBUTE_COLLISION_FIXED = (2, 8, 1)      # CVE-2026-45186 (quadratic attr-name checks)
 
+#: Highest expat fix NOT individually mapped above (CVE-2026-41080, fixed 2.8.0,
+#: ungrounded against purexml's paths). The generic floor advisory only claims an
+#: untracked gap when the runtime is actually below this — at/above it, every gap to
+#: the recommended-latest floor is a class tracked in the map.
+_HIGHEST_UNMAPPED_FIX = (2, 8, 0)
+
 
 def _as_version_tuple(v):
     """Normalize a version to a tuple of ints. Accepts a ``"x.y.z"`` string or a
@@ -258,13 +264,16 @@ def security_report():
         cur = ".".join(map(str, EXPAT_VERSION))
         rec = ".".join(map(str, RECOMMENDED_EXPAT_VERSION))
         live = sorted(k for k, v in mitigations.items() if v == LIVE)
-        # Surface the recommended-latest gap — expat DoS fixes NOT individually
-        # tracked in the map above (the mapped classes report their own status; this
-        # covers the rest, e.g. CVE-2026-41080, so a runtime below the floor never
-        # silently under-reports — PR#10 Codex P2).
-        msg = ("libexpat %s is below the recommended-latest floor %s: it may be "
-               "missing expat DoS fixes not individually tracked here (e.g. "
-               "CVE-2026-41080, expat 2.8.0)" % (cur, rec))
+        # Below the recommended-latest floor. Claim an UNTRACKED gap only when the
+        # runtime actually lacks the highest unmapped fix (CVE-2026-41080, 2.8.0) —
+        # at/above 2.8.0 every remaining gap to 2.8.1 is a class tracked in the map,
+        # so citing 41080 there would overstate (PR#11 Gemini). The mapped LIVE
+        # classes are always named so a runtime below the floor never under-reports
+        # (the PR#10 Codex P2 guarantee).
+        msg = "libexpat %s is below the recommended-latest floor %s" % (cur, rec)
+        if EXPAT_VERSION < _HIGHEST_UNMAPPED_FIX:
+            msg += (": it may be missing expat DoS fixes not individually tracked "
+                    "here (e.g. CVE-2026-41080, expat 2.8.0)")
         if live:
             msg += ("; the tracked class(es) %s are also live on this runtime"
                     % ", ".join(live))
