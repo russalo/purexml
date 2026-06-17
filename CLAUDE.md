@@ -339,6 +339,20 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.5.0** *(shipped 2026-06-17, PR #8)* — **trust surface**: read-only
+  `security_report()` posture API (libexpat version + per-class mitigation map +
+  `RECOMMENDED_LIMITS`; genuinely immutable via `MappingProxyType` + `__new__`/`_make`
+  normalization) + audit evidence (960-doc differential fuzz, opt-in Atheris `[fuzz]`
+  extra, committed `docs/EQUIVALENCE.md`). First minor under the maintained-successor
+  mandate; no parse-behavior change. Four-leg review; 5 PR-bot findings all real +
+  fixed. SCHEMA n/a; LOGIC unchanged. [RFC](docs/v0.5.0_RFC_Specification.md) ·
+  [compliance](docs/COMPLIANCE-v0.5.md).
+- **v0.4.0** *(shipped 2026-06-16, PR #7)* — opt-in structural-DoS caps
+  (`max_depth`/`max_attributes`/`max_bytes`, default-OFF) raising `LimitExceeded` — the
+  first deliberate divergence beyond defusedxml (opt-in only; default path stays
+  byte-equivalent). Four-leg review; all 4 PR-bot findings real + fixed. SCHEMA n/a;
+  LOGIC extended (structural caps). [RFC](docs/v0.4.0_RFC_Specification.md) ·
+  [compliance](docs/COMPLIANCE-v0.4.md).
 - **v0.3.1** *(shipped 2026-06-16, PR #6)* — **patch**: Tier-1 hardening
   (within-mirror) — a structural no-I/O import guard (`src` imports only stdlib
   `xml`; no network/exec/os) + broadened differential fuzz. No behavior change.
