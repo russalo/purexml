@@ -108,6 +108,8 @@ Run the relevant checklist AT the moment, not from memory of having read it.
 - [ ] Are those findings logged in `scratch/review/`?
 - [ ] Is this implementation (PR-worthy), not a draft (conversation)?
 - [ ] Did I re-introduce anything in `Excluded decisions`?
+- [ ] **libexpat currency:** ran `scratch/review/check_expat_currency.py` (IN-SYNC, or
+  drift surfaced)? See the libexpat Known decision.
 
 **Before merge (minors):**
 - [ ] Did the PR-bot leg fire (Codex / Gemini Code Assist / Copilot), and are
@@ -552,6 +554,17 @@ blame`.
   latest-stable (patch); (2) if the class reaches purexml's *parse paths*, add it to the
   map gated on its fix version — a **minor** (mitigation-set change → RFC), as v0.6 did.
   This is the maintained-successor promise in mechanism; don't let the floor go stale.
+  **Standing check (the proactive gate):** run
+  `./.venv/bin/python scratch/review/check_expat_currency.py` — it compares the latest
+  upstream libexpat release (`gh` API, no new deps) against `RECOMMENDED_EXPAT_VERSION`
+  and prints IN-SYNC or DRIFT + the review checklist (exit 1 on drift). It is a
+  **release-time + on-touch gate**, fired at the moments drift actually matters:
+  - **before opening ANY release PR** (add it to the pre-PR Decision-gate run), and
+  - **whenever a session edits `_expat_security.py`**.
+  These triggers catch drift at the right time without a wall-clock poller — libexpat
+  ships months apart, and the harness's recurring scheduler auto-expires in 7 days, so a
+  cron would be theater here. On drift, follow the printed checklist and **surface to
+  Russell — never auto-PR/merge.** Currency is now a gate, not a thing remembered.
 - **CVE-2026-41080 deliberately UNMAPPED** (v0.6) — its cause/reachability vs purexml's
   paths isn't grounded, so it is NOT a named map class; the generic floor advisory cites
   it only when the runtime is below its 2.8.0 fix (`_HIGHEST_UNMAPPED_FIX`). Don't add it
