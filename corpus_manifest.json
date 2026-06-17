@@ -1,5 +1,5 @@
 {
- "_about": "purexml leg-3 corpus baseline. Subset symlinked from the shared pkplab root (/srv/projects/pkplab/scanner-corpora) into gitignored scratch/corpora/. Bytes are NOT committed; this manifest pins exactly what scratch/review/corpus_sweep.py gates on so the sweep is reproducible.",
+ "_about": "purexml leg-3 corpus baseline. Subset symlinked from the shared pkplab root (/srv/projects/pkplab/scanner-corpora) into gitignored scratch/corpora/. Bytes NOT committed; this pins exactly what scratch/review/corpus_sweep.py gates on. OOXML = real parseable containers only (valid zip with XML parts); empty/corrupted/no-part edge_cases excluded (they test degradation, not XML parsing).",
  "shared_root": "/srv/projects/pkplab/scanner-corpora/",
  "corpora": {
   "tika_xml": {
@@ -1428,7 +1428,7 @@
    ]
   },
   "ooxml_docx": {
-   "count": 16,
+   "count": 27,
    "files": [
     {
      "path": "ooxml-fixtures/PS-ComMVP-PS-ComMVP-idx.docx",
@@ -1506,6 +1506,61 @@
      "size": 10953
     },
     {
+     "path": "ooxml-fixtures/edge_cases/docx_with_macros.docx",
+     "sha256": "fde7c770bdd9c386695476ab6090e04e6e4689915a562e8065fca7bca27b2440",
+     "size": 777
+    },
+    {
+     "path": "ooxml-fixtures/rtf/pdf/docx/docx_01_authorization_letter_1745.docx",
+     "sha256": "a7063632c2c07f03c48cefa4e733239f3f732f76cf0e3d48b4584150e4f80f39",
+     "size": 1972410
+    },
+    {
+     "path": "ooxml-fixtures/rtf/pdf/docx/docx_02_certificate_completion_1745.docx",
+     "sha256": "cd0230619072a303a3f03ca681009287de0fc8dd161e4ef89ba37dc968d7ef76",
+     "size": 19967
+    },
+    {
+     "path": "ooxml-fixtures/rtf/pdf/docx/docx_03_emergency_contact_list_1746.docx",
+     "sha256": "98f669766484a2a28fd7bbb16e9f6babedb60ac594e2b2c651b2fd7d6d619f23",
+     "size": 13991
+    },
+    {
+     "path": "ooxml-fixtures/rtf/pdf/docx/docx_04_notice_to_residents_1746.docx",
+     "sha256": "39ab51318fe35c8cf19a83035260cb677a9429b0ce7f0db8cacb48b3b0cb1dc3",
+     "size": 14019
+    },
+    {
+     "path": "ooxml-fixtures/rtf/pdf/docx/docx_05_contract_specs_1747.docx",
+     "sha256": "cdd7e1468c30ce7a1c68f034723fa88b6aea25a82f792483053cb31835d4fbc6",
+     "size": 15402
+    },
+    {
+     "path": "ooxml-fixtures/rtf/pdf/docx/docx_06_ocip_forms_1747.docx",
+     "sha256": "2d0234d29538ffb4589ff1faed26f2c7103268a138e93e087c3f0bd019090095",
+     "size": 134603
+    },
+    {
+     "path": "ooxml-fixtures/rtf/pdf/docx/docx_07_prelim_info_1747.docx",
+     "sha256": "d6065f3c9994b39d5d41b3c48e77821ed06ea5159e452aa7d1055d73012d4b32",
+     "size": 21757
+    },
+    {
+     "path": "ooxml-fixtures/rtf/pdf/docx/docx_08_insurance_request_1749.docx",
+     "sha256": "265603e4dbda206b940f234783596782c7dff089a1c19550117b2f58638763a0",
+     "size": 25172
+    },
+    {
+     "path": "ooxml-fixtures/rtf/pdf/docx/docx_09_change_order_proposal_1751.docx",
+     "sha256": "121b3a4ec50db4c10f80b47758f54ec8ae88d780d62ccd748748560dde5340c9",
+     "size": 15969
+    },
+    {
+     "path": "ooxml-fixtures/rtf/pdf/docx/docx_10_cal_osha_renewal_1745.docx",
+     "sha256": "4258c301fdf83bcdd71e3751e4ff6f33410dba84f32205988a33838b457ef873",
+     "size": 24454
+    },
+    {
      "path": "ooxml-fixtures/sample_report.docx",
      "sha256": "64957fa80337e51c3174093cbf250c0ae87023969daeb0b3afe416b2f28b2517",
      "size": 1055
@@ -1528,6 +1583,6 @@
    ]
   }
  },
- "aggregate_sha256": "71c006a43215e5f9c4c86abd4ae42bb2e06eebd742c48491f013b1487ce8528d",
- "total_files": 302
+ "aggregate_sha256": "1a1df04a1045681c10f878cf928c89a58608ebf6649b1920dbd6994abb0f5bb7",
+ "total_files": 313
 }
