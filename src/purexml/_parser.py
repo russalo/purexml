@@ -19,7 +19,14 @@ from xml.etree.ElementTree import ParseError, TreeBuilder
 from xml.etree.ElementTree import iterparse as _stdlib_iterparse
 from xml.etree.ElementTree import parse as _stdlib_parse
 
-from .errors import DTDForbidden, EntitiesForbidden, ExternalReferenceForbidden
+from .errors import (
+    AttributesExceeded,
+    DepthExceeded,
+    DTDForbidden,
+    EntitiesForbidden,
+    ExternalReferenceForbidden,
+    SizeExceeded,
+)
 
 __all__ = ["XMLParser", "fromstring", "parse", "fromstringlist", "iterparse"]
 
@@ -31,13 +38,21 @@ class XMLParser:
     """
 
     def __init__(self, *, target=None, encoding=None, forbid_dtd=False,
-                 forbid_entities=True, forbid_external=True):
+                 forbid_entities=True, forbid_external=True, limits=None):
         parser = _expat.ParserCreate(encoding, "}")
         self.parser = parser
         self.target = target if target is not None else TreeBuilder()
         self._error = _expat.error
         self._names = {}
         self.entity = {}  # always empty when forbid_entities (every decl is blocked)
+
+        # --- opt-in structural-DoS limits (v0.4 mirror-plus; None == no cap) ---
+        # Extracted to scalars so the default path is a cheap `is not None` check.
+        self._max_depth = limits.max_depth if limits else None
+        self._max_attributes = limits.max_attributes if limits else None
+        self._max_bytes = limits.max_bytes if limits else None
+        self._depth = 0
+        self._fed = 0
 
         # --- tree-building glue (mirrors stdlib xml.etree XMLParser) ---
         # Guard the optional target callbacks with hasattr, like the stdlib, so a
@@ -94,6 +109,15 @@ class XMLParser:
     def _start(self, tag, attr_list):
         fixname = self._fixname
         tag = fixname(tag)
+        # opt-in structural caps (checked before building the element)
+        if self._max_attributes is not None and attr_list:
+            nattrs = len(attr_list) // 2
+            if nattrs > self._max_attributes:
+                raise AttributesExceeded(tag, nattrs, self._max_attributes)
+        if self._max_depth is not None:
+            self._depth += 1
+            if self._depth > self._max_depth:
+                raise DepthExceeded(self._depth, self._max_depth)
         attrib = {}
         if attr_list:
             for i in range(0, len(attr_list), 2):
@@ -101,6 +125,8 @@ class XMLParser:
         return self.target.start(tag, attrib)
 
     def _end(self, tag):
+        if self._max_depth is not None:
+            self._depth -= 1
         return self.target.end(self._fixname(tag))
 
     def _start_ns(self, prefix, uri):
@@ -196,13 +222,18 @@ class XMLParser:
 
     # ---- feed/close (compatible with xml.etree.ElementTree.parse) ----
     def feed(self, data):
+        if self._max_bytes is not None:
+            self._fed += len(data)
+            if self._fed > self._max_bytes:
+                self._cleanup()
+                raise SizeExceeded(self._fed, self._max_bytes)
         try:
             self.parser.Parse(data, False)
         except self._error as v:
             self._cleanup()
             self._raiseerror(v)
         except BaseException:
-            # blocking refusals (EntitiesForbidden/...) and anything else
+            # blocking refusals (EntitiesForbidden / LimitExceeded / ...) and anything else
             self._cleanup()
             raise
 
@@ -217,7 +248,8 @@ class XMLParser:
             self._cleanup()
 
 
-def fromstring(text, forbid_dtd=False, forbid_entities=True, forbid_external=True):
+def fromstring(text, forbid_dtd=False, forbid_entities=True, forbid_external=True,
+               *, limits=None):
     """Parse XML *text* into an ``xml.etree.ElementTree.Element``, safely.
 
     Behaviorally equivalent to ``defusedxml.ElementTree.fromstring``: entity
@@ -226,41 +258,47 @@ def fromstring(text, forbid_dtd=False, forbid_entities=True, forbid_external=Tru
     subclasses); ``forbid_dtd=True`` additionally blocks any DOCTYPE
     (``DTDForbidden``); malformed input raises ``xml.etree.ElementTree.ParseError``.
     Stdlib-only.
+
+    *limits* (purexml mirror-plus; keyword-only, default ``None`` = no caps = strict
+    mirror): an opt-in ``purexml.Limits`` bounding structural DoS — exceeding a cap
+    raises a ``LimitExceeded`` subclass.
     """
     parser = XMLParser(forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
-                       forbid_external=forbid_external)
+                       forbid_external=forbid_external, limits=limits)
     parser.feed(text)
     return parser.close()
 
 
 def parse(source, parser=None, forbid_dtd=False, forbid_entities=True,
-          forbid_external=True):
+          forbid_external=True, *, limits=None):
     """Parse XML from *source* (a filename or file-like) into a hardened
-    ``ElementTree``. Mirrors ``defusedxml.ElementTree.parse``."""
+    ``ElementTree``. Mirrors ``defusedxml.ElementTree.parse``. *limits* (opt-in,
+    keyword-only) applies only when building the default parser."""
     if parser is None:
         parser = XMLParser(forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
-                           forbid_external=forbid_external)
+                           forbid_external=forbid_external, limits=limits)
     return _stdlib_parse(source, parser)
 
 
 def fromstringlist(sequence, parser=None, forbid_dtd=False, forbid_entities=True,
-                   forbid_external=True):
+                   forbid_external=True, *, limits=None):
     """Parse a *sequence* of XML string fragments into an ``Element``, safely.
 
     Stdlib-parity addition (``defusedxml.ElementTree`` does not provide
     ``fromstringlist``); behaves like a hardened ``xml.etree.ElementTree``
-    ``fromstringlist`` — equivalent to ``fromstring("".join(sequence))``.
+    ``fromstringlist`` — equivalent to ``fromstring("".join(sequence))``. *limits*
+    (opt-in, keyword-only) applies only when building the default parser.
     """
     if parser is None:
         parser = XMLParser(forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
-                           forbid_external=forbid_external)
+                           forbid_external=forbid_external, limits=limits)
     for text in sequence:
         parser.feed(text)
     return parser.close()
 
 
 def iterparse(source, events=None, parser=None, forbid_dtd=False,
-              forbid_entities=True, forbid_external=True):
+              forbid_entities=True, forbid_external=True, *, limits=None):
     """Incrementally parse XML from *source*, yielding ``(event, elem)`` pairs, safely.
 
     Mirrors ``defusedxml.ElementTree.iterparse``. Reuses the stdlib `iterparse`
@@ -277,5 +315,5 @@ def iterparse(source, events=None, parser=None, forbid_dtd=False,
     """
     if parser is None:
         parser = XMLParser(forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
-                           forbid_external=forbid_external)
+                           forbid_external=forbid_external, limits=limits)
     return _stdlib_iterparse(source, events, parser)

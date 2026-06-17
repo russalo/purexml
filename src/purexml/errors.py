@@ -12,6 +12,10 @@ __all__ = [
     "DTDForbidden",
     "EntitiesForbidden",
     "ExternalReferenceForbidden",
+    "LimitExceeded",
+    "DepthExceeded",
+    "AttributesExceeded",
+    "SizeExceeded",
 ]
 
 
@@ -67,3 +71,42 @@ class ExternalReferenceForbidden(PureXMLError):
         )
         self.sysid = sysid
         self.pubid = pubid
+
+
+class LimitExceeded(PureXMLError):
+    """Base for opt-in structural-DoS limit breaches (v0.4 mirror-plus).
+
+    These fire only when a caller passes `limits=` — defusedxml has no caps, so by
+    default purexml does not raise these (the strict-mirror default is preserved).
+    """
+
+
+class DepthExceeded(LimitExceeded):
+    """Element nesting deeper than `limits.max_depth`."""
+
+    def __init__(self, depth, limit):
+        super().__init__("DepthExceeded(depth=%d, max_depth=%d)" % (depth, limit))
+        self.depth = depth
+        self.limit = limit
+
+
+class AttributesExceeded(LimitExceeded):
+    """An element with more attributes than `limits.max_attributes`."""
+
+    def __init__(self, tag, count, limit):
+        super().__init__(
+            "AttributesExceeded(element=%r, count=%d, max_attributes=%d)"
+            % (tag, count, limit)
+        )
+        self.tag = tag
+        self.count = count
+        self.limit = limit
+
+
+class SizeExceeded(LimitExceeded):
+    """Total input fed exceeds `limits.max_bytes`."""
+
+    def __init__(self, size, limit):
+        super().__init__("SizeExceeded(bytes=%d, max_bytes=%d)" % (size, limit))
+        self.size = size
+        self.limit = limit
