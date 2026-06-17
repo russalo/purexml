@@ -341,6 +341,13 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.7.0** *(approved 2026-06-17, in implementation)* — **posture CLI**:
+  `python -m purexml` over `security_report()` — default human report (informs, exit 0),
+  `--json` (machine-readable, PROVISIONAL), `--check [--min-expat X.Y.Z]` (opt-in CI gate,
+  pin-your-floor), `--version`; + `SecurityReport.as_dict()`. First build of the
+  publish-worthy-debut push. `__main__.py` is the one I/O boundary (no-I/O guard
+  carve-out: may add argparse/json/sys, still under FORBIDDEN). No parse-behavior change;
+  SCHEMA n/a; LOGIC unchanged. [RFC](docs/v0.7.0_RFC_Specification.md).
 - **v0.6.0** *(shipped 2026-06-17, PR #11)* — **complete the posture map**: adds the two
   newer expat-layer DoS classes (`content_token_overflow_cve_2026_25210` → expat 2.7.4;
   `attribute_collision_dos_cve_2026_45186` → 2.8.1, opt-in `max_attributes` partially
@@ -440,6 +447,10 @@ Small by design (~300 lines of `src/`). The whole engine is one class.
   `ParseError`/`tostring`.
 - **`src/purexml/__init__.py`** — top-level convenience re-exports of the family +
   exceptions + the expat-version API + `__version__`; imports the `ElementTree` submodule.
+- **`src/purexml/__main__.py`** — the `python -m purexml` posture CLI (v0.7): prints
+  `security_report()` (default), `--json`, `--check [--min-expat]` (opt-in gate),
+  `--version`. The package's one I/O boundary; reads `_es.EXPAT_VERSION` at call time so
+  it stays consistent with `security_report()` (and testable under monkeypatch).
 - **`src/purexml/errors.py`** — `PureXMLError(ValueError)` ← `DTDForbidden`,
   `EntitiesForbidden`, `ExternalReferenceForbidden`, `LimitExceeded`(←`Depth`/
   `Attributes`/`SizeExceeded`). Malformed → stdlib `ParseError`.
@@ -457,8 +468,9 @@ Small by design (~300 lines of `src/`). The whole engine is one class.
   vs the oracle), `test_attacks` + `test_fuzz_equivalence` + `test_hardening_soak` +
   `conftest` (attack battery + differential fuzz + red-team soak + the no-fetch/no-read
   trip-wire), `test_v04_limits`, `test_v05_security_report` (posture API + version-gating),
-  `test_no_io` (structural import guard), `test_durability` / `test_expat_security` /
-  `test_misc`. Run on CPython ≥3.10.
+  `test_v07_cli` (the `python -m purexml` flag matrix + JSON + --check exit codes),
+  `test_no_io` (structural import guard, incl. the `__main__.py` CLI carve-out),
+  `test_durability` / `test_expat_security` / `test_misc`. Run on CPython ≥3.10.
 - **Out of `src/` (gitignored `scratch/`):** `review/corpus_sweep.py` (empirical
   sweep over the shared pkplab corpus via symlinks — baseline pinned in committed
   `corpus_manifest.json`); `measure/` (measure-first findings); `spinoff_ideas.md`.

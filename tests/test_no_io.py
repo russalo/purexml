@@ -19,6 +19,13 @@ import purexml
 #: security guarantee — each entry is justified inline).
 ALLOWED_TOPLEVEL = {"xml", "collections", "types"}
 
+#: The CLI entry point (`__main__.py`, v0.7) is the package's ONE explicit I/O
+#: boundary — it prints the posture report, so it may import the CLI-output stdlib on
+#: top of the library surface. None of these reach the network/filesystem/subprocess
+#: (they stay subject to FORBIDDEN below); the parse surface keeps the strict allowlist.
+CLI_EXTRA = {"argparse", "json", "sys"}
+CLI_FILE = "__main__.py"
+
 #: Explicitly forbidden — network, process-exec, OS, and low-level memory modules,
 #: plus common third-party HTTP clients. None belong in a stdlib-only safe parser.
 FORBIDDEN = {
@@ -45,13 +52,15 @@ def _toplevel_imports(path):
 
 
 def test_src_imports_only_stdlib_xml():
-    """Strong form: the entire runtime import surface is the stdlib `xml` package."""
+    """Strong form: the entire runtime import surface is the stdlib `xml` package —
+    except the CLI entry point, which may add CLI-output stdlib (see CLI_EXTRA)."""
     for py in _SRC.rglob("*.py"):
-        extra = _toplevel_imports(py) - ALLOWED_TOPLEVEL
+        allowed = ALLOWED_TOPLEVEL | CLI_EXTRA if py.name == CLI_FILE else ALLOWED_TOPLEVEL
+        extra = _toplevel_imports(py) - allowed
         assert not extra, (
             "%s imports outside the allowed surface %s: %s "
             "(adding a stdlib import is a conscious security decision — update "
-            "ALLOWED_TOPLEVEL with justification)" % (py.name, ALLOWED_TOPLEVEL, extra)
+            "ALLOWED_TOPLEVEL with justification)" % (py.name, allowed, extra)
         )
 
 

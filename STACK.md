@@ -42,7 +42,8 @@ scaffolding side-by-side; the Go half was deleted when purexml chose Python.)
   `parse`/`iterparse`/`fromstringlist`), `errors.py` (exception hierarchy),
   `limits.py` (opt-in structural-DoS caps — `Limits`/`RECOMMENDED_LIMITS`, v0.4),
   `_expat_security.py` (opt-in libexpat version awareness + `security_report()`
-  posture API, v0.5).
+  posture API, v0.5), `__main__.py` (the `python -m purexml` posture CLI, v0.7 —
+  the package's one I/O boundary).
 - `tests/` at repo root, plain `pytest` (no `tests/__init__.py` — flat layout so
   `conftest.py` imports cleanly). See **Architecture** in `CLAUDE.md`.
 - `fuzz/` at repo root — the opt-in Atheris coverage-guided harness (dev-only,
@@ -56,7 +57,8 @@ pip install -e ".[dev]"                         # pytest + defusedxml oracle
 python -m pytest tests/ -q
 ```
 
-No CLI — the surface is the library call `purexml.fromstring(text)`.
+Primarily a library (`purexml.fromstring(text)` etc.). A small read-only posture CLI
+exists: `python -m purexml` (+ `--json` / `--check [--min-expat]` / `--version`, v0.7).
 
 ## CI
 
