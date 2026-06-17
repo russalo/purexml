@@ -31,7 +31,7 @@ def _toplevel_imports(path):
     """Top-level module names imported non-relatively by *path* (relative imports
     — the package's own modules — are excluded)."""
     mods = set()
-    for node in ast.walk(ast.parse(path.read_text())):
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
         if isinstance(node, ast.Import):
             for alias in node.names:
                 mods.add(alias.name.split(".")[0])

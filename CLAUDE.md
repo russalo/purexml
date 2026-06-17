@@ -339,6 +339,10 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.3.1** *(shipped 2026-06-16, PR #6)* — **patch**: Tier-1 hardening
+  (within-mirror) — a structural no-I/O import guard (`src` imports only stdlib
+  `xml`; no network/exec/os) + broadened differential fuzz. No behavior change.
+  _HISTORY only._
 - **v0.3.0** *(shipped 2026-06-16, PR #5)* — hardened `iterparse`; **completes the
   `defusedxml.ElementTree` family** (the streaming slice; Option A — `_setevents`
   + reuse stdlib iterparse). Four-leg review; all 3 PR-bot findings grounded-declined.
