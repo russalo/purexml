@@ -133,7 +133,7 @@ single `docs: freshness sweep to vX.Y` commit.
 The sweep set: `README.md`, `CLAUDE.md` (What this is / Architecture / Spec
 versions / Known decisions), `STACK.md`, `LIMITATIONS.md`, `SECURITY.md`,
 `PUBLIC_CONTRACT.md`, `HISTORY.md`, `docs/ROADMAP-to-1.0.md`,
-`docs/TARGET_SPECIFICATION.md`, and the `scratch/review/auditor_GEMINI.md` adapter.
+`docs/FO_REQUIRED_COMPATIBILITY.md`, and the `scratch/review/auditor_GEMINI.md` adapter.
 (Established 2026-06-16.)
 
 ---

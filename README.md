@@ -26,7 +26,7 @@ PyPI/name/license) is deferred to v1.0 — see *License*. Path to 1.0:
 [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md). Latest spec + audit:
 [`docs/v0.3.0_RFC_Specification.md`](docs/v0.3.0_RFC_Specification.md),
 [`docs/COMPLIANCE-v0.3.md`](docs/COMPLIANCE-v0.3.md); north star:
-[`docs/TARGET_SPECIFICATION.md`](docs/TARGET_SPECIFICATION.md).
+[`docs/FO_REQUIRED_COMPATIBILITY.md`](docs/FO_REQUIRED_COMPATIBILITY.md).
 
 ## Stack
 

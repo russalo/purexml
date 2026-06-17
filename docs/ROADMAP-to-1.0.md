@@ -57,8 +57,10 @@ On top, add bounded opt-in defense-in-depth defusedxml never had:
   remote, external-entity local, DTD retrieval; + 2 newer: CVE-2023-52425
   large-tokens/reparse, disproportionate dynamic memory on old expat),
   **version-gated on `pyexpat.EXPAT_VERSION`.** Also ships the version assertion.
-- **G5 — decide deferred items:** adoption model (vendor vs dep) → packaging,
-  PyPI + name claim, license. Must land by 1.0.
+- **G5 — decide deferred items.** Adoption-model **direction is decided: publish
+  first-party** (ratified 2026-06-16; `docs/v1.0_TARGET.md`). Remaining specifics to
+  land by 1.0: PyPI timing, claiming the name, the license, the optional vendorable
+  single-file form.
 - **G6 — 1.0 freeze:** see the pre-freeze checklist below.
 
 ## Pre-freeze checklist (the 1.0 freeze gate — expands G6)

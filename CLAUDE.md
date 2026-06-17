@@ -146,7 +146,7 @@ The anchor consumer is **file-observer** (it uses only `fromstring`), but the 1.
 identity is the *complete* ElementTree drop-in (see Known decisions). This is a
 *security control*, not a format reader — owning it means owning the audit burden,
 which is why the adversarial review leg carries extra weight here. Capability
-north star: [`docs/TARGET_SPECIFICATION.md`](docs/TARGET_SPECIFICATION.md); the
+north star: [`docs/FO_REQUIRED_COMPATIBILITY.md`](docs/FO_REQUIRED_COMPATIBILITY.md); the
 plan to 1.0: [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md).
 
 ## Lane discipline
@@ -492,15 +492,15 @@ blame`.
   bound structural DoS). **Rule: any defense-in-depth is OPT-IN, default-OFF — never
   diverge from defusedxml by default.** At 1.0 freeze the mirror surface is STABLE;
   the novel defense-in-depth is PROVISIONAL (it may evolve). See `docs/v0.4.0_RFC_Specification.md`.
-- **Adoption model DEFERRED TO v1.0** (decided 2026-06-16) — file-observer may
-  *vendor* purexml (its leaning) or take it as a *first-party dependency*; the
-  choice is **deliberately not made until v1.0.** Everything that rides on it is
-  therefore also deferred: PyPI publishing, claiming the `purexml` name (confirmed
-  free 2026-06-15), the license, and the **vendor single-file form** (scanner #6).
-  Until 1.0, purexml ships as the `src/purexml/` package in the private repo only,
-  consumed via git/path or by vendoring the package as-is. Do **not** publish,
-  claim the name, set a license, or build the single-file amalgamation before the
-  1.0 adoption decision. See `scratch/packaging_and_naming_notes.md`.
+- **Adoption model: DIRECTION decided = publish first-party; SPECIFICS deferred to
+  v1.0** (direction ratified 2026-06-16). purexml is an **ecosystem-adoptable,
+  first-party library** (not vendor-only) — that's the mandate (`docs/v1.0_TARGET.md`).
+  But the *specifics* — PyPI timing, claiming the `purexml` name (confirmed free
+  2026-06-15), the license, the optional vendorable single-file form — stay deferred
+  to the 1.0 freeze. **Until 1.0, still: do NOT publish, claim the name, or set a
+  license** — package-only in the private repo, consumed via git/path. The direction
+  just means: when 1.0's specifics are decided, they aim at *published*, not vendored.
+  See `scratch/packaging_and_naming_notes.md`.
 
 ## Excluded decisions (do NOT re-introduce)
 
@@ -617,7 +617,7 @@ axis live.
 current state in that one pass — don't fix only the doc that prompted it. The set
 to sweep: `README.md`, `CLAUDE.md` (What this is / Architecture / Spec versions /
 Known decisions), `STACK.md`, `LIMITATIONS.md`, `SECURITY.md`, `PUBLIC_CONTRACT.md`,
-`HISTORY.md`, `docs/ROADMAP-to-1.0.md`, `docs/TARGET_SPECIFICATION.md`, and the
+`HISTORY.md`, `docs/ROADMAP-to-1.0.md`, `docs/FO_REQUIRED_COMPATIBILITY.md`, and the
 `scratch/review/auditor_GEMINI.md` adapter. Docs drift in lockstep, so catching
 them up together (one "docs: freshness sweep to vX.Y" commit) keeps them
 consistent and is cheaper than chasing each later. See CONVENTIONS.md §3.2.

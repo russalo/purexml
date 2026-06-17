@@ -1,18 +1,18 @@
-# purexml — Target Specification
+# purexml — file-observer Required Compatibility (the 1.0 consumer floor)
 
-> **Status: TARGET (capability spec).** Authored by the file-observer instance as the
-> consumer-side contract + north star. It states the **capabilities** this project must
-> deliver and the bar they must clear — **not how to build them.** Implementation (which
-> stdlib mechanism, how the hardening is configured) belongs to this project's own
-> instance. The name `purexml` is provisional — rename freely.
+> **Status: Consumer floor (binding).** Authored by the file-observer (FO) instance as
+> *the minimum FO requires to adopt purexml* — the compatibility purexml must always
+> satisfy for its anchor consumer. This is the **floor, not the ceiling**: FO's required
+> capabilities + the bar they clear, not how to build them, and not the whole of what
+> purexml is. (Originally "Target Specification"; renamed 2026-06-16 — it was always FO's
+> required-compat contract, and purexml's own 1.0 aspiration is a strict superset.)
 
-> **Scope evolution (2026-06-16):** this north star framed the *minimal* slice the
-> anchor consumer needs (one hardened `fromstring`). purexml's 1.0 identity has since
-> been ratified as the **complete `defusedxml.ElementTree` drop-in** (the full family,
-> shipped through v0.3) — a strict superset of this capability, serving §1's
-> "drop the dependency with zero functionality loss" for *any* ElementTree consumer,
-> not just file-observer. The authoritative current scope + plan is
-> [`ROADMAP-to-1.0.md`](ROADMAP-to-1.0.md); this doc is kept as the originating contract.
+> **Where the wider 1.0 lives.** purexml has grown well past this floor — it is now the
+> complete `defusedxml.ElementTree` drop-in plus opt-in defense-in-depth (shipped through
+> v0.4). FO's floor below remains the non-negotiable compatibility guarantee; purexml's
+> own steward vision for a healthy 1.0 is in [`v1.0_TARGET.md`](v1.0_TARGET.md), and the
+> execution plan is [`ROADMAP-to-1.0.md`](ROADMAP-to-1.0.md). This doc is the originating
+> contract — the promise FO holds purexml to.
 
 ## 1. Purpose
 
