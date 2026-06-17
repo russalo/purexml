@@ -24,6 +24,7 @@ below.
 
 | Version | Schema | Date | Notable | Spec | Compliance |
 |---|---|---|---|---|---|
+| 0.4.0 | n/a | _RFC approved; unreleased_ | **Mirror-plus** — opt-in structural-DoS caps (`max_depth`/`max_attributes`/`max_bytes`, default OFF so the strict-mirror default is preserved) raising `LimitExceeded`. First deliberate divergence beyond defusedxml (opt-in only). SCHEMA n/a; LOGIC extended (structural caps). | [v0.4.0_RFC_Specification.md](docs/v0.4.0_RFC_Specification.md) _(approved 2026-06-16; implementation pending)_ | [COMPLIANCE-v0.4.md](docs/COMPLIANCE-v0.4.md) _(due before merge)_ |
 | 0.3.1 | n/a | 2026-06-16 | **Patch** — Tier-1 hardening (within-mirror, no behavior change): structural **no-I/O import guard** (src imports only stdlib `xml`; no network/exec/os modules — the no-fetch guarantee made structural, not just behavioral) + **broadened differential fuzz** (char-ref floods, conditional sections, XML 1.1, declared encodings, adjacent CDATA). LOGIC unchanged, SCHEMA n/a. _(HISTORY only, no RFC — part of v0.3.)_ | _(no RFC — patch)_ | _(part of v0.3)_ |
 | 0.3.0 | n/a | 2026-06-16 | Hardened `iterparse` — **completes the `defusedxml.ElementTree` family** (the streaming slice). Reuses stdlib `iterparse` via `_setevents` on `purexml.XMLParser` (Option A). Merged via PR #5; four-leg review complete (all 3 PR-bot findings grounded-declined). SCHEMA n/a; LOGIC unchanged (default behavior; adds the streaming entry point). | [v0.3.0_RFC_Specification.md](docs/v0.3.0_RFC_Specification.md) | [COMPLIANCE-v0.3.md](docs/COMPLIANCE-v0.3.md) |
 | 0.2.0 | n/a | 2026-06-16 | Complete the non-streaming `defusedxml.ElementTree` surface: `parse`, `fromstringlist`, `XML`/`tostring`, exposed `XMLParser`, the `forbid_*` knobs (+ new `DTDForbidden`), under a canonical `purexml.ElementTree` namespace. Merged via PR #4; four-leg review complete. SCHEMA n/a; LOGIC mitigation set extended (`forbid_dtd` path), default behavior unchanged. | [v0.2.0_RFC_Specification.md](docs/v0.2.0_RFC_Specification.md) | [COMPLIANCE-v0.2.md](docs/COMPLIANCE-v0.2.md) |
@@ -41,11 +42,10 @@ List any RFCs currently in draft (`docs/v{X.Y.Z}_RFC_DRAFT.md`). When none are
 open, state so explicitly rather than deleting the section — the empty-but-named
 state is the signal:
 
-> No drafts in flight. The **`defusedxml.ElementTree` family is complete** as of
-> v0.3.0; the build axis to 1.0 is done. Remaining work is adoption validation +
-> the freeze ceremony — see [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md). No
-> RFC is open; the next RFC is the v1.0 freeze when adoption + the deferred
-> decisions land.
+> No drafts in flight. The **v0.4.0 RFC is approved** (2026-06-16) and in
+> implementation — [`docs/v0.4.0_RFC_Specification.md`](docs/v0.4.0_RFC_Specification.md)
+> (mirror-plus opt-in structural-DoS caps; the `defusedxml.ElementTree` family was
+> completed at v0.3.0). See [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md).
 >
 > (Shipped 2026-06-16: v0.1.0 fromstring (PR #1); v0.1.1 floor→3.10 (PR #2); v0.1.2
 > durability + expat awareness (PR #3); v0.2.0 non-streaming ElementTree surface +

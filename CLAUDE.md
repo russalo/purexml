@@ -483,12 +483,15 @@ blame`.
   v0.1.0). A true drop-in must accept defusedxml's parameterized signature
   (`forbid_dtd`/`forbid_entities`/`forbid_external`, identical defaults). They
   land in v0.2. (See the tombstone in Excluded decisions.)
-- **Posture = behavioral mirror + bounded, opt-in defense-in-depth** — mirror
-  defusedxml's *defaults* for compatibility, but add what defusedxml lacks:
-  runtime `pyexpat.EXPAT_VERSION` assertion, reparse-deferral awareness
-  (CVE-2023-52425), amplification-limit awareness, optional `forbid_dtd=True`
-  strict mode (OWASP). At 1.0 freeze the mirror surface STABLE, keep the novel
-  defense-in-depth PROVISIONAL (moving libexpat landscape).
+- **Identity = "strict defusedxml mirror by DEFAULT, plus OPT-IN defense-in-depth"**
+  (mirror-plus, **ratified 2026-06-16** at v0.4). Mirror defusedxml's *defaults* for
+  drop-in compatibility (the default path stays byte-equivalent), but add what
+  defusedxml lacks, **opt-in**: runtime `pyexpat.EXPAT_VERSION` assertion (v0.1.2),
+  the `forbid_dtd=True` OWASP strict mode (v0.2), and **opt-in structural-DoS caps**
+  (`max_depth`/`max_attributes`/`max_bytes`, v0.4 — defusedxml + the expat cap don't
+  bound structural DoS). **Rule: any defense-in-depth is OPT-IN, default-OFF — never
+  diverge from defusedxml by default.** At 1.0 freeze the mirror surface is STABLE;
+  the novel defense-in-depth is PROVISIONAL (it may evolve). See `docs/v0.4.0_RFC_Specification.md`.
 - **Adoption model DEFERRED TO v1.0** (decided 2026-06-16) — file-observer may
   *vendor* purexml (its leaning) or take it as a *first-party dependency*; the
   choice is **deliberately not made until v1.0.** Everything that rides on it is
