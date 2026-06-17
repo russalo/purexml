@@ -31,14 +31,17 @@ with atheris.instrument_imports():
 
 
 def _kind(fn, data):
-    """('parse', canonical-C14N) on success, ('raise', None) on any exception.
+    """('parse', canonical-C14N) on success, ('raise', None) on a *parse* exception.
 
     Only the parse-vs-raise *kind* and the canonical tree are compared — exception
-    *types* differ by design (purexml has its own hierarchy)."""
+    *types* differ by design (purexml has its own hierarchy). Catch only the parse
+    call: a parse-success-but-serialize-failure must surface (not be masked as a
+    parse failure), or a serialization divergence would hide behind both-raise."""
     try:
-        return ("parse", ET.canonicalize(ET.tostring(fn(data), encoding="unicode")))
+        tree = fn(data)
     except Exception:  # noqa: BLE001 — kind, not type, is the contract
         return ("raise", None)
+    return ("parse", ET.canonicalize(ET.tostring(tree, encoding="unicode")))
 
 
 def _one_input(data):

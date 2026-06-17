@@ -54,11 +54,14 @@ _DOCTYPE = [
 
 def _elem(rng, depth):
     tag = rng.choice(["a", "b", "c", "n:x", "item"])
-    attrs = ""
+    # Accumulate into a dict so a repeated name doesn't emit a duplicate attribute
+    # (a well-formedness violation that makes both parsers raise early, wasting the
+    # document on the error path instead of exploring deeper parse paths — PR#8 Gemini).
+    attr_map = {}
     for _ in range(rng.randint(0, 3)):
-        attrs += " %s=%r" % (
-            rng.choice(["k", "id", "n:at", "xml:lang"]),
-            rng.choice(["1", "v", "café", "a&amp;b", "&lt;x&gt;", "&#65;z", ""]))
+        attr_map[rng.choice(["k", "id", "n:at", "xml:lang"])] = rng.choice(
+            ["1", "v", "café", "a&amp;b", "&lt;x&gt;", "&#65;z", ""])
+    attrs = "".join(" %s=%r" % (k, v) for k, v in attr_map.items())
     body = ""
     n = 0 if depth >= 4 else rng.randint(0, 3)
     if n == 0:
@@ -92,10 +95,14 @@ def _doc(rng):
 
 
 def _kind(fn, s):
+    # Catch only the parse call: a parse-success-but-serialize-failure must surface
+    # rather than masquerade as a parse failure (else a serialization divergence
+    # would hide behind both-raise — PR#8 Gemini).
     try:
-        return ("parse", ET.canonicalize(ET.tostring(fn(s), encoding="unicode")))
+        tree = fn(s)
     except Exception:  # noqa: BLE001 — kind, not type, is what matters
         return ("raise", None)
+    return ("parse", ET.canonicalize(ET.tostring(tree, encoding="unicode")))
 
 
 #: Fuzz dimensions — single source of truth, also read by the equivalence-report

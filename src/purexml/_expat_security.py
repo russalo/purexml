@@ -151,6 +151,22 @@ class SecurityReport(namedtuple("SecurityReport", _ReportFields)):
 
     __slots__ = ()
 
+    def __new__(cls, expat_version, expat_meets_safe_floor, expat_meets_recommended,
+                recommended_limits, mitigations, notes):
+        # Normalize the container fields so EVERY construction path — direct
+        # construction AND ``_replace()`` — yields a genuinely immutable report,
+        # not just ``security_report()``'s output (PR#8 Codex P2). ``mitigations``
+        # becomes a defensive read-only view; ``notes`` a tuple.
+        return super().__new__(
+            cls, expat_version, expat_meets_safe_floor, expat_meets_recommended,
+            recommended_limits, MappingProxyType(dict(mitigations)), tuple(notes))
+
+    @classmethod
+    def _make(cls, iterable):
+        # Route _make (used by _replace) through __new__ so it normalizes too;
+        # the default _make bypasses __new__ via tuple.__new__.
+        return cls(*iterable)
+
     def __str__(self):
         ver = ".".join(map(str, self.expat_version))
         lines = [
@@ -169,9 +185,12 @@ class SecurityReport(namedtuple("SecurityReport", _ReportFields)):
         for cls in sorted(self.mitigations):
             lines.append("    %-*s : %s" % (width, cls, self.mitigations[cls]))
         rl = self.recommended_limits
-        lines.append(
-            "  recommended opt-in limits: max_depth=%s max_attributes=%s "
-            "max_bytes=%s" % (rl.max_depth, rl.max_attributes, rl.max_bytes))
+        if rl is None:
+            lines.append("  recommended opt-in limits: None")
+        else:
+            lines.append(
+                "  recommended opt-in limits: max_depth=%s max_attributes=%s "
+                "max_bytes=%s" % (rl.max_depth, rl.max_attributes, rl.max_bytes))
         if self.notes:
             lines.append("  notes:")
             for n in self.notes:
@@ -202,7 +221,7 @@ def security_report():
         "external_dtd_retrieval": BLOCKED,
         # libexpat reparse-deferral (CVE-2023-52425), fixed in expat 2.6.0.
         "large_tokens_cve_2023_52425":
-            EXPAT_MITIGATED if EXPAT_VERSION >= SAFE_EXPAT_VERSION else LIVE,
+            EXPAT_MITIGATED if meets_safe else LIVE,
         # disproportionate dynamic memory — covered only at the recommended floor.
         "disproportionate_memory":
             EXPAT_MITIGATED if meets_recommended else LIVE,
@@ -229,11 +248,13 @@ def security_report():
         "an unresolved SYSTEM/PUBLIC declaration still parses (no I/O), matching "
         "defusedxml. Pass forbid_dtd=True to reject the DOCTYPE outright.")
 
+    # __new__ normalizes mitigations → read-only view and notes → tuple, so a plain
+    # dict/list is fine here (see SecurityReport.__new__).
     return SecurityReport(
         expat_version=EXPAT_VERSION,
         expat_meets_safe_floor=meets_safe,
         expat_meets_recommended=meets_recommended,
         recommended_limits=RECOMMENDED_LIMITS,
-        mitigations=MappingProxyType(mitigations),  # read-only — see SecurityReport
-        notes=tuple(notes),
+        mitigations=mitigations,
+        notes=notes,
     )

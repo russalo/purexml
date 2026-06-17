@@ -43,6 +43,24 @@ def test_report_is_frozen_printable_value():
         assert cls in rendered
 
 
+def test_immutable_on_all_construction_paths():
+    # PR#8 Codex P2: immutability must hold for direct construction and _replace(),
+    # not only for security_report()'s output — __new__/_make normalize the inputs.
+    r = purexml.security_report()
+    # _replace with mutable inputs still yields a read-only mapping + tuple
+    r2 = r._replace(mitigations={"x": purexml.LIVE}, notes=["n"])
+    assert type(r2.mitigations).__name__ == "mappingproxy"
+    assert isinstance(r2.notes, tuple)
+    with pytest.raises(TypeError):
+        r2.mitigations["x"] = purexml.BLOCKED
+    # direct construction normalizes too (and a None recommended_limits prints)
+    d = purexml.SecurityReport((2, 6, 1), True, False, None, {"k": "v"}, ["note"])
+    assert type(d.mitigations).__name__ == "mappingproxy"
+    with pytest.raises(TypeError):
+        d.mitigations["k"] = "z"
+    assert "None" in str(d)  # recommended_limits=None must not crash __str__
+
+
 def test_report_matches_runtime_expat():
     r = purexml.security_report()
     assert r.expat_version == _expat.version_info == purexml.EXPAT_VERSION
