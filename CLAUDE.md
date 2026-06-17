@@ -101,10 +101,10 @@ Run the relevant checklist AT the moment, not from memory of having read it.
 
 **Before opening a PR (minors+):**
 - [ ] Did the three *pre-open* review legs run — in-house swarm, Gemini
-  cross-model, repo-clone/empirical sweep? (The fourth leg, PR bots, fires *on
-  PR open* — it's checked at the before-merge gate, not here.) "Subset on
-  patches per scope" is a decision you make and record, not a default you slide
-  into.
+  cross-model, repo-clone/empirical sweep — **at the depth the Review-tier rubric
+  sets for this change type**? (The fourth leg, PR bots, fires *on PR open* — it's
+  checked at the before-merge gate, not here.) Scaling down is a decision you make
+  and *record in the PR/findings* (per the rubric), not a default you slide into.
 - [ ] Are those findings logged in `scratch/review/`?
 - [ ] Is this implementation (PR-worthy), not a draft (conversation)?
 - [ ] Did I re-introduce anything in `Excluded decisions`?
@@ -618,7 +618,8 @@ to the AI too — review must come from where the author didn't think.
 > "before opening a PR" checklist. A prior instance ran this as one-and-a-half
 > legs without noticing — the silent-regression failure this whole contract guards.
 
-The four legs (run all on minors+; subset on patches per scope):
+The four legs (all four *run* on minors+; their **depth** scales by change type — see
+the **Review-tier rubric** below; patches subset per scope):
 
 1. **In-house multi-agent swarm** — finder angles × candidates → verify →
    ranked findings. Same model, decorrelated *perspectives*.
@@ -630,6 +631,34 @@ The four legs (run all on minors+; subset on patches per scope):
 3. **Repo-clone audit + empirical sweep** — clean-room clone; deterministic
    sweep vs a baseline.
 4. **PR bots** — Codex / Gemini Code Assist / Copilot on PR open. External.
+
+### Review-tier rubric (how the legs scale by change type)
+
+Codified from v0.1–v0.6 practice — "subset per scope" made precise so scaling is a
+**recorded standard, not silent per-PR judgment**. Pick the tier by three questions:
+*(a) does it touch parse-or-block behavior (the mirror)? (b) is it a new public
+capability/surface? (c) is it security-load-bearing?*
+
+| Change type | Leg 1 (in-house) | Leg 2 (Gemini `gem.sh`) | Leg 3 (sweep) | Leg 4 (bots) | RFC / compliance |
+|---|---|---|---|---|---|
+| **Feature minor** — new parse surface / capability; touches the mirror (v0.2–v0.4) | full multi-angle swarm | yes | **mandatory** | yes | RFC + compliance |
+| **Report-only / additive-to-provisional minor** — no parse-or-block change (v0.6) | 1 decorrelated finder | yes (1 pass) | yes — as the cheap **"mirror-untouched" proof** (expect 0 divergences) | yes | RFC + compliance |
+| **Patch** — bug fix / hardening / data within an already-approved design (v0.1.1/.2, v0.3.1, v0.5.1) | inline grounded probes or 1 finder | subset — `gem.sh` **if security-relevant**, else skip (recorded) | yes if it *could* touch the mirror | yes (on PR) | HISTORY only |
+| **Docs-only** (PR #9, #12) | — | — | — | — (CI only) | — |
+
+**Floor that never scales (holds at every tier):**
+- The **grounding rule** — triage every finding against real code before it counts.
+- The **empirical sweep on anything that could touch the mirror** — even report-only runs
+  it to *prove* untouched (0 divergences is the evidence, not the assumption).
+- **PR bots fire on every minor+** (leg 4 is on-open; it's checked at the before-merge gate).
+- **Findings logged** in `scratch/review/`; **compliance before merge** on minors+.
+- **Security overrides scale-down:** if a change is security-load-bearing, legs 1+2 stay at
+  full depth regardless of diff size (the adversarial leg carries extra weight here — see
+  *What this is*). A tiny diff to a blocking handler is a feature-minor-tier review.
+
+**Recording rule:** state the chosen tier in the PR body / findings log (e.g. "scaled per
+report-only scope — sweep as mirror-proof, single in-house finder"). Scaling **down** is a
+conscious, written decision; scaling is never the thing you slide into.
 
 **Canonical tooling:** [`/srv/projects/review-kit/`](file:///srv/projects/review-kit/)
 is the Russell-owned shared kit (lift-and-adapt source). Per-project copies
