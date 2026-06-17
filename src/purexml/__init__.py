@@ -19,11 +19,17 @@ from xml.etree.ElementTree import ParseError, tostring
 
 from . import ElementTree
 from ._expat_security import (
+    BLOCKED,
+    EXPAT_MITIGATED,
     EXPAT_VERSION,
+    LIVE,
+    OPT_IN,
     RECOMMENDED_EXPAT_VERSION,
     SAFE_EXPAT_VERSION,
+    SecurityReport,
     assert_expat_secure,
     expat_is_secure,
+    security_report,
 )
 from ._parser import XMLParser, fromstring, fromstringlist, iterparse, parse
 from .errors import (
@@ -40,7 +46,7 @@ from .limits import RECOMMENDED_LIMITS, Limits
 
 XML = fromstring
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 __all__ = [
     # the ElementTree family (also at purexml.ElementTree)
@@ -71,5 +77,12 @@ __all__ = [
     "RECOMMENDED_EXPAT_VERSION",
     "expat_is_secure",
     "assert_expat_secure",
+    # security-posture report (v0.5 trust surface) — read-only introspection
+    "security_report",
+    "SecurityReport",
+    "BLOCKED",
+    "EXPAT_MITIGATED",
+    "OPT_IN",
+    "LIVE",
     "__version__",
 ]

@@ -259,14 +259,27 @@ that evaporate under repro — the grounding step is what separates the two.
 This section is for **us**. The running list of everything the project has.
 Keep it current — projects fill these in as inventories accumulate.
 
-TODO subsections that may be relevant (delete what doesn't apply):
-- Versioned constants (where each version axis lives in the code)
-- Specialist tools / handlers / namespaces (whatever the project's unit-of-extension is)
-- Output fields by namespace
-- Error codes
-- Safety flags / observations
-- Configuration profiles
-- Customer dictionaries / closed tables
+### Public API surface (top-level `purexml`, all re-exported)
+
+The frozen-at-1.0 *mirror* surface vs the PROVISIONAL *defense-in-depth*:
+
+| Name | Kind | Since | Freeze posture |
+|---|---|---|---|
+| `fromstring`, `parse`, `iterparse`, `fromstringlist`, `XML`, `XMLParser`, `tostring`, `ParseError` | ElementTree family (also at `purexml.ElementTree`) | v0.1–v0.3 | STABLE (mirror) |
+| `PureXMLError`, `DTDForbidden`, `EntitiesForbidden`, `ExternalReferenceForbidden` | exception hierarchy | v0.1–v0.2 | STABLE (mirror) |
+| `Limits`, `RECOMMENDED_LIMITS`, `LimitExceeded`, `DepthExceeded`, `AttributesExceeded`, `SizeExceeded` | opt-in structural-DoS caps | v0.4 | PROVISIONAL |
+| `EXPAT_VERSION`, `SAFE_EXPAT_VERSION`, `RECOMMENDED_EXPAT_VERSION`, `expat_is_secure`, `assert_expat_secure` | libexpat version awareness | v0.1.2 | PROVISIONAL |
+| `security_report`, `SecurityReport`, `BLOCKED`, `EXPAT_MITIGATED`, `OPT_IN`, `LIVE` | posture report (trust surface) | v0.5 | PROVISIONAL |
+
+Source of truth: `src/purexml/__init__.py` `__all__` (a test asserts version sync;
+keep this table in step when exports change). Freeze postures: `docs/ROADMAP-to-1.0.md`.
+
+### Versioned constants
+- RELEASE: `pyproject.toml` `version` + `purexml.__version__` (test-synced).
+- LOGIC (mitigation set): narrated per release in `HISTORY.md`. SCHEMA: n/a (returns stdlib `Element`).
+
+Remaining TODO subsections (delete what doesn't apply): error codes, configuration
+profiles, closed tables — none accumulated yet beyond the surface above.
 
 ---
 

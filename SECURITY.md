@@ -19,6 +19,12 @@ entry point, including incremental `iterparse` streaming:
   expands an entity bomb, hangs, consumes unbounded CPU/memory, or crashes the
   host process. Blocked/malformed input always yields a catchable exception.
 
+Beyond the mirror, `security_report()` (v0.5) is **read-only introspection** — it
+reports this runtime's posture (libexpat version + per-class mitigation layer +
+the opt-in `Limits` preset) and **does not change parse behavior or hard-fail**;
+the enforce-vs-warn policy is a 1.0 decision. The structural-DoS caps (`Limits`,
+v0.4) are **opt-in, default-off**, so they never alter the strict-mirror default.
+
 It is stdlib-only (`xml.parsers.expat` + `xml.etree`) with **zero runtime
 dependencies**, so the host process inherits no third-party parser attack surface.
 As of v0.3.1 this is enforced **structurally**: a CI-gated test (`tests/test_no_io.py`)
@@ -43,8 +49,8 @@ Pre-1.0: the current minor is supported; older is not (please upgrade).
 
 | Version | Supported |
 |---|---|
-| 0.3.x | Yes (current) |
-| < 0.3 | No (pre-1.0 moves fast; upgrade) |
+| 0.5.x | Yes (current) |
+| < 0.5 | No (pre-1.0 moves fast; upgrade) |
 
 ## Dependency security
 
@@ -53,6 +59,7 @@ Pre-1.0: the current minor is supported; older is not (please upgrade).
 | *(none)* | runtime | **Zero runtime dependencies** — stdlib only. No third-party parser/native code in the import path; nothing to compromise via the dependency surface. |
 | `defusedxml` | dev/test **oracle** | Never shipped, never imported under `src/` (guarded by a test). Used only to validate equivalence. |
 | `pytest` | dev/test | test runner only |
+| `atheris` | dev/test (`[fuzz]` extra) | Opt-in coverage-guided fuzzing only (`fuzz/`). Never shipped, never imported under `src/`. |
 
 ## The bounds any change must preserve
 

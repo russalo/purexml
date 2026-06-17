@@ -12,10 +12,12 @@ import pathlib
 import purexml
 
 #: The top-level (non-relative) imports the runtime is permitted: the stdlib XML
-#: parser, and `collections` (pure data structures — `namedtuple` for `Limits`, no
-#: I/O). Adding anything here must be a conscious decision (a pure parser's import
-#: surface is part of its security guarantee — each entry is justified inline).
-ALLOWED_TOPLEVEL = {"xml", "collections"}
+#: parser, `collections` (pure data structures — `namedtuple` for `Limits`, no
+#: I/O), and `types` (`MappingProxyType` — a read-only mapping view for the
+#: `SecurityReport.mitigations` trust surface; pure, no I/O). Adding anything here
+#: must be a conscious decision (a pure parser's import surface is part of its
+#: security guarantee — each entry is justified inline).
+ALLOWED_TOPLEVEL = {"xml", "collections", "types"}
 
 #: Explicitly forbidden — network, process-exec, OS, and low-level memory modules,
 #: plus common third-party HTTP clients. None belong in a stdlib-only safe parser.
