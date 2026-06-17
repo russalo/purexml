@@ -35,17 +35,30 @@ __all__ = [
 EXPAT_VERSION = _expat.version_info
 
 #: Functional floor: 2.6.0 covers billion-laughs (since 2.4.0) AND the large-tokens
-#: / CVE-2023-52425 reparse-deferral mitigation (2.6.0). The major DoS classes are
-#: mitigated here, but the *disproportionate dynamic memory* class stays live below
-#: RECOMMENDED. Opt into this looser bar explicitly. Provisional.
+#: / CVE-2023-52425 reparse-deferral mitigation (2.6.0). The major DoS classes in our
+#: mitigation map are covered here, but the *disproportionate dynamic memory* class
+#: (fixed 2.7.2) and the newer 2.7.4–2.8.1 DoS fixes stay live below RECOMMENDED. Opt
+#: into this looser bar explicitly. Provisional.
 SAFE_EXPAT_VERSION = (2, 6, 0)
 
-#: Conservative floor named by current CPython docs (``xml`` security section):
-#: Expat < 2.7.2 "may be vulnerable" to several classes. **The default** for the
-#: secure checks below — fail-safe (under-reporting security is worse than
-#: over-reporting). Provisional; the precise floor + enforce-vs-warn policy is a
-#: 1.0-freeze decision.
-RECOMMENDED_EXPAT_VERSION = (2, 7, 2)
+#: Conservative "recommended" floor = the **latest stable libexpat** with all known
+#: XML-parsing security fixes. Bumped to 2.8.1 (2026-05-10) after a 2026 release train
+#: shipped DoS fixes above the old 2.7.2 line, several reachable through purexml's
+#: normal parse paths: 2.7.4 (CVE-2026-25210, doContent integer overflow),
+#: 2.8.0 (CVE-2026-41080, the fix CPython tracked for its bundled expat),
+#: 2.8.1 (CVE-2026-45186, quadratic attribute-name collision check). (2.7.4
+#: CVE-2026-24515 and 2.7.5 CVE-2026-32776 are NULL-deref classes purexml does not
+#: reach — unused encoding handler / blocked external param entities — but the floor
+#: stays at latest-stable: fail-safe, and a consumer's expat is shared.) **The default**
+#: for the secure checks below — under-reporting security is worse than over-reporting.
+#: Provisional; the precise floor + enforce-vs-warn policy is a 1.0-freeze decision.
+#: Per-class fix versions (not this coarse floor) drive the mitigation map.
+RECOMMENDED_EXPAT_VERSION = (2, 8, 1)
+
+#: Per-class fix version for the *disproportionate dynamic memory* class (libexpat
+#: 2.7.2) — kept separate from RECOMMENDED so the mitigation map reports this class
+#: accurately even as the recommended-latest floor moves forward.
+_DISPROPORTIONATE_MEMORY_FIXED = (2, 7, 2)
 
 
 def _as_version_tuple(v):
@@ -222,9 +235,10 @@ def security_report():
         # libexpat reparse-deferral (CVE-2023-52425), fixed in expat 2.6.0.
         "large_tokens_cve_2023_52425":
             EXPAT_MITIGATED if meets_safe else LIVE,
-        # disproportionate dynamic memory — covered only at the recommended floor.
+        # disproportionate dynamic memory — fixed in expat 2.7.2 (its own fix
+        # version, NOT the moving recommended-latest floor).
         "disproportionate_memory":
-            EXPAT_MITIGATED if meets_recommended else LIVE,
+            EXPAT_MITIGATED if EXPAT_VERSION >= _DISPROPORTIONATE_MEMORY_FIXED else LIVE,
         # structural DoS (depth / attributes / size) — purexml opt-in caps only.
         "structural_dos_depth_attrs_size": OPT_IN,
     }
@@ -234,10 +248,17 @@ def security_report():
         cur = ".".join(map(str, EXPAT_VERSION))
         rec = ".".join(map(str, RECOMMENDED_EXPAT_VERSION))
         live = sorted(k for k, v in mitigations.items() if v == LIVE)
-        notes.append(
-            "libexpat %s is below the recommended floor %s: the expat-layer "
-            "class(es) %s may be live on this runtime — upgrade Python or the "
-            "system expat." % (cur, rec, ", ".join(live)))
+        # Always surface the recommended-latest gap — newer expat DoS fixes that
+        # are NOT individually tracked in the map above (else a runtime below an
+        # older floor would hear only about the mapped LIVE classes and under-report
+        # the 2.7.4–2.8.1 fixes it is also missing — PR#10 Codex P2).
+        msg = ("libexpat %s is below the recommended-latest floor %s: newer expat "
+               "DoS fixes (2.7.4–2.8.1, e.g. doContent overflow / quadratic "
+               "attribute-name checks) are not on this runtime" % (cur, rec))
+        if live:
+            msg += ("; additionally the tracked class(es) %s may be live"
+                    % ", ".join(live))
+        notes.append(msg + " — upgrade Python or the system expat.")
     notes.append(
         "structural DoS (deep nesting / attribute floods / giant documents) is "
         "opt-in: pass RECOMMENDED_LIMITS (or your own Limits) to the parse entry "

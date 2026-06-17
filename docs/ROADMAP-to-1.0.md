@@ -33,8 +33,10 @@ forbid_entities=True, forbid_external=True`), and accept defusedxml's
 On top, add bounded opt-in defense-in-depth defusedxml never had (all **shipped**,
 default-off):
 - **Runtime libexpat-version assertion** (`pyexpat.EXPAT_VERSION`) — protection is
-  entirely libexpat-version-dependent (Expat <2.7.2 still vulnerable to several
-  classes); unique to purexml. (v0.1.2; surfaced for adopters by `security_report()` in v0.5.)
+  entirely libexpat-version-dependent (the recommended-latest floor is **2.8.1** as
+  of 2026-05, after the 2.7.4–2.8.1 DoS release train; older expat is still
+  vulnerable to several classes); unique to purexml. (v0.1.2; surfaced for adopters by
+  `security_report()` in v0.5; floor refreshed to 2.8.1 in v0.5.1.)
 - **Reparse-deferral awareness** (CVE-2023-52425 "large tokens"; Expat 2.6.0;
   CPython 3.13 `Get/SetReparseDeferralEnabled`, reachable via our expat parser).
 - **Amplification-limit awareness** (libexpat 2.4.0 billion-laughs cap).
@@ -93,7 +95,8 @@ the freeze*, ordered by cost-of-getting-it-wrong.
   `EntitiesForbidden`/`ExternalReferenceForbidden`, **+ `DTDForbidden` once
   `forbid_dtd=True` mode lands** (reachable). Set must be complete before freeze.
 - [ ] **Version-assertion policy** — hard-fail vs warn on Expat < floor; freeze the
-  *policy*, not a hardcoded number (safe floor moves: 2.4.0 → 2.6.0 → 2.7.2 …).
+  *policy*, not a hardcoded number (safe floor moves: 2.4.0 → 2.6.0 → 2.7.2 → 2.8.1 …
+  — already bumped once in v0.5.1, which is exactly why the *number* must not freeze).
 
 **B. Build AND verify the whole frozen surface:**
 - [x] v0.2 oracle-gated complete (PR #4) · [x] v0.3 (`iterparse`) oracle-gated

@@ -339,6 +339,13 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.5.1** *(2026-06-17)* — **patch**: adversarial soak + expat-floor currency (no
+  parse-behavior change). 17-vector red-team soak module (incl. encoding-vector attacks
+  proving encoding-independent blocking) + 60k-comparison heavy differential soak (0
+  divergences). **`RECOMMENDED_EXPAT_VERSION` 2.7.2 → 2.8.1** (2026 libexpat 2.7.4–2.8.1
+  DoS train; CVE-2026-25210/41080/45186 reach normal parse paths), `disproportionate_memory`
+  decoupled onto its own 2.7.2 fix version. Adding the new reachable DoS classes to the
+  mitigation map is deferred (mitigation-set change). LOGIC unchanged. _HISTORY only._
 - **v0.5.0** *(shipped 2026-06-17, PR #8)* — **trust surface**: read-only
   `security_report()` posture API (libexpat version + per-class mitigation map +
   `RECOMMENDED_LIMITS`; genuinely immutable via `MappingProxyType` + `__new__`/`_make`
