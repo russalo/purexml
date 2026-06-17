@@ -341,7 +341,7 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
-- **v0.7.0** *(approved 2026-06-17, in implementation)* — **posture CLI**:
+- **v0.7.0** *(shipped 2026-06-17, PR #15)* — **posture CLI**:
   `python -m purexml` over `security_report()` — default human report (informs, exit 0),
   `--json` (machine-readable, PROVISIONAL), `--check [--min-expat X.Y.Z]` (opt-in CI gate,
   pin-your-floor), `--version`; + `SecurityReport.as_dict()`. First build of the
@@ -581,6 +581,17 @@ blame`.
   paths isn't grounded, so it is NOT a named map class; the generic floor advisory cites
   it only when the runtime is below its 2.8.0 fix (`_HIGHEST_UNMAPPED_FIX`). Don't add it
   to the map without grounding it first (grounding rule).
+- **The 1.0 gate is the publish-worthy ECOSYSTEM DEBUT, not one consumer** (reframed
+  2026-06-17). Stress-tested by assuming file-observer gone entirely: purexml's reason to
+  exist *survives the loss of any single consumer* — it's the maintained, zero-dep successor
+  to the OWASP-recommended-but-abandoned `defusedxml` (0.7.1/2021; 0.8.0 stalled at rc2),
+  tracking the moving libexpat threat the incumbent doesn't. So **build for a cold security
+  engineer evaluating it on publish day** (the first 60 seconds), not for FO's needs. FO is
+  the **anchor consumer + first validation track** (G1, alive), NOT the definition of done.
+  **Publishing (PyPI/name/license) stays deferred for STRATEGIC TIMING + first-impression
+  quality — Russell's call — not for lack of readiness.** Next work = the first-impression
+  layer (public README/story, trust signals). See `docs/ROADMAP-to-1.0.md` (Reframe note)
+  and `scratch/README_public_draft.md`.
 - **Version-assertion enforce-vs-warn: leaning INFORM-by-default** (1.0 decision, not yet
   ratified). `security_report()` informs; `assert_expat_secure()` stays opt-in. A
   hard-fail-by-default on a *moving* floor would make a consumer's gate

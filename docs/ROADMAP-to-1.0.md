@@ -3,7 +3,7 @@
 > **Status: ratified 2026-06-16** (by Russell). Grounded by `/deep-research` run
 > wf_5ea8ed7c-044 (findings: `scratch/research/2026-06-16_1.0-scope-research.md`,
 > 25/25 claims confirmed vs primary sources). This is the living plan from the
-> shipped v0.6.0 to the 1.0 contract freeze.
+> shipped v0.7.0 to the 1.0 contract freeze.
 
 ## What 1.0 means
 Per the russalo version philosophy, **1.0 = a governance declaration on a
