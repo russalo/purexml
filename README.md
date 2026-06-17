@@ -87,6 +87,8 @@ root = fromstring(untrusted_xml, limits=RECOMMENDED_LIMITS)   # raises LimitExce
 - [`HISTORY.md`](HISTORY.md) — running index of all versions, specs, and compliance reports
 - [`CONVENTIONS.md`](CONVENTIONS.md) — naming, version-bump rules, document promotion paths
 - [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md) — consumer-facing stability commitments *(delete if no stable public surface)*
+- [`COMPATIBILITY.md`](COMPATIBILITY.md) — drop-in compatibility with `defusedxml` (contract, exception edge, scope)
+- [`CHANGELOG.md`](CHANGELOG.md) — public-facing changelog
 - [`LIMITATIONS.md`](LIMITATIONS.md) — what this project deliberately does **not** do
 - [`SECURITY.md`](SECURITY.md) — security policy, scope, and how to report vulnerabilities
 - `docs/` — RFCs, compliance reports, and standards-tracking notes per release

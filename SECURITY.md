@@ -45,12 +45,56 @@ constructable failing inputs.
 
 ## Supported versions
 
-Pre-1.0: the current minor is supported; older is not (please upgrade).
+Pre-1.0: the current minor is supported; older is not (please upgrade). At 1.0 this
+becomes a binding policy (the latest minor; security fixes backported per the
+then-published support window).
 
 | Version | Supported |
 |---|---|
 | 0.7.x | Yes (current) |
 | < 0.7 | No (pre-1.0 moves fast; upgrade) |
+
+## Security advisories & CVE handling
+
+How a confirmed vulnerability is handled, once triaged against the real code (every
+report is reproduced from its failing input before it counts):
+
+1. **Reproduce + assess** — construct the failing input, confirm it's real, rate severity.
+2. **Fix on a private branch** with a regression test that fails before / passes after,
+   under the four-leg review (the adversarial leg carries extra weight here).
+3. **Release** a patch on the supported minor (and backport per the support window).
+4. **Disclose** — publish a security advisory with the affected versions, the fixed
+   version, and a workaround if any; credit the reporter unless they decline.
+5. **Coordinated disclosure** — we ask reporters to hold public disclosure until a fix
+   ships or a reasonable window elapses; we aim to move quickly on a security control.
+
+A distinct class is **libexpat-layer** issues: some XML-DoS protection lives in libexpat,
+not purexml. For those, the fix is *upgrade your runtime's expat* — and
+`purexml.security_report()` / `python -m purexml` already tell you whether yours is
+current (see *Maintenance policy*). purexml advisories cover the purexml layer; we surface
+the libexpat dimension rather than claim to fix it.
+
+> [[STRATEGIC: at publish, the private channel below is joined by a public one —
+> GitHub Security Advisories / a `SECURITY` contact — and a concrete disclosure window.]]
+
+## Maintenance policy
+
+purexml's reason to exist beyond a one-time mirror is that it is **maintained where the
+incumbent froze.** Concretely, that means:
+
+- **Tracks libexpat.** A standing gate (`tools/check_expat_currency.py`) checks the latest
+  libexpat against the recommended floor before every release and when the security code
+  changes; new reachable attack classes are added to `security_report()`, gated on their
+  fix version. (Done twice already: the 2026 expat 2.7.4–2.8.1 DoS train was folded in
+  within days.)
+- **Proven per release.** Every release is differentially tested against the `defusedxml`
+  oracle (C14N-equivalent-or-both-raise) over a real corpus + a fuzzer; the result is a
+  committed [`docs/EQUIVALENCE.md`](docs/EQUIVALENCE.md). New XML-attack research becomes
+  new corpus + tests.
+- **Reviewed.** Every change runs the four-leg decorrelated review; findings are grounded
+  against the real code before action.
+
+These are practices we run today, stated so adopters can rely on them — not an SLA promise.
 
 ## Dependency security
 

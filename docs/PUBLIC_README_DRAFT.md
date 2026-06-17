@@ -110,9 +110,9 @@ from purexml.ElementTree import fromstring, parse, iterparse
 ```
 No code changes for the common `defusedxml.ElementTree` API — same defaults, same
 `forbid_*` parameters, same exception hierarchy (`ParseError` for malformed,
-`*Forbidden` for blocked). For deliberate behavioral edges (where matching the oracle
-means matching its *allow* behavior too), see [`LIMITATIONS.md`](LIMITATIONS.md); for the
-compatibility evidence, see *Trust*.
+`*Forbidden` for blocked, all subclassing `ValueError`). The full contract, the one
+catch-clause edge, and what's in/out of scope are in [`COMPATIBILITY.md`](COMPATIBILITY.md);
+the compatibility evidence is in *Trust*.
 
 ## Trust — evidence, not assertion
 
