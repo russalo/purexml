@@ -96,18 +96,25 @@ def test_structural_class_is_opt_in():
 # security_report() reads the module-level EXPAT_VERSION, so monkeypatching it
 # exercises the below-floor / at-floor branches without a different interpreter.
 
-# memory (disproportionate) is gated on its OWN fix version (2.7.2), decoupled from
-# the recommended-latest floor (now 2.8.1) — so 2.7.2 reports the class mitigated
-# even though it sits below the recommended floor.
-@pytest.mark.parametrize("ver,large,memory,safe,rec", [
-    ((2, 5, 0), purexml.LIVE,            purexml.LIVE,            False, False),  # pre-2.6
-    ((2, 6, 0), purexml.EXPAT_MITIGATED, purexml.LIVE,            True,  False),  # safe floor
-    ((2, 6, 1), purexml.EXPAT_MITIGATED, purexml.LIVE,            True,  False),  # between
-    ((2, 7, 2), purexml.EXPAT_MITIGATED, purexml.EXPAT_MITIGATED, True,  False),  # memory-fixed, < recommended
-    ((2, 8, 1), purexml.EXPAT_MITIGATED, purexml.EXPAT_MITIGATED, True,  True),   # recommended-latest
-    ((2, 9, 0), purexml.EXPAT_MITIGATED, purexml.EXPAT_MITIGATED, True,  True),   # above
+# Each expat-layer class gates on its OWN fix version, decoupled from the moving
+# recommended-latest floor (2.8.1): large=2.6.0, memory=2.7.2, content=2.7.4 (v0.6),
+# attr_collision=2.8.1 (v0.6). So a version can report a class mitigated while still
+# sitting below the recommended-latest floor.
+_M = purexml.EXPAT_MITIGATED
+_L = purexml.LIVE
+
+
+@pytest.mark.parametrize("ver,large,memory,content,attr,safe,rec", [
+    ((2, 5, 0), _L, _L, _L, _L, False, False),  # pre-2.6
+    ((2, 6, 0), _M, _L, _L, _L, True,  False),  # safe floor (large fixed)
+    ((2, 6, 1), _M, _L, _L, _L, True,  False),  # between
+    ((2, 7, 2), _M, _M, _L, _L, True,  False),  # memory fixed
+    ((2, 7, 4), _M, _M, _M, _L, True,  False),  # content fixed (v0.6)
+    ((2, 8, 0), _M, _M, _M, _L, True,  False),  # 41080 fixed but attr still live, < recommended
+    ((2, 8, 1), _M, _M, _M, _M, True,  True),   # attr fixed = recommended-latest
+    ((2, 9, 0), _M, _M, _M, _M, True,  True),   # above
 ])
-def test_version_gating(monkeypatch, ver, large, memory, safe, rec):
+def test_version_gating(monkeypatch, ver, large, memory, content, attr, safe, rec):
     monkeypatch.setattr(S, "EXPAT_VERSION", ver)
     r = purexml.security_report()
     assert r.expat_version == ver
@@ -115,6 +122,8 @@ def test_version_gating(monkeypatch, ver, large, memory, safe, rec):
     assert r.expat_meets_recommended is rec
     assert r.mitigations["large_tokens_cve_2023_52425"] == large
     assert r.mitigations["disproportionate_memory"] == memory
+    assert r.mitigations["content_token_overflow_cve_2026_25210"] == content
+    assert r.mitigations["attribute_collision_dos_cve_2026_45186"] == attr
     # purexml's own handlers are version-independent — a regression that
     # accidentally version-gated a BLOCKED class must be caught below the floor too.
     for cls in ("billion_laughs", "quadratic_blowup",
@@ -143,12 +152,38 @@ def test_at_recommended_no_floor_advisory(monkeypatch):
     assert any("opt-in" in n for n in notes)
 
 
-def test_between_memory_fix_and_recommended_advisory(monkeypatch):
-    # 2.7.2 <= ver < 2.8.1: mapped classes all mitigated, but still below the
-    # recommended-latest floor — the advisory must fire WITHOUT naming a live class.
-    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 7, 2))
+def test_recommended_gap_always_names_unmapped_cve(monkeypatch):
+    # Below recommended-latest, the advisory must ALWAYS surface the unmapped gap
+    # (e.g. CVE-2026-41080) even when some mapped classes are already mitigated —
+    # so a runtime never silently under-reports (PR#10 Codex P2). At 2.7.4 the
+    # content class is fixed but attr-collision is still live AND 41080 is unmapped.
+    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 7, 4))
     r = purexml.security_report()
     assert r.expat_meets_recommended is False
-    assert all(v != purexml.LIVE for v in r.mitigations.values())
     joined = " ".join(r.notes)
     assert "recommended-latest floor" in joined
+    assert "CVE-2026-41080" in joined
+
+    # At 2.8.0, CVE-2026-41080 IS fixed — so the advisory must NOT cite it as a
+    # potential missing fix (precision; PR#11 Gemini). The floor note still fires
+    # (2.8.0 < recommended 2.8.1) and names the still-live tracked class.
+    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 8, 0))
+    r2 = purexml.security_report()
+    assert r2.expat_meets_recommended is False
+    joined2 = " ".join(r2.notes)
+    assert "recommended-latest floor" in joined2
+    assert "CVE-2026-41080" not in joined2
+    assert "attribute_collision_dos_cve_2026_45186" in joined2  # the real live gap
+
+
+def test_attribute_collision_live_surfaces_max_attributes_lever(monkeypatch):
+    # When the attr-collision class is live (<2.8.1), the report must point at the
+    # opt-in max_attributes lever that bounds it (v0.6 design Q2).
+    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 7, 4))
+    r = purexml.security_report()
+    assert r.mitigations["attribute_collision_dos_cve_2026_45186"] == purexml.LIVE
+    assert any("max_attributes" in n and "attribute_collision" in n for n in r.notes)
+    # at/above the fix, that lever note is gone
+    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 8, 1))
+    assert not any("attribute_collision_dos is live" in n
+                   for n in purexml.security_report().notes)

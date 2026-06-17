@@ -339,6 +339,13 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.6.0** *(approved 2026-06-17, in implementation)* — **complete the posture map**:
+  adds the two newer expat-layer DoS classes (`content_token_overflow_cve_2026_25210` →
+  expat 2.7.4; `attribute_collision_dos_cve_2026_45186` → 2.8.1, opt-in `max_attributes`
+  partially bounds it) as first-class `security_report().mitigations` entries with
+  per-class fix-version gating. Report-only; no parse-behavior change. CVE-2026-41080
+  left unmapped (ungrounded). SCHEMA n/a; LOGIC unchanged (reported, not blocked).
+  [RFC](docs/v0.6.0_RFC_Specification.md).
 - **v0.5.1** *(2026-06-17)* — **patch**: adversarial soak + expat-floor currency (no
   parse-behavior change). 17-vector red-team soak module (incl. encoding-vector attacks
   proving encoding-independent blocking) + 60k-comparison heavy differential soak (0

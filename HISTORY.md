@@ -24,6 +24,7 @@ below.
 
 | Version | Schema | Date | Notable | Spec | Compliance |
 |---|---|---|---|---|---|
+| 0.6.0 | n/a | _RFC approved; unreleased_ | **Complete the posture map** — adds the two newer expat-layer DoS classes (reachable via normal parse paths) as first-class `security_report().mitigations` entries with per-class fix-version gating: `content_token_overflow_cve_2026_25210` (expat 2.7.4) and `attribute_collision_dos_cve_2026_45186` (expat 2.8.1; opt-in `max_attributes` partially bounds it). Report-only — **no parse-behavior change**; LOGIC unchanged (reported, not blocked), SCHEMA n/a. CVE-2026-41080 left unmapped (ungrounded) under the generic floor advisory. | [v0.6.0_RFC_Specification.md](docs/v0.6.0_RFC_Specification.md) _(approved 2026-06-17)_ | [COMPLIANCE-v0.6.md](docs/COMPLIANCE-v0.6.md) |
 | 0.5.1 | n/a | 2026-06-17 | **Patch** — adversarial soak + expat-floor currency (no parse-behavior change): a 17-vector red-team soak module (`test_hardening_soak.py` — distinct DoS classes, the unparsed-entity/NDATA path, sub-cap nested bomb, and **encoding-vector** attacks proving the block is encoding-independent), backed by a 60k-comparison heavy differential soak (0 divergences). **Refreshed `RECOMMENDED_EXPAT_VERSION` 2.7.2 → 2.8.1** after the 2026 libexpat 2.7.4–2.8.1 DoS release train (CVE-2026-25210/41080/45186 reach normal parse paths; 24515/32776 don't), and **decoupled** `disproportionate_memory` onto its own 2.7.2 fix version so the moving floor can't mis-gate it. `security_report()`/`assert_expat_secure()` now recommend latest-stable (fail-safe; opt-in surface, PROVISIONAL). Adding the two newly-reachable DoS classes to the mitigation map is **deferred** (a mitigation-set change). LOGIC unchanged (no parse-or-block change), SCHEMA n/a. _(HISTORY only, no RFC — part of v0.5.)_ | _(no RFC — patch)_ | _(part of v0.5)_ |
 | 0.5.0 | n/a | 2026-06-17 | **Trust surface** — a read-only `security_report()` posture API (libexpat version + per-class mitigation map + recommended limits, genuinely immutable) and the audit story as shipped evidence (richer differential fuzz — 960 docs — + optional Atheris `[fuzz]` extra + a committed `docs/EQUIVALENCE.md`). First minor under the maintained-successor mandate; no parse-behavior change. PR #8; four-leg review complete (5 PR-bot findings all real + fixed). SCHEMA n/a; LOGIC unchanged. | [v0.5.0_RFC_Specification.md](docs/v0.5.0_RFC_Specification.md) | [COMPLIANCE-v0.5.md](docs/COMPLIANCE-v0.5.md) |
 | 0.4.0 | n/a | 2026-06-16 | **Mirror-plus** — opt-in structural-DoS caps (`max_depth`/`max_attributes`/`max_bytes`, default OFF so the strict-mirror default is preserved) raising `LimitExceeded`. First deliberate divergence beyond defusedxml (opt-in only). Merged via PR #7; four-leg review complete (all 4 PR-bot findings real + fixed). SCHEMA n/a; LOGIC extended (structural caps). | [v0.4.0_RFC_Specification.md](docs/v0.4.0_RFC_Specification.md) | [COMPLIANCE-v0.4.md](docs/COMPLIANCE-v0.4.md) |
@@ -44,15 +45,16 @@ List any RFCs currently in draft (`docs/v{X.Y.Z}_RFC_DRAFT.md`). When none are
 open, state so explicitly rather than deleting the section — the empty-but-named
 state is the signal:
 
-> No drafts in flight. **v0.5.0 shipped** 2026-06-17 (PR #8) — the trust surface
-> (`security_report()` + audit evidence). Next minor is undecided; see
-> [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md) (remaining to 1.0: G1/G2
-> file-observer adoption, G5 packaging/license specifics, G6 freeze).
+> No drafts in flight. The **v0.6.0 RFC is approved** (2026-06-17) and in
+> implementation — [`docs/v0.6.0_RFC_Specification.md`](docs/v0.6.0_RFC_Specification.md)
+> (complete the posture map: the two newer expat DoS classes). Remaining to 1.0: G1/G2
+> file-observer adoption, G5 packaging/license specifics, G6 freeze — see
+> [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md).
 >
 > (Shipped: v0.1.0 fromstring (PR #1); v0.1.1 floor→3.10 (PR #2); v0.1.2 durability +
 > expat awareness (PR #3); v0.2.0 non-streaming ElementTree surface + forbid_* knobs
 > (PR #4); v0.3.0 iterparse — family complete (PR #5); v0.4.0 opt-in structural-DoS
-> caps (PR #7); v0.5.0 trust surface (PR #8).)
+> caps (PR #7); v0.5.0 trust surface (PR #8); v0.5.1 soak + expat-floor currency (PR #10).)
 
 ---
 
