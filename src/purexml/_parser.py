@@ -268,6 +268,12 @@ def iterparse(source, events=None, parser=None, forbid_dtd=False,
     blocking handlers fire *during* the incremental feed (bombs/XXE are blocked at
     the declaration mid-stream, before the consumer iterates past them), and the
     parser's error/close cleanup releases the heavy state. Default events: `"end"`.
+
+    Note: if a caller abandons the iterator before EOF (an early ``break``), the
+    parser + partial tree are reclaimed by cyclic GC rather than promptly — the
+    stdlib `iterparse` iterator only closes the parser at EOF, so this matches
+    ``defusedxml.ElementTree.iterparse`` exactly (prompt early-break cleanup is a
+    possible mirror-plus improvement; see scratch/spinoff_ideas.md).
     """
     if parser is None:
         parser = XMLParser(forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
