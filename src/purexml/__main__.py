@@ -39,6 +39,12 @@ def main(argv=None):
     parser = _build_parser()
     args = parser.parse_args(argv)
 
+    # --min-expat is meaningless without --check; silently ignoring it would let a
+    # user who meant to gate (`--min-expat X`) get a silent exit-0 pass — a security
+    # footgun in CI. Fail loudly instead (PR#15 Gemini).
+    if args.min_expat is not None and not args.check:
+        parser.error("--min-expat requires --check")
+
     if args.version:
         print("purexml %s (libexpat %s)" % (__version__, _ver(_es.EXPAT_VERSION)))
         return 0

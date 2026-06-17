@@ -87,3 +87,11 @@ def test_malformed_min_expat_errors(capsys):
     with pytest.raises(SystemExit) as exc:
         main(["--check", "--min-expat", "not-a-version"])
     assert exc.value.code != 0  # argparse error exit (2)
+
+
+def test_min_expat_without_check_errors(capsys):
+    # --min-expat without --check would silently no-op (exit 0); for a security gate
+    # that's a footgun — must fail loudly instead (PR#15 Gemini).
+    with pytest.raises(SystemExit) as exc:
+        main(["--min-expat", "2.8.1"])
+    assert exc.value.code != 0
