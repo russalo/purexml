@@ -32,8 +32,11 @@ scaffolding side-by-side; the Go half was deleted when purexml chose Python.)
 
 - `src/purexml/` — the `src` layout (not a flat package) is load-bearing: it
   forces an explicit editable install (`pip install -e .`) and prevents accidental
-  import of the working tree. Modules: `__init__.py` (public surface),
-  `_parser.py` (the expat-based engine), `errors.py` (exception hierarchy).
+  import of the working tree. Modules: `__init__.py` (top-level re-exports),
+  `ElementTree.py` (the canonical `purexml.ElementTree` namespace mirroring
+  defusedxml), `_parser.py` (the expat-based engine — `XMLParser` + `fromstring`/
+  `parse`/`iterparse`/`fromstringlist`), `errors.py` (exception hierarchy),
+  `_expat_security.py` (opt-in libexpat version awareness).
 - `tests/` at repo root, plain `pytest` (no `tests/__init__.py` — flat layout so
   `conftest.py` imports cleanly). See **Architecture** in `CLAUDE.md`.
 

@@ -6,6 +6,14 @@
 > stdlib mechanism, how the hardening is configured) belongs to this project's own
 > instance. The name `purexml` is provisional — rename freely.
 
+> **Scope evolution (2026-06-16):** this north star framed the *minimal* slice the
+> anchor consumer needs (one hardened `fromstring`). purexml's 1.0 identity has since
+> been ratified as the **complete `defusedxml.ElementTree` drop-in** (the full family,
+> shipped through v0.3) — a strict superset of this capability, serving §1's
+> "drop the dependency with zero functionality loss" for *any* ElementTree consumer,
+> not just file-observer. The authoritative current scope + plan is
+> [`ROADMAP-to-1.0.md`](ROADMAP-to-1.0.md); this doc is kept as the originating contract.
+
 ## 1. Purpose
 
 Provide a **pure-Python, zero-runtime-dependency** capability to **safely parse untrusted

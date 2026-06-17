@@ -138,12 +138,16 @@ parses succeed, same attacks blocked). The key insight: `defusedxml` is not an
 open-ended parser, it is a *finite, closed set of hardening behaviors* layered on
 the standard library's own XML parser — so purexml delivers those same
 protections on the stdlib (`xml.etree`, which builds on CPython's `pyexpat`),
-directly. The consumer surface is a single hardened call: `fromstring(text) ->
-xml.etree.ElementTree.Element`. The anchor consumer is **file-observer**. This is
-a *security control*, not a format reader — owning it means owning the audit
-burden, which is why the adversarial review leg carries extra weight here. Full
-capability spec: [`docs/TARGET_SPECIFICATION.md`](docs/TARGET_SPECIFICATION.md)
-(the 1.0 north star); first slice: [`docs/v0.1.0_RFC_Specification.md`](docs/v0.1.0_RFC_Specification.md).
+directly. As of **v0.3 the consumer surface is the full `defusedxml.ElementTree`
+family** — `fromstring`, `parse`, `iterparse`, `fromstringlist`, `XML`,
+`XMLParser`, `tostring`, the `forbid_*` knobs — under a canonical
+`purexml.ElementTree` namespace, so migration is a literal `s/defusedxml/purexml/`.
+The anchor consumer is **file-observer** (it uses only `fromstring`), but the 1.0
+identity is the *complete* ElementTree drop-in (see Known decisions). This is a
+*security control*, not a format reader — owning it means owning the audit burden,
+which is why the adversarial review leg carries extra weight here. Capability
+north star: [`docs/TARGET_SPECIFICATION.md`](docs/TARGET_SPECIFICATION.md); the
+plan to 1.0: [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md).
 
 ## Lane discipline
 
@@ -335,16 +339,26 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.3.0** *(shipped 2026-06-16, PR #5)* — hardened `iterparse`; **completes the
+  `defusedxml.ElementTree` family** (the streaming slice; Option A — `_setevents`
+  + reuse stdlib iterparse). Four-leg review; all 3 PR-bot findings grounded-declined.
+  SCHEMA n/a; LOGIC unchanged. [RFC](docs/v0.3.0_RFC_Specification.md) ·
+  [compliance](docs/COMPLIANCE-v0.3.md).
+- **v0.2.0** *(shipped 2026-06-16, PR #4)* — non-streaming ElementTree surface
+  (`parse`/`fromstringlist`/`XML`/`tostring`/`XMLParser`) + the `forbid_*` knobs
+  (+ `DTDForbidden`) under the `purexml.ElementTree` namespace. SCHEMA n/a; LOGIC
+  mitigation set extended (`forbid_dtd`). [RFC](docs/v0.2.0_RFC_Specification.md) ·
+  [compliance](docs/COMPLIANCE-v0.2.md).
+- **v0.1.2** *(shipped 2026-06-16, PR #3)* — **patch**: durability hardening — the
+  differential fuzz gate vs the oracle, the 2 newer expat-layer attack classes
+  (CVE-2023-52425 + disproportionate-memory, version-gated), and the opt-in
+  libexpat version-awareness API. No behavior change. _HISTORY only._
 - **v0.1.1** *(shipped 2026-06-16, PR #2)* — **patch**: lower runtime floor to
-  Python **3.10** (was 3.12) so purexml never binds a consumer's floor; CI matrix
-  tests 3.10–3.13. No logic/behavior change. SCHEMA n/a; LOGIC unchanged (v0.1).
-  _HISTORY only, no RFC._
-- **v0.1.0** *(shipped 2026-06-16, PR #1)* — first slice: the whole consumer
-  contract (C1 safe-parse + C2 safe-failure) via a single hardened `fromstring`,
-  behaviorally equivalent to `defusedxml` defaults. Spec:
-  [`docs/v0.1.0_RFC_Specification.md`](docs/v0.1.0_RFC_Specification.md);
-  compliance: [`docs/COMPLIANCE-v0.1.md`](docs/COMPLIANCE-v0.1.md); four-leg
-  review complete. SCHEMA n/a; LOGIC introduced (mitigation set v0.1).
+  Python **3.10**; CI matrix 3.10–3.13. No behavior change. _HISTORY only._
+- **v0.1.0** *(shipped 2026-06-16, PR #1)* — first slice: hardened `fromstring`
+  (C1 safe-parse + C2 safe-failure), behaviorally equivalent to `defusedxml`
+  defaults. [RFC](docs/v0.1.0_RFC_Specification.md) ·
+  [compliance](docs/COMPLIANCE-v0.1.md). SCHEMA n/a; LOGIC introduced (set v0.1).
 
 ## Stack
 
@@ -366,33 +380,40 @@ knowledge.
 
 ## Architecture
 
-Tiny by design (~200 lines of `src/`). The whole public surface is one call.
+Small by design (~300 lines of `src/`). The whole engine is one class.
 
-- **`src/purexml/__init__.py`** — public exports: `fromstring`, the exception
-  hierarchy, `ParseError` (re-exported from stdlib), `__version__`.
-- **`src/purexml/_parser.py`** — the engine. `fromstring(text)` →
-  `_HardenedParser`, built **directly on `xml.parsers.expat` + a
-  `xml.etree.ElementTree.TreeBuilder`** (NOT by subclassing `xml.etree`'s
-  `XMLParser` — the CPython C accelerator doesn't expose the expat handler hooks;
-  see Known decisions). It mirrors the stdlib `XMLParser` expat→tree glue
-  (namespace separator `"}"`, `ordered_attributes`, `buffer_text`, `_fixname`
-  Clark-notation, undefined-entity handling) so the returned `Element` is
-  byte-identical to the stdlib's, then installs the defusedxml-default blocking
-  handlers (`EntityDeclHandler`/`UnparsedEntityDeclHandler` → `EntitiesForbidden`;
-  `ExternalEntityRefHandler` → `ExternalReferenceForbidden`; no
-  `StartDoctypeDeclHandler`, so an entity-free DTD is allowed). `feed_close`
-  breaks the parser↔self reference cycle in a `finally`.
-- **`src/purexml/errors.py`** — `PureXMLError(ValueError)` ←
-  `EntitiesForbidden`, `ExternalReferenceForbidden`. Malformed input raises the
-  stdlib `ParseError` unchanged.
-- **`tests/`** — the falsify-first battery: `test_equivalence.py` (C14N
-  same-parse vs the defusedxml oracle, str+bytes, + the exact consumer surface),
-  `test_attacks.py` (attack battery + the no-fetch/no-read proof harness in
-  `conftest.py`), `test_misc.py` (malformed parity, version-sync, zero-dep guard,
-  the reference-cycle regression). Run on CPython ≥3.10.
-- **Out of `src/` (gitignored):** `scratch/review/corpus_sweep.py` — the
-  empirical same-parse sweep over file-observer's real corpus (read-only;
-  not committed). `scratch/measure/` — the measure-first findings.
+- **`src/purexml/_parser.py`** — the engine. The public **`XMLParser`** is built
+  **directly on `xml.parsers.expat` + a `xml.etree.ElementTree.TreeBuilder`** (NOT
+  by subclassing `xml.etree`'s `XMLParser` — the CPython C accelerator doesn't
+  expose the expat handler hooks; see Known decisions). It mirrors the stdlib
+  `XMLParser` expat→tree glue (separator `"}"`, `ordered_attributes`,
+  `buffer_text`, `_fixname` Clark-notation, undefined-entity handling) so the
+  `Element` is byte-identical, then installs the blocking handlers per the
+  `forbid_*` flags (`EntityDeclHandler`/`UnparsedEntityDeclHandler` →
+  `EntitiesForbidden`; `ExternalEntityRefHandler` → `ExternalReferenceForbidden`;
+  `StartDoctypeDeclHandler` → `DTDForbidden` only when `forbid_dtd=True`). It also
+  implements **`_setevents`** (a verbatim stdlib mirror) so it drives stdlib
+  `iterparse`. `feed`/`close` clean up the parser↔self cycle on **every** path
+  (success or error). Functions: `fromstring`, `parse` (via stdlib `parse`),
+  `fromstringlist`, `iterparse` (via stdlib `iterparse`).
+- **`src/purexml/ElementTree.py`** — the canonical `purexml.ElementTree` namespace
+  mirroring `defusedxml.ElementTree` (the `s/defusedxml/purexml/` surface):
+  re-exports the family + `XML`/`XMLParse`/`XMLTreeBuilder` aliases + stdlib
+  `ParseError`/`tostring`.
+- **`src/purexml/__init__.py`** — top-level convenience re-exports of the family +
+  exceptions + the expat-version API + `__version__`; imports the `ElementTree` submodule.
+- **`src/purexml/errors.py`** — `PureXMLError(ValueError)` ← `DTDForbidden`,
+  `EntitiesForbidden`, `ExternalReferenceForbidden`. Malformed → stdlib `ParseError`.
+- **`src/purexml/_expat_security.py`** — opt-in libexpat version-awareness
+  (`EXPAT_VERSION`, `expat_is_secure`/`assert_expat_secure`; conservative default floor).
+- **`tests/`** — the falsify-first battery: `test_equivalence` / `test_v02_surface`
+  / `test_v03_iterparse` (C14N same-parse + event-stream + knob-matrix equivalence
+  vs the oracle), `test_attacks` + `test_fuzz_equivalence` + `conftest` (attack
+  battery + differential fuzz + the no-fetch/no-read trip-wire), `test_durability`
+  / `test_expat_security` / `test_misc`. Run on CPython ≥3.10.
+- **Out of `src/` (gitignored `scratch/`):** `review/corpus_sweep.py` (empirical
+  sweep over the shared pkplab corpus via symlinks — baseline pinned in committed
+  `corpus_manifest.json`); `measure/` (measure-first findings); `spinoff_ideas.md`.
 
 ## Known decisions
 
@@ -583,3 +604,13 @@ russalo projects with a stable contract) carries **multiple independent
 version axes** (release version, internal logic version, public schema
 version) that bump independently. CONVENTIONS.md is where the rules for each
 axis live.
+
+**Documentation freshness — sweep ALL docs together, not piecemeal** (Russell,
+2026-06-16). When a change warrants a doc update, refresh **every** doc to the
+current state in that one pass — don't fix only the doc that prompted it. The set
+to sweep: `README.md`, `CLAUDE.md` (What this is / Architecture / Spec versions /
+Known decisions), `STACK.md`, `LIMITATIONS.md`, `SECURITY.md`, `PUBLIC_CONTRACT.md`,
+`HISTORY.md`, `docs/ROADMAP-to-1.0.md`, `docs/TARGET_SPECIFICATION.md`, and the
+`scratch/review/auditor_GEMINI.md` adapter. Docs drift in lockstep, so catching
+them up together (one "docs: freshness sweep to vX.Y" commit) keeps them
+consistent and is cheaper than chasing each later. See CONVENTIONS.md §3.2.

@@ -41,16 +41,17 @@ On top, add bounded opt-in defense-in-depth defusedxml never had:
   XXE *and* billion-laughs).
 
 ## Gates to 1.0
-- **G1 — file-observer trial-adopts v0.1.1** (start now; import swap). The
-  validation 1.0 requires. *Critical path, scanner-side.*
-- **G2 — adoption surfaces real scope** (likely small; equivalence already proven).
-- **G3 — build the ElementTree family:**
-  - **v0.2** — `parse` + `fromstringlist` + `XML`/`tostring` aliases + expose
-    `XMLParser` + the `forbid_*` knobs. Low risk (same engine).
-  - **v0.3** — `iterparse`. *The one hard piece:* incremental hardening, no-fetch
-    under streaming, event-by-event equivalence, reparse-deferral interaction.
-  - Each minor → RFC, measure-first, oracle-gated, four-leg review.
-- **G4 — durability hardening (v0.1.2 patch, parallelizable NOW):** differential
+- **G1 — file-observer trial-adopts purexml** (import swap). The validation 1.0
+  requires. *Critical path, scanner-side.* ⬜ — now appropriate (the ElementTree
+  family is complete; adoption would be the full surface, not a partial swap).
+- **G2 — adoption surfaces real scope** (likely small; equivalence already proven). ⬜
+- **G3 — build the ElementTree family — ✅ COMPLETE (2026-06-16).**
+  - **v0.2** ✅ (PR #4) — `parse` + `fromstringlist` + `XML`/`tostring` + `XMLParser`
+    + the `forbid_*` knobs.
+  - **v0.3** ✅ (PR #5) — `iterparse` (Option A: `_setevents` + reuse stdlib
+    iterparse). Event-stream equivalence proven on real data; all PR-bot findings
+    grounded-declined. **The build axis to 1.0 is done.**
+- **G4 — durability hardening — ✅ COMPLETE (v0.1.2, PR #3):** differential
   fuzzing vs defusedxml across the Python/expat matrix + committed curated corpus
   of **7 classes** (5 baseline: billion-laughs, quadratic blowup, external-entity
   remote, external-entity local, DTD retrieval; + 2 newer: CVE-2023-52425
@@ -79,7 +80,8 @@ the freeze*, ordered by cost-of-getting-it-wrong.
   *policy*, not a hardcoded number (safe floor moves: 2.4.0 → 2.6.0 → 2.7.2 …).
 
 **B. Build AND verify the whole frozen surface:**
-- [ ] v0.2 oracle-gated complete · [ ] v0.3 (`iterparse`) oracle-gated complete.
+- [x] v0.2 oracle-gated complete (PR #4) · [x] v0.3 (`iterparse`) oracle-gated
+  complete (PR #5). **The frozen surface is built + verified.**
 
 **C. Validate by real adoption ("validated codebase"):**
 - [ ] file-observer has adopted + run purexml in production before the freeze.
@@ -106,11 +108,14 @@ the freeze*, ordered by cost-of-getting-it-wrong.
 become 2.0-class mistakes if frozen without an explicit decision.
 
 ## Distance estimate
-**~60% — the hard correctness core is done.** Built & proven: the hardened engine,
-C14N oracle-gating, falsify-first battery, corpus sweep, four-leg apparatus.
-Remaining = breadth on a proven engine (`parse`/`fromstringlist`/`XMLParser` easy;
-`iterparse` the real risk) + the version-assertion/durability value-add + freeze
-ceremony. ~2 minors + a hardening patch + freeze.
+**~85% — the build axis is DONE (v0.3 complete the ElementTree family).** Built &
+proven: the full hardened ElementTree surface, C14N + event-stream oracle-gating,
+falsify-first battery + differential fuzz, corpus sweep, durability + version
+awareness, four-leg apparatus. **No build work remains.** What's left for 1.0:
+- **G1/G2** — file-observer adoption validation (the "validated codebase" gate).
+- **G5** — the deferred adoption-model / license / packaging decisions.
+- **G6** — the freeze ceremony (lock the contract surface, fill `PUBLIC_CONTRACT.md`,
+  backward-compat policy). The pre-freeze checklist above is the gate.
 
 ## Open questions (revisit, don't block)
 1. Real-world per-module usage distribution (validates deferring minidom/sax).

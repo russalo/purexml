@@ -40,14 +40,15 @@ List any RFCs currently in draft (`docs/v{X.Y.Z}_RFC_DRAFT.md`). When none are
 open, state so explicitly rather than deleting the section — the empty-but-named
 state is the signal:
 
-> No drafts in flight. The **v0.3.0 RFC is approved** (2026-06-16) and in
-> implementation — [`docs/v0.3.0_RFC_Specification.md`](docs/v0.3.0_RFC_Specification.md)
-> (hardened `iterparse`; completes the ElementTree family). See
-> [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md).
+> No drafts in flight. The **`defusedxml.ElementTree` family is complete** as of
+> v0.3.0; the build axis to 1.0 is done. Remaining work is adoption validation +
+> the freeze ceremony — see [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md). No
+> RFC is open; the next RFC is the v1.0 freeze when adoption + the deferred
+> decisions land.
 >
-> (Shipped 2026-06-16: v0.1.0 hardened fromstring (PR #1); v0.1.1 floor→3.10
-> (PR #2); v0.1.2 durability + expat awareness (PR #3); v0.2.0 non-streaming
-> ElementTree surface + forbid_* knobs (PR #4).)
+> (Shipped 2026-06-16: v0.1.0 fromstring (PR #1); v0.1.1 floor→3.10 (PR #2); v0.1.2
+> durability + expat awareness (PR #3); v0.2.0 non-streaming ElementTree surface +
+> forbid_* knobs (PR #4); v0.3.0 iterparse — family complete (PR #5).)
 
 ---
 

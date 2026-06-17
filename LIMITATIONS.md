@@ -1,19 +1,22 @@
 # Limitations
 
-purexml does one thing — safely parse untrusted XML into a standard `Element`,
-behaviorally equivalent to `defusedxml`'s default `fromstring`. This document
-states plainly what it does **not** do.
+purexml does one thing — safely parse untrusted XML, behaviorally equivalent to
+`defusedxml.ElementTree`. This document states plainly what it does **not** do.
 
-## It is `fromstring` only — not a general XML toolkit
+## It is the `ElementTree` family — not all of defusedxml, not a writer
 
-purexml's entire surface is `fromstring(text) -> xml.etree.ElementTree.Element`.
-It does **not** provide:
-- other parse modes (`iterparse`, SAX, `parse`-from-file) — out of scope for
-  v0.1.x; add only if a consumer needs them, as their own slice;
-- any XML **writing** / serialization — it is a hardened *reader*, never a writer;
-- configurable hardening (`forbid_dtd`/`forbid_entities`/`forbid_external` knobs)
-  — the behavior is fixed to defusedxml's defaults; a tunable security control is
-  a misconfiguration surface (see `CLAUDE.md` *Excluded decisions*).
+As of v0.3, purexml mirrors `defusedxml.ElementTree`'s full surface (`fromstring`,
+`parse`, `iterparse`, `fromstringlist`, `XML`, `XMLParser`, `tostring`, the
+`forbid_*` knobs). It does **not** provide:
+- the **other defusedxml submodules** — `minidom`, `sax`, `pulldom`,
+  `expatreader`/`expatbuilder`, `xmlrpc`, the deprecated `lxml` shim. Deferred,
+  not excluded — added post-1.0 only if a consumer needs them (`docs/ROADMAP-to-1.0.md`);
+- any XML **writing** / serialization beyond re-exporting stdlib `tostring` — it
+  is a hardened *reader*;
+- a non-pyexpat code path — see *Threat model* (IronPython/Jython out of scope).
+
+(The `forbid_*` knobs were re-opened for the general-replacement scope at v0.2 —
+defaults match defusedxml; `forbid_dtd=True` is OWASP's stricter DTD-disable mode.)
 
 ## It is equivalence, not "maximum strictness"
 

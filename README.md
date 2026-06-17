@@ -3,30 +3,33 @@
 > Safely parse untrusted XML using only the Python standard library.
 
 purexml is a pure-Python, zero-runtime-dependency replacement for `defusedxml`:
-it returns the same parse result the stdlib parser would (an
-`xml.etree.ElementTree.Element`) while blocking the known XML attack classes —
-entity-expansion bombs, external-entity resolution (XXE), and external DTD
-retrieval — exactly as `defusedxml` does. The whole consumer surface is one
-hardened call, `fromstring(text) -> Element`. It is a security control, not a
-format reader; correctness is validated oracle-gated against `defusedxml`.
+it returns the same parse results the stdlib parser would (standard `xml.etree`
+objects) while blocking the known XML attack classes — entity-expansion bombs,
+external-entity resolution (XXE), and external DTD retrieval — exactly as
+`defusedxml` does. As of v0.3 it mirrors **`defusedxml.ElementTree`'s full
+surface** (`fromstring`, `parse`, `iterparse`, `fromstringlist`, `XML`,
+`XMLParser`, `tostring`, the `forbid_*` knobs), so migrating off `defusedxml` is a
+literal `s/defusedxml/purexml/`. It is a security control, not a format reader;
+correctness is validated oracle-gated against `defusedxml`.
 
 ## Status
 
-**Working — v0.1.1 shipped (2026-06-16).** The hardened `fromstring` is
-implemented, stdlib-only, and validated against `defusedxml` as an oracle (C14N
-same-parse equivalence over a real corpus + an adversarial attack battery). Runs
-on CPython ≥3.10. No public contract is frozen yet, and it is **not published**:
-the vendor-vs-first-party adoption model (and with it PyPI/name/license) is
-deliberately deferred to v1.0 — see *License*. Spec + audit:
-[`docs/v0.1.0_RFC_Specification.md`](docs/v0.1.0_RFC_Specification.md),
-[`docs/COMPLIANCE-v0.1.md`](docs/COMPLIANCE-v0.1.md); north star:
+**Working — v0.3.0 shipped (2026-06-16); complete `defusedxml.ElementTree`
+drop-in.** All ElementTree parse entry points are implemented, stdlib-only, and
+validated against `defusedxml` as an oracle (C14N same-parse + event-stream
+equivalence over a real corpus, an adversarial attack battery, and a 3.10–3.13 CI
+matrix). Runs on CPython ≥3.10. No public contract is frozen yet (binds at v1.0),
+and it is **not published**: the vendor-vs-first-party adoption model (and with it
+PyPI/name/license) is deferred to v1.0 — see *License*. Path to 1.0:
+[`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md). Latest spec + audit:
+[`docs/v0.3.0_RFC_Specification.md`](docs/v0.3.0_RFC_Specification.md),
+[`docs/COMPLIANCE-v0.3.md`](docs/COMPLIANCE-v0.3.md); north star:
 [`docs/TARGET_SPECIFICATION.md`](docs/TARGET_SPECIFICATION.md).
 
 ## Stack
 
-See [`STACK.md`](STACK.md) for the language, runtime, dependencies, and any
-language-variant adaptations of this template (Python `pyproject.toml` /
-Go `justfile`, etc.). All stack-specific commands live there.
+See [`STACK.md`](STACK.md) for the language (Python ≥3.10), runtime, dependencies
+(zero at runtime), and CI. All stack-specific commands live there.
 
 ## Quickstart
 
@@ -35,12 +38,18 @@ pip install -e ".[dev]"   # editable install + pytest (the defusedxml oracle is 
 python -m pytest tests/ -q
 ```
 
-There is no CLI. Intended use is a single library call (once v0.1.0 lands):
+No CLI — it's a library. The canonical namespace mirrors `defusedxml.ElementTree`,
+so adoption is a literal `s/defusedxml/purexml/`:
 
 ```python
-from purexml import fromstring
-element = fromstring(untrusted_xml_text)   # raises on bomb / XXE / external DTD / malformed
+from purexml.ElementTree import fromstring, parse, iterparse   # was: defusedxml.ElementTree
+root = fromstring(untrusted_xml_text)        # raises on bomb / XXE / external DTD / malformed
+tree = parse("untrusted.xml")                # hardened ElementTree
+for event, elem in iterparse("big.xml"):     # hardened streaming
+    ...
 ```
+
+`from purexml import fromstring` also works (top-level convenience re-export).
 
 ## Documentation
 

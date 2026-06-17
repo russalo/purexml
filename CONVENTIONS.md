@@ -121,6 +121,21 @@ For projects with a public schema, fields graduate through tiers:
 A field enters at **candidate or provisional, never directly stable.**
 Promotion criterion: *settled producing logic + evidence of value*, not age.
 
+### 3.2 Documentation freshness sweeps (catch up ALL docs together)
+
+When a change warrants updating docs, **sweep every doc to the current state in
+that one pass** — never patch only the doc that prompted it. The docs drift in
+lockstep (a shipped version touches the surface description, the version index,
+the scope/limitations, the security scope, the roadmap), so updating them together
+keeps them consistent and is cheaper than chasing each one later. Land it as a
+single `docs: freshness sweep to vX.Y` commit.
+
+The sweep set: `README.md`, `CLAUDE.md` (What this is / Architecture / Spec
+versions / Known decisions), `STACK.md`, `LIMITATIONS.md`, `SECURITY.md`,
+`PUBLIC_CONTRACT.md`, `HISTORY.md`, `docs/ROADMAP-to-1.0.md`,
+`docs/TARGET_SPECIFICATION.md`, and the `scratch/review/auditor_GEMINI.md` adapter.
+(Established 2026-06-16.)
+
 ---
 
 ## 4. File-Naming Conventions
