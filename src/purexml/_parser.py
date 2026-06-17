@@ -16,11 +16,12 @@ forbid_external=True``). It exposes ``feed``/``close`` so it is drop-in for
 """
 import xml.parsers.expat as _expat
 from xml.etree.ElementTree import ParseError, TreeBuilder
+from xml.etree.ElementTree import iterparse as _stdlib_iterparse
 from xml.etree.ElementTree import parse as _stdlib_parse
 
 from .errors import DTDForbidden, EntitiesForbidden, ExternalReferenceForbidden
 
-__all__ = ["XMLParser", "fromstring", "parse", "fromstringlist"]
+__all__ = ["XMLParser", "fromstring", "parse", "fromstringlist", "iterparse"]
 
 
 class XMLParser:
@@ -101,6 +102,61 @@ class XMLParser:
 
     def _end(self, tag):
         return self.target.end(self._fixname(tag))
+
+    def _start_ns(self, prefix, uri):
+        return self.target.start_ns(prefix or "", uri or "")
+
+    def _end_ns(self, prefix):
+        return self.target.end_ns(prefix or "")
+
+    # ---- incremental event API (drives stdlib iterparse / XMLPullParser) ----
+    def _setevents(self, events_queue, events_to_report):
+        # Internal API used by xml.etree's XMLPullParser/iterparse. Faithful mirror
+        # of the stdlib XMLParser._setevents (wires expat handlers to append
+        # (event, data) to the queue). The blocking handlers installed in __init__
+        # are NOT touched here, so hardening stays active during incremental feed.
+        parser = self.parser
+        append = events_queue.append
+        for event_name in events_to_report:
+            if event_name == "start":
+                parser.ordered_attributes = 1
+
+                def handler(tag, attrib_in, event=event_name, append=append,
+                            start=self._start):
+                    append((event, start(tag, attrib_in)))
+                parser.StartElementHandler = handler
+            elif event_name == "end":
+                def handler(tag, event=event_name, append=append, end=self._end):
+                    append((event, end(tag)))
+                parser.EndElementHandler = handler
+            elif event_name == "start-ns":
+                if hasattr(self.target, "start_ns"):
+                    def handler(prefix, uri, event=event_name, append=append,
+                                start_ns=self._start_ns):
+                        append((event, start_ns(prefix, uri)))
+                else:
+                    def handler(prefix, uri, event=event_name, append=append):
+                        append((event, (prefix or "", uri or "")))
+                parser.StartNamespaceDeclHandler = handler
+            elif event_name == "end-ns":
+                if hasattr(self.target, "end_ns"):
+                    def handler(prefix, event=event_name, append=append,
+                                end_ns=self._end_ns):
+                        append((event, end_ns(prefix)))
+                else:
+                    def handler(prefix, event=event_name, append=append):
+                        append((event, None))
+                parser.EndNamespaceDeclHandler = handler
+            elif event_name == "comment":
+                def handler(text, event=event_name, append=append, self=self):
+                    append((event, self.target.comment(text)))
+                parser.CommentHandler = handler
+            elif event_name == "pi":
+                def handler(pi_target, data, event=event_name, append=append, self=self):
+                    append((event, self.target.pi(pi_target, data)))
+                parser.ProcessingInstructionHandler = handler
+            else:
+                raise ValueError("unknown event %r" % event_name)
 
     def _default(self, text):
         # Mirrors the stdlib: a reference to an entity that was never defined raises
@@ -201,3 +257,25 @@ def fromstringlist(sequence, parser=None, forbid_dtd=False, forbid_entities=True
     for text in sequence:
         parser.feed(text)
     return parser.close()
+
+
+def iterparse(source, events=None, parser=None, forbid_dtd=False,
+              forbid_entities=True, forbid_external=True):
+    """Incrementally parse XML from *source*, yielding ``(event, elem)`` pairs, safely.
+
+    Mirrors ``defusedxml.ElementTree.iterparse``. Reuses the stdlib `iterparse`
+    iterator driving purexml's hardened `XMLParser` via `_setevents` — so the
+    blocking handlers fire *during* the incremental feed (bombs/XXE are blocked at
+    the declaration mid-stream, before the consumer iterates past them), and the
+    parser's error/close cleanup releases the heavy state. Default events: `"end"`.
+
+    Note: if a caller abandons the iterator before EOF (an early ``break``), the
+    parser + partial tree are reclaimed by cyclic GC rather than promptly — the
+    stdlib `iterparse` iterator only closes the parser at EOF, so this matches
+    ``defusedxml.ElementTree.iterparse`` exactly (prompt early-break cleanup is a
+    possible mirror-plus improvement; see scratch/spinoff_ideas.md).
+    """
+    if parser is None:
+        parser = XMLParser(forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
+                           forbid_external=forbid_external)
+    return _stdlib_iterparse(source, events, parser)

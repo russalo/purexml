@@ -25,7 +25,7 @@ from ._expat_security import (
     assert_expat_secure,
     expat_is_secure,
 )
-from ._parser import XMLParser, fromstring, fromstringlist, parse
+from ._parser import XMLParser, fromstring, fromstringlist, iterparse, parse
 from .errors import (
     DTDForbidden,
     EntitiesForbidden,
@@ -35,13 +35,14 @@ from .errors import (
 
 XML = fromstring
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 __all__ = [
     # the ElementTree family (also at purexml.ElementTree)
     "ElementTree",
     "fromstring",
     "parse",
+    "iterparse",
     "fromstringlist",
     "XML",
     "XMLParser",
