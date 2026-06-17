@@ -126,12 +126,10 @@ def test_namespace_mirrors_defusedxml_shape():
     assert PET.tostring is ET.tostring
 
 
-def test_iterparse_absent_until_v03():
-    # honest scope: unimplemented defusedxml names are absent -> AttributeError,
-    # not a silent wrong-parse.
-    assert not hasattr(PET, "iterparse")
-    with pytest.raises(AttributeError):
-        PET.iterparse  # noqa: B018
+def test_iterparse_present_as_of_v03():
+    # v0.2 deferred iterparse to v0.3 (then absent → AttributeError). As of v0.3 it
+    # is present, completing the defusedxml.ElementTree family.
+    assert hasattr(PET, "iterparse") and "iterparse" in PET.__all__
 
 
 def test_element_not_reexported_faithful_to_defusedxml():
