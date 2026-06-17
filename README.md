@@ -14,8 +14,10 @@ correctness is validated oracle-gated against `defusedxml`.
 
 ## Status
 
-**Working — v0.3.0 shipped (2026-06-16); complete `defusedxml.ElementTree`
-drop-in.** All ElementTree parse entry points are implemented, stdlib-only, and
+**Working — current v0.3.1 (2026-06-16); complete `defusedxml.ElementTree`
+drop-in** (the family completed at v0.3.0; v0.3.1 is Tier-1 hardening — a
+structural no-I/O guard). All ElementTree parse entry points are implemented,
+stdlib-only, and
 validated against `defusedxml` as an oracle (C14N same-parse + event-stream
 equivalence over a real corpus, an adversarial attack battery, and a 3.10–3.13 CI
 matrix). Runs on CPython ≥3.10. No public contract is frozen yet (binds at v1.0),

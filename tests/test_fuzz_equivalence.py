@@ -19,13 +19,22 @@ import purexml
 from conftest import requires_oracle
 
 _TEXT = ["", "x", "hi there", "  ws  ", "&lt;esc&gt;", "&amp;", "&undef;",
-         "<![CDATA[<raw> & ]]>", "café", "&e;"]
+         "<![CDATA[<raw> & ]]>", "café", "&e;",
+         "&#65;&#x42;&#67;",                       # decimal + hex char refs
+         "&#65;" * 200,                            # char-ref flood (not a bomb)
+         "<![CDATA[]]>" "<![CDATA[x]]>",           # adjacent CDATA sections
+         "a]]>b",                                  # stray CDATA-close in text
+         "\t\n\r mixed ws ", "&#x9;&#xA;"]         # whitespace + control char refs
 _DOCTYPE = [
     "",                                                              # no dtd
     "<!DOCTYPE root [ <!ELEMENT root ANY> ]>",                       # benign internal dtd
+    "<!DOCTYPE root [ <!ELEMENT root ANY><!ATTLIST root a CDATA #IMPLIED> ]>",  # ATTLIST
+    "<!DOCTYPE root [ <!NOTATION n SYSTEM 'urn:x'> ]>",              # notation decl (allowed)
     "<!DOCTYPE root [ <!ENTITY e 'expanded'> ]>",                    # internal entity decl (blocked)
     "<!DOCTYPE root [ <!ENTITY e '&e2;&e2;'><!ENTITY e2 'xxxx'> ]>", # mini-bomb (blocked)
     "<!DOCTYPE root [ <!ENTITY %% p 'v'> ]>",                        # param entity decl (blocked)
+    "<!DOCTYPE root [ <![IGNORE[ <!ELEMENT x ANY> ]]> ]>",           # conditional section (IGNORE)
+    "<!DOCTYPE root [ <![INCLUDE[ <!ELEMENT root ANY> ]]> ]>",       # conditional section (INCLUDE)
     "<!DOCTYPE root [ <!ENTITY e SYSTEM 'file:///no-such-%d'> ]>",   # external entity (blocked)
     "<!DOCTYPE root SYSTEM 'http://127.0.0.1:1/x%d.dtd'>",           # external dtd (allowed, no fetch)
     "<!DOCTYPE root PUBLIC '-//X//Y' 'http://127.0.0.1:1/%d'>",      # public external dtd
@@ -55,8 +64,10 @@ def _elem(rng, depth):
 
 def _doc(rng):
     s = ""
-    if rng.random() < 0.5:
-        s += "<?xml version='1.0'%s?>" % rng.choice([" encoding='UTF-8'", ""])
+    if rng.random() < 0.6:
+        ver = rng.choice(["1.0", "1.1"])
+        enc = rng.choice([" encoding='UTF-8'", " encoding='utf-8'", " encoding='ISO-8859-1'", ""])
+        s += "<?xml version='%s'%s?>" % (ver, enc)
     dt = rng.choice(_DOCTYPE)
     if "%d" in dt:
         dt = dt % rng.randint(0, 9)
