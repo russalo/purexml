@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "purexml"
-version = "0.4.0"
+version = "0.5.0"
 description = "Safely parse untrusted XML using only the Python standard library — a zero-dependency defusedxml replacement."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -34,6 +34,12 @@ dependencies = []
 # defusedxml is the dev/test ORACLE only (RFC §3/§5) — never a runtime dependency,
 # never imported under src/. It is the incumbent purexml is validated against.
 dev = ["pytest", "defusedxml"]
+
+# Coverage-guided differential fuzzing (v0.5 RFC §3/§4). DEV-ONLY, opt-in — Atheris
+# is heavier tooling (libFuzzer/clang) for on-demand deep sweeps; the always-run
+# seeded differential gate (tests/test_fuzz_equivalence.py) needs NO extra. Atheris
+# is NEVER a runtime dependency and is never imported under src/.
+fuzz = ["atheris", "defusedxml"]
 
 # URLs PROVISIONAL — repo home not confirmed (adoption model open; may be vendored
 # rather than published). russalo convention path shown; revisit when publishing is decided.

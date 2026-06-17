@@ -24,7 +24,7 @@ below.
 
 | Version | Schema | Date | Notable | Spec | Compliance |
 |---|---|---|---|---|---|
-| 0.5.0 | n/a | _RFC approved; unreleased_ | **Trust surface** — a read-only `security_report()` posture API (libexpat version + per-class mitigation map + recommended limits) and the audit story as shipped evidence (richer differential fuzz + optional Atheris extra + a committed equivalence report). First minor under the maintained-successor mandate; no parse-behavior change. SCHEMA n/a; LOGIC unchanged. | [v0.5.0_RFC_Specification.md](docs/v0.5.0_RFC_Specification.md) _(approved 2026-06-16; implementation pending)_ | [COMPLIANCE-v0.5.md](docs/COMPLIANCE-v0.5.md) _(due before merge)_ |
+| 0.5.0 | n/a | 2026-06-17 | **Trust surface** — a read-only `security_report()` posture API (libexpat version + per-class mitigation map + recommended limits, genuinely immutable) and the audit story as shipped evidence (richer differential fuzz — 960 docs — + optional Atheris `[fuzz]` extra + a committed `docs/EQUIVALENCE.md`). First minor under the maintained-successor mandate; no parse-behavior change. PR #8; four-leg review complete (5 PR-bot findings all real + fixed). SCHEMA n/a; LOGIC unchanged. | [v0.5.0_RFC_Specification.md](docs/v0.5.0_RFC_Specification.md) | [COMPLIANCE-v0.5.md](docs/COMPLIANCE-v0.5.md) |
 | 0.4.0 | n/a | 2026-06-16 | **Mirror-plus** — opt-in structural-DoS caps (`max_depth`/`max_attributes`/`max_bytes`, default OFF so the strict-mirror default is preserved) raising `LimitExceeded`. First deliberate divergence beyond defusedxml (opt-in only). Merged via PR #7; four-leg review complete (all 4 PR-bot findings real + fixed). SCHEMA n/a; LOGIC extended (structural caps). | [v0.4.0_RFC_Specification.md](docs/v0.4.0_RFC_Specification.md) | [COMPLIANCE-v0.4.md](docs/COMPLIANCE-v0.4.md) |
 | 0.3.1 | n/a | 2026-06-16 | **Patch** — Tier-1 hardening (within-mirror, no behavior change): structural **no-I/O import guard** (src imports only stdlib `xml`; no network/exec/os modules — the no-fetch guarantee made structural, not just behavioral) + **broadened differential fuzz** (char-ref floods, conditional sections, XML 1.1, declared encodings, adjacent CDATA). LOGIC unchanged, SCHEMA n/a. _(HISTORY only, no RFC — part of v0.3.)_ | _(no RFC — patch)_ | _(part of v0.3)_ |
 | 0.3.0 | n/a | 2026-06-16 | Hardened `iterparse` — **completes the `defusedxml.ElementTree` family** (the streaming slice). Reuses stdlib `iterparse` via `_setevents` on `purexml.XMLParser` (Option A). Merged via PR #5; four-leg review complete (all 3 PR-bot findings grounded-declined). SCHEMA n/a; LOGIC unchanged (default behavior; adds the streaming entry point). | [v0.3.0_RFC_Specification.md](docs/v0.3.0_RFC_Specification.md) | [COMPLIANCE-v0.3.md](docs/COMPLIANCE-v0.3.md) |
@@ -43,14 +43,15 @@ List any RFCs currently in draft (`docs/v{X.Y.Z}_RFC_DRAFT.md`). When none are
 open, state so explicitly rather than deleting the section — the empty-but-named
 state is the signal:
 
-> No drafts in flight. The **v0.5.0 RFC is approved** (2026-06-16) and in
-> implementation — [`docs/v0.5.0_RFC_Specification.md`](docs/v0.5.0_RFC_Specification.md)
-> (the trust surface: `security_report()` + audit evidence; first minor under the
-> maintained-successor mandate). See [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md).
+> No drafts in flight. **v0.5.0 shipped** 2026-06-17 (PR #8) — the trust surface
+> (`security_report()` + audit evidence). Next minor is undecided; see
+> [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md) (remaining to 1.0: G1/G2
+> file-observer adoption, G5 packaging/license specifics, G6 freeze).
 >
-> (Shipped 2026-06-16: v0.1.0 fromstring (PR #1); v0.1.1 floor→3.10 (PR #2); v0.1.2
-> durability + expat awareness (PR #3); v0.2.0 non-streaming ElementTree surface +
-> forbid_* knobs (PR #4); v0.3.0 iterparse — family complete (PR #5).)
+> (Shipped: v0.1.0 fromstring (PR #1); v0.1.1 floor→3.10 (PR #2); v0.1.2 durability +
+> expat awareness (PR #3); v0.2.0 non-streaming ElementTree surface + forbid_* knobs
+> (PR #4); v0.3.0 iterparse — family complete (PR #5); v0.4.0 opt-in structural-DoS
+> caps (PR #7); v0.5.0 trust surface (PR #8).)
 
 ---
 

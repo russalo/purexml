@@ -18,6 +18,13 @@ As of v0.3, purexml mirrors `defusedxml.ElementTree`'s full surface (`fromstring
 (The `forbid_*` knobs were re-opened for the general-replacement scope at v0.2 —
 defaults match defusedxml; `forbid_dtd=True` is OWASP's stricter DTD-disable mode.)
 
+Beyond the mirror it adds two **opt-in, default-off** capabilities `defusedxml`
+lacks: structural-DoS caps (`Limits`, v0.4) and a read-only posture report
+(`security_report()`, v0.5). Neither changes default parse behavior — see the next
+section. The posture report is **informational only**: it does not parse, fetch, or
+hard-fail, and the enforce-vs-warn policy for the libexpat-version floor is deferred
+to 1.0 (it currently *informs*, never enforces).
+
 ## It is equivalence, not "maximum strictness"
 
 The contract is *behavioral equivalence to `defusedxml.ElementTree.fromstring` at
@@ -30,6 +37,12 @@ matching its block behavior.** Specifically, purexml deliberately **allows**:
 "purexml allows X" is only a defect if `defusedxml` *blocks* X on the same path.
 Do not "harden" purexml past the oracle — over-blocking breaks the equivalence
 contract and the consumer's parses.
+
+The **one sanctioned divergence** is opt-in: passing `Limits` (v0.4) makes purexml
+reject pathological-but-legal structural input (`LimitExceeded`) that `defusedxml`
+would accept. This is *by design* and only when the caller asks — with the default
+`limits=None`, purexml stays byte-equivalent to the oracle. The equivalence sweep
+runs at the default (no limits), so it measures the mirror, not the opt-in mode.
 
 ## Threat model
 

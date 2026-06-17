@@ -24,7 +24,13 @@ _TEXT = ["", "x", "hi there", "  ws  ", "&lt;esc&gt;", "&amp;", "&undef;",
          "&#65;" * 200,                            # char-ref flood (not a bomb)
          "<![CDATA[]]>" "<![CDATA[x]]>",           # adjacent CDATA sections
          "a]]>b",                                  # stray CDATA-close in text
-         "\t\n\r mixed ws ", "&#x9;&#xA;"]         # whitespace + control char refs
+         "\t\n\r mixed ws ", "&#x9;&#xA;",         # whitespace + control char refs
+         "&#x10FFFF;", "&#x110000;", "&#0;",       # max-codepoint + out-of-range + null
+         "&#xD800;",                               # lone surrogate (invalid char)
+         "&lt;&amp;&gt;&quot;&apos;",              # all five predefined entities packed
+         "text &lt; <![CDATA[ & raw ]]> tail",     # text/CDATA boundary interleave
+         "𝔘𝔫𝔦𝔠𝔬𝔡𝔢",                                  # astral-plane (4-byte UTF-8)
+         "  &#32; \t&#9; "]                        # ws char refs amid literal ws
 _DOCTYPE = [
     "",                                                              # no dtd
     "<!DOCTYPE root [ <!ELEMENT root ANY> ]>",                       # benign internal dtd
@@ -38,16 +44,26 @@ _DOCTYPE = [
     "<!DOCTYPE root [ <!ENTITY e SYSTEM 'file:///no-such-%d'> ]>",   # external entity (blocked)
     "<!DOCTYPE root SYSTEM 'http://127.0.0.1:1/x%d.dtd'>",           # external dtd (allowed, no fetch)
     "<!DOCTYPE root PUBLIC '-//X//Y' 'http://127.0.0.1:1/%d'>",      # public external dtd
+    "<!DOCTYPE root [ <!-- dtd comment --><!ELEMENT root ANY> ]>",   # comment inside internal subset
+    "<!DOCTYPE root [ <!ENTITY a 'x'><!ENTITY b 'y'><!ENTITY c 'z'> ]>",  # multiple entity decls (blocked)
+    "<!DOCTYPE root [ <!ENTITY e '&#38;#60;'> ]>",                   # entity w/ nested char-ref (blocked)
+    "<!DOCTYPE root [ <!ELEMENT root ANY><!ATTLIST root a CDATA 'def'> ]>",  # ATTLIST w/ default value
+    "<!DOCTYPE root [ <!ENTITY %% p SYSTEM 'http://127.0.0.1:1/p%d.dtd'> ]>",  # external param entity (blocked on ref; decl alone)
 ]
 
 
 def _elem(rng, depth):
     tag = rng.choice(["a", "b", "c", "n:x", "item"])
-    attrs = ""
-    for _ in range(rng.randint(0, 2)):
-        attrs += " %s=%r" % (rng.choice(["k", "id", "n:at"]), rng.choice(["1", "v", "café"]))
+    # Accumulate into a dict so a repeated name doesn't emit a duplicate attribute
+    # (a well-formedness violation that makes both parsers raise early, wasting the
+    # document on the error path instead of exploring deeper parse paths — PR#8 Gemini).
+    attr_map = {}
+    for _ in range(rng.randint(0, 3)):
+        attr_map[rng.choice(["k", "id", "n:at", "xml:lang"])] = rng.choice(
+            ["1", "v", "café", "a&amp;b", "&lt;x&gt;", "&#65;z", ""])
+    attrs = "".join(" %s=%r" % (k, v) for k, v in attr_map.items())
     body = ""
-    n = 0 if depth >= 3 else rng.randint(0, 3)
+    n = 0 if depth >= 4 else rng.randint(0, 3)
     if n == 0:
         body = rng.choice(_TEXT)
     else:
@@ -79,19 +95,30 @@ def _doc(rng):
 
 
 def _kind(fn, s):
+    # Catch only the parse call: a parse-success-but-serialize-failure must surface
+    # rather than masquerade as a parse failure (else a serialization divergence
+    # would hide behind both-raise — PR#8 Gemini).
     try:
-        return ("parse", ET.canonicalize(ET.tostring(fn(s), encoding="unicode")))
+        tree = fn(s)
     except Exception:  # noqa: BLE001 — kind, not type, is what matters
         return ("raise", None)
+    return ("parse", ET.canonicalize(ET.tostring(tree, encoding="unicode")))
+
+
+#: Fuzz dimensions — single source of truth, also read by the equivalence-report
+#: generator (scratch/review/gen_equivalence_report.py) so the published doc count
+#: can never drift from what the test actually runs.
+SEEDS = 12
+PER_SEED = 80  # SEEDS × PER_SEED = 960 documents (× 2 for str+bytes)
 
 
 @requires_oracle
-@pytest.mark.parametrize("seed", range(8))
+@pytest.mark.parametrize("seed", range(SEEDS))
 def test_differential_fuzz(seed):
     import defusedxml.ElementTree as DET
 
     rng = random.Random(seed * 1000 + 17)
-    for _ in range(60):  # 8 seeds × 60 = 480 documents
+    for _ in range(PER_SEED):
         doc = _doc(rng)
         for arg in (doc, doc.encode("utf-8")):  # str AND bytes
             pk = _kind(purexml.fromstring, arg)

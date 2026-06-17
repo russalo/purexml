@@ -27,6 +27,10 @@ scaffolding side-by-side; the Go half was deleted when purexml chose Python.)
 - **Dev/test: `pytest` + `defusedxml`.** `defusedxml` is the **oracle** purexml
   is validated against — never a runtime dependency, never imported under `src/`.
   Declared in `pyproject.toml` `[project.optional-dependencies].dev`.
+- **Opt-in fuzz: `atheris`** (`[fuzz]` extra). Coverage-guided differential
+  fuzzing only (`fuzz/`), on-demand — heavier tooling (clang/libFuzzer), so it is
+  NOT in the always-run `[dev]` set or CI. Dev-only; never shipped, never under
+  `src/`.
 
 ## Source layout
 
@@ -36,9 +40,13 @@ scaffolding side-by-side; the Go half was deleted when purexml chose Python.)
   `ElementTree.py` (the canonical `purexml.ElementTree` namespace mirroring
   defusedxml), `_parser.py` (the expat-based engine — `XMLParser` + `fromstring`/
   `parse`/`iterparse`/`fromstringlist`), `errors.py` (exception hierarchy),
-  `_expat_security.py` (opt-in libexpat version awareness).
+  `limits.py` (opt-in structural-DoS caps — `Limits`/`RECOMMENDED_LIMITS`, v0.4),
+  `_expat_security.py` (opt-in libexpat version awareness + `security_report()`
+  posture API, v0.5).
 - `tests/` at repo root, plain `pytest` (no `tests/__init__.py` — flat layout so
   `conftest.py` imports cleanly). See **Architecture** in `CLAUDE.md`.
+- `fuzz/` at repo root — the opt-in Atheris coverage-guided harness (dev-only,
+  not collected by pytest). The committed equivalence artifact is `docs/EQUIVALENCE.md`.
 
 ## Commands / dev environment
 
