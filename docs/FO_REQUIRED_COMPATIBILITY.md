@@ -9,7 +9,8 @@
 
 > **Where the wider 1.0 lives.** purexml has grown well past this floor — it is now the
 > complete `defusedxml.ElementTree` drop-in plus opt-in defense-in-depth (shipped through
-> v0.4). FO's floor below remains the non-negotiable compatibility guarantee; purexml's
+> v0.5: `Limits` caps in v0.4, the `security_report()` posture API in v0.5). FO's floor
+> below remains the non-negotiable compatibility guarantee; purexml's
 > own steward vision for a healthy 1.0 is in [`v1.0_TARGET.md`](v1.0_TARGET.md), and the
 > execution plan is [`ROADMAP-to-1.0.md`](ROADMAP-to-1.0.md). This doc is the originating
 > contract — the promise FO holds purexml to.
