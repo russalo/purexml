@@ -49,8 +49,8 @@ Pre-1.0: the current minor is supported; older is not (please upgrade).
 
 | Version | Supported |
 |---|---|
-| 0.6.x | Yes (current) |
-| < 0.6 | No (pre-1.0 moves fast; upgrade) |
+| 0.7.x | Yes (current) |
+| < 0.7 | No (pre-1.0 moves fast; upgrade) |
 
 ## Dependency security
 

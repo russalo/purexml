@@ -51,19 +51,34 @@ default-off):
   tracks the moving target** (v0.5.1 + v0.6 folded the 2026 libexpat 2.7.4–2.8.1 train in
   within days); the frozen incumbent couldn't.
 
+> **Reframe (2026-06-17) — the gate is the ecosystem debut, not one consumer.**
+> Stress-tested by removing file-observer entirely: purexml's reason to exist
+> *survives the loss of any single consumer* — it is the maintained, zero-dep
+> successor to the OWASP-recommended-but-abandoned `defusedxml` (0.7.1 / 2021;
+> 0.8.0 stalled at rc2), one that tracks the moving libexpat threat the incumbent
+> no longer does. So the **1.0 gate is now: a publish-worthy debut + first real
+> adoption** — measured by *an evaluator who wasn't recruited choosing it*, not by
+> any one captive consumer. **file-observer is the anchor consumer + first
+> validation track (G1/G2, alive), not the definition of done** — and FO-in-production
+> is itself a credibility signal *for* the debut, so the two compose. Publishing
+> stays deferred for **strategic timing + first-impression quality** (Russell's call),
+> not for lack of readiness. Build target: what a cold security engineer needs in the
+> first 60 seconds on publish day.
+
 ## Gates to 1.0
-- **G1 — file-observer trial-adopts purexml** (import swap). The validation 1.0
-  requires. *Critical path, scanner-side.* 🟡 **in progress (scanner-side, 2026-06-17).**
-  file-observer has **verified v0.5 consumer-side** — the literal swap holds
-  (`purexml.ElementTree.fromstring`, default still mirrors defusedxml) and confirmed
-  it would take purexml as a **dependency** (publish-first-party; swap shape is
-  unchanged either way). `security_report()` accepted as the right trust surface — to
-  be recorded in scanner's `ScanContext` dep-provenance at adoption.
-- **G2 — adoption surfaces real scope** (likely small; equivalence already proven).
-  🟡 Two remaining validation items — **adversarial soak** + a **2nd independent
-  consumer** — are being built scanner-side as separate file-observer side projects;
-  no purexml action required (per scanner relay 2026-06-17). Consumer-side gate read:
-  *model settled, trust-surface advancing.*
+- **G1 — file-observer adopts purexml** (import swap) — the **first** real-adoption
+  proof, not the only one. 🟡 **in progress (scanner-side, 2026-06-17).** FO has
+  **verified v0.5 consumer-side** (literal `purexml.ElementTree.fromstring` swap, default
+  mirrors defusedxml) and confirmed it would take purexml as a **dependency**;
+  `security_report()` accepted as the trust surface (to be recorded in `ScanContext`
+  dep-provenance at adoption). FO uses only `fromstring`, so it's fully covered by the
+  current surface — it does not constrain the public scope.
+- **G2 — ecosystem readiness (the publish-worthy debut)** — the broadened gate: the
+  first-impression layer a stranger evaluates (public README/story, the trust signals,
+  a one-line posture demo) + first *external* adoption signal (a non-russalo dependent,
+  a stranger's issue, download/awareness). FO's two scanner-side validation items
+  (adversarial soak + 2nd consumer) feed this but don't bound it. *Equivalence already
+  proven; the gap is presentation + reach, not capability.*
 - **G3 — build the ElementTree family — ✅ COMPLETE (2026-06-16).**
   - **v0.2** ✅ (PR #4) — `parse` + `fromstringlist` + `XML`/`tostring` + `XMLParser`
     + the `forbid_*` knobs.

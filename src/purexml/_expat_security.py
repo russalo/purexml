@@ -189,6 +189,24 @@ class SecurityReport(namedtuple("SecurityReport", _ReportFields)):
         # the default _make bypasses __new__ via tuple.__new__.
         return cls(*iterable)
 
+    def as_dict(self):
+        """A JSON-safe ``dict`` of the report (version tuples → ``"x.y.z"`` strings,
+        ``mitigations`` → plain dict, ``recommended_limits`` → dict-or-None, ``notes``
+        → list). Backs `python -m purexml --json`. PROVISIONAL with the report."""
+        rl = self.recommended_limits
+        return {
+            "expat_version": ".".join(map(str, self.expat_version)),
+            "expat_meets_safe_floor": self.expat_meets_safe_floor,
+            "expat_meets_recommended": self.expat_meets_recommended,
+            "recommended_limits": (None if rl is None else {
+                "max_depth": rl.max_depth,
+                "max_attributes": rl.max_attributes,
+                "max_bytes": rl.max_bytes,
+            }),
+            "mitigations": dict(self.mitigations),
+            "notes": list(self.notes),
+        }
+
     def __str__(self):
         ver = ".".join(map(str, self.expat_version))
         lines = [
