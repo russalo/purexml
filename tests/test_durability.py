@@ -35,13 +35,15 @@ def test_large_token_equivalence_cve_2023_52425():
 
 
 def test_disproportionate_memory_class_version_gated():
-    """Disproportionate dynamic-memory use affects Expat < 2.7.2. Below the
-    recommended floor the class is live; the version-awareness surface must reflect
-    reality so a consumer can choose to fail-closed."""
-    if purexml.EXPAT_VERSION < purexml.RECOMMENDED_EXPAT_VERSION:
+    """Disproportionate dynamic-memory use affects Expat < 2.7.2 (its own fix
+    version — distinct from the moving recommended-latest floor). Below it the class
+    is live; the version-awareness surface must reflect reality so a consumer can
+    choose to fail-closed."""
+    DISPROP_FIXED = (2, 7, 2)
+    if purexml.EXPAT_VERSION < DISPROP_FIXED:
         pytest.skip(
-            "runtime expat %s < recommended %s — class live here; "
+            "runtime expat %s < %s — disproportionate-memory class live here; "
             "consumers should assert_expat_secure(RECOMMENDED_EXPAT_VERSION)"
-            % (purexml.EXPAT_VERSION, purexml.RECOMMENDED_EXPAT_VERSION)
+            % (purexml.EXPAT_VERSION, DISPROP_FIXED)
         )
     assert purexml.EXPAT_VERSION >= purexml.SAFE_EXPAT_VERSION

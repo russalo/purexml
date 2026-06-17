@@ -96,11 +96,15 @@ def test_structural_class_is_opt_in():
 # security_report() reads the module-level EXPAT_VERSION, so monkeypatching it
 # exercises the below-floor / at-floor branches without a different interpreter.
 
+# memory (disproportionate) is gated on its OWN fix version (2.7.2), decoupled from
+# the recommended-latest floor (now 2.8.1) — so 2.7.2 reports the class mitigated
+# even though it sits below the recommended floor.
 @pytest.mark.parametrize("ver,large,memory,safe,rec", [
     ((2, 5, 0), purexml.LIVE,            purexml.LIVE,            False, False),  # pre-2.6
     ((2, 6, 0), purexml.EXPAT_MITIGATED, purexml.LIVE,            True,  False),  # safe floor
     ((2, 6, 1), purexml.EXPAT_MITIGATED, purexml.LIVE,            True,  False),  # between
-    ((2, 7, 2), purexml.EXPAT_MITIGATED, purexml.EXPAT_MITIGATED, True,  True),   # recommended
+    ((2, 7, 2), purexml.EXPAT_MITIGATED, purexml.EXPAT_MITIGATED, True,  False),  # memory-fixed, < recommended
+    ((2, 8, 1), purexml.EXPAT_MITIGATED, purexml.EXPAT_MITIGATED, True,  True),   # recommended-latest
     ((2, 9, 0), purexml.EXPAT_MITIGATED, purexml.EXPAT_MITIGATED, True,  True),   # above
 ])
 def test_version_gating(monkeypatch, ver, large, memory, safe, rec):
@@ -131,8 +135,19 @@ def test_below_recommended_emits_advisory_note(monkeypatch):
 
 
 def test_at_recommended_no_floor_advisory(monkeypatch):
-    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 7, 2))
+    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 8, 1))  # the recommended-latest floor
     notes = purexml.security_report().notes
-    assert not any("below the recommended floor" in n for n in notes)
+    assert not any("recommended" in n and "floor" in n for n in notes)
     # the structural opt-in advisory is always present (it's never auto-covered)
     assert any("opt-in" in n for n in notes)
+
+
+def test_between_memory_fix_and_recommended_advisory(monkeypatch):
+    # 2.7.2 <= ver < 2.8.1: mapped classes all mitigated, but still below the
+    # recommended-latest floor — the advisory must fire WITHOUT naming a live class.
+    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 7, 2))
+    r = purexml.security_report()
+    assert r.expat_meets_recommended is False
+    assert all(v != purexml.LIVE for v in r.mitigations.values())
+    joined = " ".join(r.notes)
+    assert "recommended-latest floor" in joined

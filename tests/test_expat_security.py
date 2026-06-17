@@ -14,7 +14,10 @@ def test_expat_version_exposed():
 
 def test_floors_are_documented_constants():
     assert purexml.SAFE_EXPAT_VERSION == (2, 6, 0)
-    assert purexml.RECOMMENDED_EXPAT_VERSION == (2, 7, 2)
+    # RECOMMENDED tracks latest-stable libexpat (bumped to 2.8.1 after the 2026
+    # release train); it is >= the functional floor.
+    assert purexml.RECOMMENDED_EXPAT_VERSION == (2, 8, 1)
+    assert purexml.RECOMMENDED_EXPAT_VERSION >= purexml.SAFE_EXPAT_VERSION
 
 
 def test_functional_floor_met_on_this_runtime():
