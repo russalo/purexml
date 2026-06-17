@@ -339,13 +339,15 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
-- **v0.6.0** *(approved 2026-06-17, in implementation)* — **complete the posture map**:
-  adds the two newer expat-layer DoS classes (`content_token_overflow_cve_2026_25210` →
-  expat 2.7.4; `attribute_collision_dos_cve_2026_45186` → 2.8.1, opt-in `max_attributes`
-  partially bounds it) as first-class `security_report().mitigations` entries with
-  per-class fix-version gating. Report-only; no parse-behavior change. CVE-2026-41080
-  left unmapped (ungrounded). SCHEMA n/a; LOGIC unchanged (reported, not blocked).
-  [RFC](docs/v0.6.0_RFC_Specification.md).
+- **v0.6.0** *(shipped 2026-06-17, PR #11)* — **complete the posture map**: adds the two
+  newer expat-layer DoS classes (`content_token_overflow_cve_2026_25210` → expat 2.7.4;
+  `attribute_collision_dos_cve_2026_45186` → 2.8.1, opt-in `max_attributes` partially
+  bounds it) as first-class `security_report().mitigations` entries with per-class
+  fix-version gating. Report-only; no parse-behavior change. CVE-2026-41080 left unmapped
+  (ungrounded; cited in the floor advisory only below 2.8.0). Four-leg review; 1 PR-bot
+  finding (2.8.0 advisory precision) grounded + fixed. SCHEMA n/a; LOGIC unchanged
+  (reported, not blocked). [RFC](docs/v0.6.0_RFC_Specification.md) ·
+  [compliance](docs/COMPLIANCE-v0.6.md).
 - **v0.5.1** *(2026-06-17)* — **patch**: adversarial soak + expat-floor currency (no
   parse-behavior change). 17-vector red-team soak module (incl. encoding-vector attacks
   proving encoding-independent blocking) + 60k-comparison heavy differential soak (0
@@ -427,7 +429,9 @@ Small by design (~300 lines of `src/`). The whole engine is one class.
   implements **`_setevents`** (a verbatim stdlib mirror) so it drives stdlib
   `iterparse`. `feed`/`close` clean up the parser↔self cycle on **every** path
   (success or error). Functions: `fromstring`, `parse` (via stdlib `parse`),
-  `fromstringlist`, `iterparse` (via stdlib `iterparse`).
+  `fromstringlist`, `iterparse` (via stdlib `iterparse`). Each takes the keyword-only
+  `limits=` (v0.4); depth/attr accounting is in `_start`/`_end` (decoupled from the
+  target callbacks) and `max_bytes` counts UTF-8 bytes in `feed`.
 - **`src/purexml/ElementTree.py`** — the canonical `purexml.ElementTree` namespace
   mirroring `defusedxml.ElementTree` (the `s/defusedxml/purexml/` surface):
   re-exports the family + `XML`/`XMLParse`/`XMLTreeBuilder` aliases + stdlib
@@ -435,14 +439,24 @@ Small by design (~300 lines of `src/`). The whole engine is one class.
 - **`src/purexml/__init__.py`** — top-level convenience re-exports of the family +
   exceptions + the expat-version API + `__version__`; imports the `ElementTree` submodule.
 - **`src/purexml/errors.py`** — `PureXMLError(ValueError)` ← `DTDForbidden`,
-  `EntitiesForbidden`, `ExternalReferenceForbidden`. Malformed → stdlib `ParseError`.
+  `EntitiesForbidden`, `ExternalReferenceForbidden`, `LimitExceeded`(←`Depth`/
+  `Attributes`/`SizeExceeded`). Malformed → stdlib `ParseError`.
+- **`src/purexml/limits.py`** — opt-in structural-DoS caps (v0.4): `Limits`
+  (`max_depth`/`max_attributes`/`max_bytes`, default `None`) + `RECOMMENDED_LIMITS`.
 - **`src/purexml/_expat_security.py`** — opt-in libexpat version-awareness
-  (`EXPAT_VERSION`, `expat_is_secure`/`assert_expat_secure`; conservative default floor).
+  (`EXPAT_VERSION`, `expat_is_secure`/`assert_expat_secure`; default floor =
+  `RECOMMENDED_EXPAT_VERSION`, **latest-stable**, bumped as libexpat ships fixes) **+
+  the `security_report()` posture API** (v0.5): a read-only, immutable `SecurityReport`
+  whose `mitigations` map gates each attack class on its OWN expat fix version
+  (`_DISPROPORTIONATE_MEMORY_FIXED`/`_CONTENT_TOKEN_OVERFLOW_FIXED`/`_ATTRIBUTE_COLLISION_FIXED`),
+  decoupled from the moving recommended-latest floor.
 - **`tests/`** — the falsify-first battery: `test_equivalence` / `test_v02_surface`
   / `test_v03_iterparse` (C14N same-parse + event-stream + knob-matrix equivalence
-  vs the oracle), `test_attacks` + `test_fuzz_equivalence` + `conftest` (attack
-  battery + differential fuzz + the no-fetch/no-read trip-wire), `test_durability`
-  / `test_expat_security` / `test_misc`. Run on CPython ≥3.10.
+  vs the oracle), `test_attacks` + `test_fuzz_equivalence` + `test_hardening_soak` +
+  `conftest` (attack battery + differential fuzz + red-team soak + the no-fetch/no-read
+  trip-wire), `test_v04_limits`, `test_v05_security_report` (posture API + version-gating),
+  `test_no_io` (structural import guard), `test_durability` / `test_expat_security` /
+  `test_misc`. Run on CPython ≥3.10.
 - **Out of `src/` (gitignored `scratch/`):** `review/corpus_sweep.py` (empirical
   sweep over the shared pkplab corpus via symlinks — baseline pinned in committed
   `corpus_manifest.json`); `measure/` (measure-first findings); `spinoff_ideas.md`.
@@ -529,6 +543,25 @@ blame`.
   license** — package-only in the private repo, consumed via git/path. The direction
   just means: when 1.0's specifics are decided, they aim at *published*, not vendored.
   See `scratch/packaging_and_naming_notes.md`.
+- **Posture map tracks current libexpat — the operating pattern** (set v0.5.1/v0.6).
+  `RECOMMENDED_EXPAT_VERSION` = **latest-stable libexpat** and is bumped *as a patch* when
+  a new DoS-fix release ships (it changes report DATA, not parse-or-block → not a LOGIC
+  bump). Each attack class in `security_report().mitigations` gates on its **own** expat
+  fix-version constant, **decoupled** from RECOMMENDED, so the floor can move without
+  mis-gating a class. When a new libexpat DoS fix lands: (1) bump RECOMMENDED to
+  latest-stable (patch); (2) if the class reaches purexml's *parse paths*, add it to the
+  map gated on its fix version — a **minor** (mitigation-set change → RFC), as v0.6 did.
+  This is the maintained-successor promise in mechanism; don't let the floor go stale.
+- **CVE-2026-41080 deliberately UNMAPPED** (v0.6) — its cause/reachability vs purexml's
+  paths isn't grounded, so it is NOT a named map class; the generic floor advisory cites
+  it only when the runtime is below its 2.8.0 fix (`_HIGHEST_UNMAPPED_FIX`). Don't add it
+  to the map without grounding it first (grounding rule).
+- **Version-assertion enforce-vs-warn: leaning INFORM-by-default** (1.0 decision, not yet
+  ratified). `security_report()` informs; `assert_expat_secure()` stays opt-in. A
+  hard-fail-by-default on a *moving* floor would make a consumer's gate
+  environment-dependent (scanner flagged this as a determinism break) — so the lean is:
+  never auto-enforce a moving floor; consumers wiring a hard gate pin the floor explicitly.
+  Grounded consumer input in `scratch/version_assertion_policy_input.md`; settle at G6.
 
 ## Excluded decisions (do NOT re-introduce)
 
