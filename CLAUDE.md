@@ -431,6 +431,14 @@ blame`.
   as C14N-equal to the defusedxml oracle, not ad-hoc tree comparison. Verified on
   340 real inputs (0 disagreements) + the synthetic battery. Keep the oracle a
   **dev/test-only** dep.
+- **Leg-3 corpus = the shared pkplab root, via symlinks** (`/srv/projects/pkplab/
+  scanner-corpora/`, scanner-owned shared asset for the `pure*` labs). purexml's
+  subset (`corpora/tika` + the OOXML fixtures) is **symlinked** into gitignored
+  `scratch/corpora/`; `scratch/review/corpus_sweep.py` reads those symlinks. **Never
+  commit corpus bytes** (leak + determinism). Instead, the committed
+  `corpus_manifest.json` pins counts + per-file sha256 + an aggregate hash of the
+  exact subset the sweep gates on — that's the reproducibility anchor. Recipe +
+  capability map: the shared root's `README.md`.
 - **External-DTD nuance (measure-first F2)** — an *unresolved* external-DTD
   declaration is **allowed** (parses, no fetch); only *attempted* external
   resolution is blocked. Over-blocking it would break equivalence. Don't "harden"

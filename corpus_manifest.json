@@ -1,0 +1,1533 @@
+{
+ "_about": "purexml leg-3 corpus baseline. Subset symlinked from the shared pkplab root (/srv/projects/pkplab/scanner-corpora) into gitignored scratch/corpora/. Bytes are NOT committed; this manifest pins exactly what scratch/review/corpus_sweep.py gates on so the sweep is reproducible.",
+ "shared_root": "/srv/projects/pkplab/scanner-corpora/",
+ "corpora": {
+  "tika_xml": {
+   "count": 284,
+   "files": [
+    {
+     "path": "tika/assembly.xml",
+     "sha256": "141b673c8a3197cdc076193e7ba683360d3c32c8376b096ead1965c2ec869d3d",
+     "size": 1263
+    },
+    {
+     "path": "tika/docs/pom.xml",
+     "sha256": "f37a4f7adea14b0a34bca8ad54c20128e1c79c29498b3609447483105469a4a4",
+     "size": 7727
+    },
+    {
+     "path": "tika/docs/src/assembly/docs.xml",
+     "sha256": "8edd20da6e12034f883696d869d431184efc45530596dd1738269b460f1f610c",
+     "size": 1511
+    },
+    {
+     "path": "tika/pom.xml",
+     "sha256": "3617ac988b516502d859cc0d0769aa7a389cf90860584a994bf9d67e022b1e39",
+     "size": 13428
+    },
+    {
+     "path": "tika/tika-annotation-processor/pom.xml",
+     "sha256": "cb65ee587e871cbfa244338145c7a13708a5c12b46a64a64f8028797118f1607",
+     "size": 2327
+    },
+    {
+     "path": "tika/tika-app/pom.xml",
+     "sha256": "ff96f71a7bd0685ea2c4fbbf3a1ee000e12d64adb7dd8ba444b616e3ccfc5c39",
+     "size": 7772
+    },
+    {
+     "path": "tika/tika-app/src/main/assembly/assembly.xml",
+     "sha256": "7ad54a08c85b39a33f8d2a49d3e7f594e2fe40fe62561a9053c6bc170b53fd71",
+     "size": 1864
+    },
+    {
+     "path": "tika/tika-app/src/main/resources/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-app/src/test/resources/test-data/bad_xml.xml",
+     "sha256": "0671f646d383638fa5d5b248bcce74a2e509c1166c7c59d6761f2e31a7400867",
+     "size": 142
+    },
+    {
+     "path": "tika/tika-app/src/test/resources/xml-configs/tika-config-list-map-types.xml",
+     "sha256": "cd0e2cf83c4d6a57a19506c939c659c202bfdddfc0729cdaf499df447739c80a",
+     "size": 1720
+    },
+    {
+     "path": "tika/tika-app/src/test/resources/xml-configs/tika-config-numeric-types.xml",
+     "sha256": "392a2d1d4bcd5c8948f583e362b740675cb0187a9bcf779d6efcba6528fedf98",
+     "size": 1225
+    },
+    {
+     "path": "tika/tika-app/src/test/resources/xml-configs/tika-config-redundant-exclusion.xml",
+     "sha256": "b26bcd3c57b64f765aa4d10990d4ce56c15c8d2906e2b9a3cdf389e04e098a0a",
+     "size": 1775
+    },
+    {
+     "path": "tika/tika-app/src/test/resources/xml-configs/tika-config-simple.xml",
+     "sha256": "64255b5fa316850c081de38bc088fad300b8ac469d59135508b8bef63d991197",
+     "size": 1239
+    },
+    {
+     "path": "tika/tika-app/src/test/resources/xml-configs/tika-config-with-excludes.xml",
+     "sha256": "0d802b0bd732d4365b106eecbce22c8173f6f86b4a4029f4ec246e4fa803aa7c",
+     "size": 1316
+    },
+    {
+     "path": "tika/tika-bom/pom.xml",
+     "sha256": "f05d3a0259007e6ac7d6814b692e5b0e6f3e024774df6590c2aa43431d37eb05",
+     "size": 16488
+    },
+    {
+     "path": "tika/tika-bundles/pom.xml",
+     "sha256": "780377f2d62f11def366a0987b1aa5f091b217e5d1032aaf0d7c47744a9918e5",
+     "size": 1889
+    },
+    {
+     "path": "tika/tika-bundles/tika-bundle-standard/pom.xml",
+     "sha256": "aabd39576f764be89a775c76083c52334b906dd0eb7e7899442723b7c94f7934",
+     "size": 16751
+    },
+    {
+     "path": "tika/tika-bundles/tika-bundle-standard/test-bundles.xml",
+     "sha256": "3cf2941760ee87a76fecf6fbb400ad52d24dcc97be5386fc40fce76273eb489c",
+     "size": 2209
+    },
+    {
+     "path": "tika/tika-core/pom.xml",
+     "sha256": "122df0788b00c5b43354cfadeba00d6ca6921e14aba2e59c21950e99fe13f8b8",
+     "size": 11340
+    },
+    {
+     "path": "tika/tika-core/src/main/assembly/test-jar-with-dependencies.xml",
+     "sha256": "fd625832055fa3d9e7cba60b653594b14109d31586aeeeff9d1d6a411cc70078",
+     "size": 1692
+    },
+    {
+     "path": "tika/tika-core/src/main/resources/org/apache/tika/mime/tika-mimetypes.xml",
+     "sha256": "b213c35123f215e11a9fa12d7907c9bb0a5b79214a89eeaf343984ba69143e6d",
+     "size": 329271
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/custom-mimetypes.xml",
+     "sha256": "54df44e623cfc9423f7907da9ebeb8777f6c68e07bbcd5b866329c8e3fd4cdcb",
+     "size": 1970
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/custom-mimetypes2.xml",
+     "sha256": "b44cd34fdf0f48b3d2c5d4fa7398506f46961599f221e74f02fd3fd2c79fe458",
+     "size": 1076
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/log4j2.xml",
+     "sha256": "7146b6d560259c6ca17cd1862fe82637fb4e83619f023858f40a910ce8d623a7",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/config/TIKA-2653-vowel-parser-ae.xml",
+     "sha256": "aa64c6d53bfced9227cba53675e2e61e853d6c9ca5693f9683bd8dd68d92a6d1",
+     "size": 1034
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/config/TIKA-2653-vowel-parser-iou.xml",
+     "sha256": "b5134829cfe92a8645ed11dee30b94afd898bc4722ddc8b9fec6f88cccfc99f9",
+     "size": 1035
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/mime/custom-mimetypes-badMinShouldMatch1.xml",
+     "sha256": "57be7686dcbd061aae2052affb61202ad5e146686fff08122dc0cca7b25ea1d4",
+     "size": 1402
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/mime/custom-mimetypes-badMinShouldMatch2.xml",
+     "sha256": "e6ab88251d2418acdb72f2a9b8bc5938a7414c90cb057b4b1ac66aa72df1c5f7",
+     "size": 1403
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/mime/custom-mimetypes-badMinShouldMatch3.xml",
+     "sha256": "d36dda650779ca4925fd3f7b417d0f634547589e683a6d3f555838dd5b0364ed",
+     "size": 1420
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/mime/custom-mimetypes-badMinShouldMatch4.xml",
+     "sha256": "1a8ea054cdbaf603204174d53b8b758ba5b898e0850181f9d447687bc75433aa",
+     "size": 1123
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/mime/custom-mimetypes-minShouldMatch.xml",
+     "sha256": "cac71fd984118e61457648bfa8976bc6a963dd7c069fa65e555404da26feb802",
+     "size": 1474
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/mime/external-mimetypes.xml",
+     "sha256": "5da74238f58c9a3cdd392277d5d9475c9e926688ca0b4445e533f3ef02544df0",
+     "size": 970
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/mime/test-difficult-rdf1.xml",
+     "sha256": "2bf8f70550228e0d1db1bf2678d706a0f8d8dda9f7541dff82ab15784a35fa2c",
+     "size": 1401
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/mime/test-difficult-rdf2.xml",
+     "sha256": "d79c70af29265944fafd8419b50156151ca5e48cca6d885c4ce32dbb90f1b9fc",
+     "size": 1281
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/mime/test-iso-8859-1.xml",
+     "sha256": "4d9a18272e009e2bcd3dfc071bf264b9b853335b2dc94117b21d2cccd2f3b3d2",
+     "size": 65
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/mime/test-long-comment.xml",
+     "sha256": "b58f31dd373c9078584904a757538af7417c94f039548172fa43001410c13fee",
+     "size": 901
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/mime/test-utf16be.xml",
+     "sha256": "4c0d4b3c45b54ffef9d2a485db7a09f4a1b8e10e9c919b01430062bfca69dcf8",
+     "size": 126
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/mime/test-utf16le.xml",
+     "sha256": "8271b01afb231fbd5cb75df87b9dffcd6f22d3b949ba68814c8660425b40ed4c",
+     "size": 126
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/mime/test-utf8-bom.xml",
+     "sha256": "7cbf9062ebf358c2131e6cbdc0de25e282de26761cebac0fcccfd0670f0d4638",
+     "size": 63
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/org/apache/tika/mime/test-utf8.xml",
+     "sha256": "1068e4ae9d0629d38cf299909bdd055408210cc915c1bab7904f79d3de0382d0",
+     "size": 60
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/test-documents/basic_embedded.xml",
+     "sha256": "fdaa937c96d1ed010b8d307ccddf9d11c3b48db732a8771eaafe99d59e076d0a",
+     "size": 1409
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/test-documents/embedded_then_npe.xml",
+     "sha256": "d5bd81da6c11af7990e21dea7b2f188facbcdfa6139318a02b073649355f7294",
+     "size": 1498
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/test-documents/embedded_with_npe.xml",
+     "sha256": "6982287d0df072e11d3ea83be7479f49afd9debdb8972213d863a0bb0f5ea484",
+     "size": 1469
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/test-documents/example.xml",
+     "sha256": "7a1de7471ea1c3d3ce4c9ea9bc779c23fc479df63ae5b826c268dc3021e82406",
+     "size": 2221
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/test-documents/massive_embedded.xml",
+     "sha256": "8db27c3785405ef80d245d7a4cb08a699c02ce17655fe1549d5b4a4b1ee8d469",
+     "size": 36074
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/test-documents/mock_fakeload.xml",
+     "sha256": "78ced472867e7b07fd9bb5acb6790d85c594cd13797f90e50db8db6998b2352e",
+     "size": 1149
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/test-documents/mock_times.xml",
+     "sha256": "5f3b924303e960ce35d7f705e91d3018dd110a9c3cef0546a91fe013d6dad6fd",
+     "size": 975
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/test-documents/subdir/example.xml",
+     "sha256": "7a1de7471ea1c3d3ce4c9ea9bc779c23fc479df63ae5b826c268dc3021e82406",
+     "size": 2221
+    },
+    {
+     "path": "tika/tika-core/src/test/resources/test-documents/undeclared_entity.xml",
+     "sha256": "58558db464b78334ccdf8eb081fb0e10cc96f7a458db13a6b0988150484c6af1",
+     "size": 964
+    },
+    {
+     "path": "tika/tika-detectors/pom.xml",
+     "sha256": "c3cfa98c835c1086ae36b3f4f7962097eb9194be9e070bcc9655e1721c3ed208",
+     "size": 1503
+    },
+    {
+     "path": "tika/tika-detectors/tika-detector-magika/pom.xml",
+     "sha256": "ea2163223561da4243bd84bcef4e9fe25eeca3e9131ce650469298be9f94c37c",
+     "size": 3970
+    },
+    {
+     "path": "tika/tika-detectors/tika-detector-siegfried/pom.xml",
+     "sha256": "fbe6ada237a12d492abbe4d43eec65b37769b61b4bffaca142a128bd25b6a18d",
+     "size": 4243
+    },
+    {
+     "path": "tika/tika-e2e-tests/pom.xml",
+     "sha256": "18620c4cdd0db0e065b57cdaa21119257a6f8ac16b7a0d8009b0d359c90df4f2",
+     "size": 5672
+    },
+    {
+     "path": "tika/tika-e2e-tests/tika-grpc/pom.xml",
+     "sha256": "23258cca5117827ba561d337b24cc3c7ef007f9a7a8a33295562ac6f6780f630",
+     "size": 6952
+    },
+    {
+     "path": "tika/tika-e2e-tests/tika-grpc/src/test/resources/test-fixtures/sample.xml",
+     "sha256": "4ee5b3a01ded40a6109f4b66ccc8f8cffa38cae6e22d130487781d50037f10fd",
+     "size": 179
+    },
+    {
+     "path": "tika/tika-e2e-tests/tika-server/pom.xml",
+     "sha256": "e87e566b18dd2c3b18b7cdd75d9021fbee58928bdc430a4805b55cab12d3674a",
+     "size": 5804
+    },
+    {
+     "path": "tika/tika-encoding-detectors/pom.xml",
+     "sha256": "d940bb812026c298056633813cceaf946d530a9f5b4d7e701a41d5886c782aad",
+     "size": 2350
+    },
+    {
+     "path": "tika/tika-encoding-detectors/tika-encoding-detector-html/pom.xml",
+     "sha256": "a4d727acc863e5cd9c9ef2b2fef4a998da9ae9354460355f60eaef6754e78e82",
+     "size": 2734
+    },
+    {
+     "path": "tika/tika-encoding-detectors/tika-encoding-detector-icu4j/pom.xml",
+     "sha256": "41adc5b72abe217030aacc31cf7c5cb96504adaa3d0a95e33055afe7b0173712",
+     "size": 3913
+    },
+    {
+     "path": "tika/tika-encoding-detectors/tika-encoding-detector-mojibuster/pom.xml",
+     "sha256": "2c1f7de3a44bb5c43fab403f8e2a8366b7bd23cd378037897635d6e10330c486",
+     "size": 3470
+    },
+    {
+     "path": "tika/tika-encoding-detectors/tika-encoding-detector-universal/pom.xml",
+     "sha256": "a120cd73c120798e85de06eb09532bd45603562c46aef4dd96896f6856a15ccf",
+     "size": 2856
+    },
+    {
+     "path": "tika/tika-eval/pom.xml",
+     "sha256": "e8cfa1cb23470166dc4c81ddb34f1a460e88c691dd3135d6166fb8a8cf69f4d4",
+     "size": 3129
+    },
+    {
+     "path": "tika/tika-eval/tika-eval-app/pom.xml",
+     "sha256": "bd3ced78ec08b73cdb1619309c142b8e276c9587b5ef8d4833b36f76810b0843",
+     "size": 6052
+    },
+    {
+     "path": "tika/tika-eval/tika-eval-app/src/main/assembly/assembly.xml",
+     "sha256": "620594a5d3e24f208083610877d6a77e9fe8cfb42f0a553afca63c8aa120054b",
+     "size": 1723
+    },
+    {
+     "path": "tika/tika-eval/tika-eval-app/src/main/resources/comparison-reports-pg.xml",
+     "sha256": "644640b88e961961abd60d50f9875b04edd22543c2ce34186ef96044890ca3fe",
+     "size": 57557
+    },
+    {
+     "path": "tika/tika-eval/tika-eval-app/src/main/resources/comparison-reports-tags.xml",
+     "sha256": "7d2c72281841c3b97742b1270a57217548a7bbad8ea20d5e0558fbec9b433907",
+     "size": 59839
+    },
+    {
+     "path": "tika/tika-eval/tika-eval-app/src/main/resources/comparison-reports.xml",
+     "sha256": "420cce44aae50c3a62d6f3cd602610fb516a30d401ba97e18f379f4f30f5902b",
+     "size": 50697
+    },
+    {
+     "path": "tika/tika-eval/tika-eval-app/src/main/resources/log4j2.xml",
+     "sha256": "517ac8e92531682d732e16c0aecf15efd4d6d2c2b73110054cd132b00a7aae95",
+     "size": 1347
+    },
+    {
+     "path": "tika/tika-eval/tika-eval-app/src/main/resources/profile-reports-tags.xml",
+     "sha256": "e9b9289e0da102a0defc55eb9b5bf41531cfa2b8e9cbe14d3e1270811afc33f9",
+     "size": 9808
+    },
+    {
+     "path": "tika/tika-eval/tika-eval-app/src/main/resources/profile-reports.xml",
+     "sha256": "2cae66b6367477fb6914878a1f01445a5dc94d8c7c258dc32ce6317e7eb38d00",
+     "size": 8340
+    },
+    {
+     "path": "tika/tika-eval/tika-eval-app/src/test/resources/test-dirs/batch-logs/batch-process-fatal.xml",
+     "sha256": "a150ac67b9f3b557e902876fb21f765d3004bd3de136c3362d296af7123e31fe",
+     "size": 4137
+    },
+    {
+     "path": "tika/tika-eval/tika-eval-core/pom.xml",
+     "sha256": "0b7cc0d41ef814acff3be4b17e8dfb6c17aa65b308854f10bb689b2b029b7999",
+     "size": 4627
+    },
+    {
+     "path": "tika/tika-example/pom.xml",
+     "sha256": "c3898cdf8cdc440ea915eff0518ad95f69fc063ba4692ad2c4c61169c9fbe7bd",
+     "size": 5340
+    },
+    {
+     "path": "tika/tika-example/src/main/resources/org/apache/tika/example/spring.xml",
+     "sha256": "37f069343069c2fcf2da8396db0f1ce2b7b238b027c1e4f612a242cfef715f14",
+     "size": 1237
+    },
+    {
+     "path": "tika/tika-grpc/pom.xml",
+     "sha256": "d413102aac46a8aa2bafe2e3a818f0d6dd3c92dd95d5e5f4d4078100661ef7fa",
+     "size": 23965
+    },
+    {
+     "path": "tika/tika-grpc/src/main/assembly/assembly.xml",
+     "sha256": "84e90c92a2d1a0bd36b149fd7f7bb0d6720e17473a1d54002ae33a4fe361a2bf",
+     "size": 1871
+    },
+    {
+     "path": "tika/tika-grpc/src/main/resources/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-grpc/src/test/resources/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-handlers/pom.xml",
+     "sha256": "07af5ec83f5590b1cec115ee9ef6214590f36090595ce30f5008411b8626f9b3",
+     "size": 2013
+    },
+    {
+     "path": "tika/tika-handlers/tika-handler-boilerpipe/pom.xml",
+     "sha256": "5ba40d631abe6a7d4e8c782bfe7627d6bd50adec4b1fa47820f3d2b323bb4a60",
+     "size": 1937
+    },
+    {
+     "path": "tika/tika-integration-tests/pom.xml",
+     "sha256": "f5d01d6c87713dfc4605863381d29b17dfbacf887c9116e2485f9ad28f61b159",
+     "size": 1840
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-es-integration-tests/pom.xml",
+     "sha256": "0012f62c276dbb24e75fe8f4582375179530313b00501ac1f7b86b2494e58ae9",
+     "size": 3936
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-es-integration-tests/src/test/resources/pipes-fork-server-custom-log4j2.xml",
+     "sha256": "f3cea2d58e2445dc5ce62575bdcd2c5df8376860162b1cedeaf1afa0da31fcdf",
+     "size": 1208
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-es-integration-tests/src/test/resources/test-documents/fake_oom.xml",
+     "sha256": "c185928694e450efcaedfbaa0056d2c89dd57f50034d81abf41beb0d02ecdc5b",
+     "size": 985
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-es-integration-tests/src/test/resources/test-documents/npe.xml",
+     "sha256": "3bfd0b43bb627f3ea3211a578e8ef1ed4b6d98e47d506c73c60deb4660723156",
+     "size": 1056
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-es-integration-tests/src/test/resources/test-documents/oom.xml",
+     "sha256": "76ced7b4b4b202966b31cd6540ce0ee0e3f07a36a2c6e6c5756336b613a9b6b9",
+     "size": 926
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-kafka-integration-tests/pom.xml",
+     "sha256": "b37ab3ac6ac50bedd3cb24ef8a30561134bfdb63e19a132b89037289fc1d495d",
+     "size": 4656
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-kafka-integration-tests/src/test/resources/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-kafka-integration-tests/src/test/resources/pipes-fork-server-custom-log4j2.xml",
+     "sha256": "693f09fffa1c76ba04d86a8b7a908b1557f23526da138af196eafaf8b922f624",
+     "size": 1164
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-opensearch-integration-tests/pom.xml",
+     "sha256": "4d442584587fd3dd66885a84a4986f87223a1bf9cf8d1591d7dc3e2b64ed8dce",
+     "size": 4158
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-opensearch-integration-tests/src/test/resources/pipes-fork-server-custom-log4j2.xml",
+     "sha256": "f3cea2d58e2445dc5ce62575bdcd2c5df8376860162b1cedeaf1afa0da31fcdf",
+     "size": 1208
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-opensearch-integration-tests/src/test/resources/test-documents/fake_oom.xml",
+     "sha256": "c185928694e450efcaedfbaa0056d2c89dd57f50034d81abf41beb0d02ecdc5b",
+     "size": 985
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-opensearch-integration-tests/src/test/resources/test-documents/npe.xml",
+     "sha256": "3bfd0b43bb627f3ea3211a578e8ef1ed4b6d98e47d506c73c60deb4660723156",
+     "size": 1056
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-opensearch-integration-tests/src/test/resources/test-documents/oom.xml",
+     "sha256": "76ced7b4b4b202966b31cd6540ce0ee0e3f07a36a2c6e6c5756336b613a9b6b9",
+     "size": 926
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-s3-integration-tests/pom.xml",
+     "sha256": "82511fb2b416f5c94408d920bdee061fc85a073ed1749a59f8287cf27c8c8b4b",
+     "size": 4549
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-s3-integration-tests/src/test/resources/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-s3-integration-tests/src/test/resources/pipes-fork-server-custom-log4j2.xml",
+     "sha256": "dc51dcbabfe9a7bd31b1012d5b19bb50aea5cc3c2156cb5a86c4aecdafc5a997",
+     "size": 1166
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-solr-integration-tests/pom.xml",
+     "sha256": "8bc66d711aab30f9a84191b6b0e8f619e3b5cae4291207cb2598a6cb083f5b28",
+     "size": 4497
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-solr-integration-tests/src/test/resources/log4j2.xml",
+     "sha256": "999a33d4f51bec05525bae80f4a5af7e16f44d21fe9c526a20b22a312ecac290",
+     "size": 1139
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-solr-integration-tests/src/test/resources/logback.xml",
+     "sha256": "8a3fe8fb766b3c0bedba20cd4080bcab3165966614510551ee5a64c89ef070d4",
+     "size": 1295
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-pipes-solr-integration-tests/src/test/resources/pipes-fork-server-custom-log4j2.xml",
+     "sha256": "dc51dcbabfe9a7bd31b1012d5b19bb50aea5cc3c2156cb5a86c4aecdafc5a997",
+     "size": 1166
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-resource-loading-tests/pom.xml",
+     "sha256": "9fb0ab2b79684575ed63e694c8aa3cb7abf4e306bfbc33dc496389f450df0e8b",
+     "size": 1734
+    },
+    {
+     "path": "tika/tika-integration-tests/tika-woodstox-tests/pom.xml",
+     "sha256": "67642b6cb387876086e2309135678c607a316d80464f1a40c553fd43001e4d26",
+     "size": 1610
+    },
+    {
+     "path": "tika/tika-java7/pom.xml",
+     "sha256": "cc1d783907a69cbbf49e96d728e9718afc3767c516e2007fdc95c7de817799ab",
+     "size": 4173
+    },
+    {
+     "path": "tika/tika-langdetect/pom.xml",
+     "sha256": "d4662cd0912a271c1a3e0c85591877d29b325b041e26096d37ac6b1a8dd12ae1",
+     "size": 4213
+    },
+    {
+     "path": "tika/tika-langdetect/tika-langdetect-charsoup-core/pom.xml",
+     "sha256": "88c09e579566e21a07decefcafd1be2d6988e6bf56ec80e375c42aeccceafc5c",
+     "size": 2163
+    },
+    {
+     "path": "tika/tika-langdetect/tika-langdetect-charsoup/pom.xml",
+     "sha256": "25ec4adef55d0e2d9f906588b4cff7ada97cf1e94c484d510217d66eece10ac1",
+     "size": 4370
+    },
+    {
+     "path": "tika/tika-langdetect/tika-langdetect-lingo24/pom.xml",
+     "sha256": "7d339bea33d143430ac10f8c22de0778213e7658223aef3b0eea998b23785a02",
+     "size": 2742
+    },
+    {
+     "path": "tika/tika-langdetect/tika-langdetect-mitll-text/pom.xml",
+     "sha256": "a9741c369ba7c29fa0879fc40c9c702cfee46f9f4d1aebbddeae864fabfc8d2e",
+     "size": 2751
+    },
+    {
+     "path": "tika/tika-langdetect/tika-langdetect-opennlp/pom.xml",
+     "sha256": "a89411e0b3295d39ea4e3fde174b6f54f10345fd5d4cd1f5728e2496daae6dfe",
+     "size": 3496
+    },
+    {
+     "path": "tika/tika-langdetect/tika-langdetect-optimaize/pom.xml",
+     "sha256": "f03ae8ab5f4a0cf808abdc9b1dca1c504e03a0c4cb99575f4636ee7b8e07510f",
+     "size": 3574
+    },
+    {
+     "path": "tika/tika-langdetect/tika-langdetect-test-commons/pom.xml",
+     "sha256": "ee59f0e1f435408a31f3025c8aeabef63ae37d5c107df762d7144ef71ba41104",
+     "size": 1860
+    },
+    {
+     "path": "tika/tika-langdetect/tika-langdetect-test-commons/src/main/resources/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-ml/pom.xml",
+     "sha256": "6f9ab24b5d657c2fbdf678ac54621621fd5456f27c6bd2650f215c850a956622",
+     "size": 3288
+    },
+    {
+     "path": "tika/tika-ml/tika-ml-chardetect/pom.xml",
+     "sha256": "b30872ca5209cd282a06fcc80dbdd62415b002af3c39bb4d8715cd376409302c",
+     "size": 6330
+    },
+    {
+     "path": "tika/tika-ml/tika-ml-core/pom.xml",
+     "sha256": "5f47ee59f65666f83f402443055909ae933eccbfc1fbe51b090bfe7a2bf116d1",
+     "size": 2100
+    },
+    {
+     "path": "tika/tika-ml/tika-ml-junkdetect/pom.xml",
+     "sha256": "6e5baac05d2a7ba19c4a47fb436599921c8cbb444cebd51ccec51d51cc392b34",
+     "size": 6654
+    },
+    {
+     "path": "tika/tika-parent/checkstyle.xml",
+     "sha256": "1472d7774886541c8b9226ad6ccae30a05bdf6b6c2ec31f90521bfbaa7975185",
+     "size": 4931
+    },
+    {
+     "path": "tika/tika-parent/intellij-code-style.xml",
+     "sha256": "7f4d63655d4006f25c96a6e8c536e2073b0437b66e46bb1bc7494f5c296d7bb7",
+     "size": 3281
+    },
+    {
+     "path": "tika/tika-parent/pom.xml",
+     "sha256": "9d71cdcfa61d56f12aed07e9f94cbabc70bed2c69bc9a36148a6ae7b5514f2c2",
+     "size": 66300
+    },
+    {
+     "path": "tika/tika-parsers/pom.xml",
+     "sha256": "1bd37081df0d863d6d47afb8fdd1af8d7fe58a457f545b0341551cc4345ea974",
+     "size": 7416
+    },
+    {
+     "path": "tika/tika-parsers/tika-http-jdk/pom.xml",
+     "sha256": "380499f355246a4086c61fb1807a2672a60c8ac22946fb68148e501bad341ee3",
+     "size": 2867
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-extended/pom.xml",
+     "sha256": "504fb2edfb3712a16a5207aeccac082714a9b2dbbe687a87097cf9c3d8ce54ec",
+     "size": 3487
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-extended/tika-parser-ocr-encode-module/pom.xml",
+     "sha256": "6b3ee9b786ea9e3bb7759698182da3a7c6bb0ad57dd6183c19ee35446014771f",
+     "size": 2407
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-extended/tika-parser-ocr-encode-module/src/test/resources/test-configs/tika-config-encodeocr-full.xml",
+     "sha256": "acefc4a1acd687e3c974db15f814ba4c0bf9cd0314ce29cc2f99460a46e1f6f1",
+     "size": 1289
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-extended/tika-parser-ocr-encode-module/src/test/resources/test-configs/tika-config-encodeocr-partial.xml",
+     "sha256": "641e8c9b4d5c3e5cbce261e04376163d83f179e0126c22fe8e78f7df777da962",
+     "size": 1150
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-extended/tika-parser-ocr-encode-module/src/test/resources/test-configs/tika-config-encodeocr-skip.xml",
+     "sha256": "743acdf4a0a1a7d3230dc71be05c2a22f618966cb3bc15e317e7e2d910ad8c52",
+     "size": 1077
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-extended/tika-parser-scientific-module/pom.xml",
+     "sha256": "93f735aa17f674b486aa71f86d845285cfae3b52d7e3b42ba7566e40513ac082",
+     "size": 5081
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-extended/tika-parser-scientific-package/pom.xml",
+     "sha256": "c7632516030e03f76bb7e4f498f270bd81d8b5a62741a10675e1f02e898917a5",
+     "size": 5371
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-extended/tika-parser-sqlite3-module/pom.xml",
+     "sha256": "c4d4391ffd5ffd6083396eebbd64902dc2ea64f61203f25b895316e28a482424",
+     "size": 2350
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-extended/tika-parser-sqlite3-package/pom.xml",
+     "sha256": "3c1e649c9f10d1b35973af4d1469b70fb7debb1307ab2149a6c57f3a9bf66134",
+     "size": 4792
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-extended/tika-parsers-extended-integration-tests/pom.xml",
+     "sha256": "96bcfdfa67561f5a5345adf071cfbc9f2bf0d8bdb6895c215ca2f2cec984a442",
+     "size": 3076
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-ml/pom.xml",
+     "sha256": "dd5ebffb924a7dcdd538889e41a406a1f32c9fae25b15d6c7c70d04dfc44ceca",
+     "size": 4024
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-ml/tika-inference/pom.xml",
+     "sha256": "96adf5d74900cbdf1186c53491d1daecbf4c73c71d25f8bfc45fae8dab2d42e8",
+     "size": 2933
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-ml/tika-parser-nlp-module/pom.xml",
+     "sha256": "02d1b33b80894e3b75308a31660b71423ecfd4053e0f736dfdf691a200b14b36",
+     "size": 6931
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-ml/tika-parser-nlp-module/src/test/resources/test-documents/testTEI.xml",
+     "sha256": "992582db2a930368a9226da77f14a3db856d742436349e1156d38d1b89cb1141",
+     "size": 11002
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-ml/tika-parser-nlp-package/pom.xml",
+     "sha256": "9cccced5b319810191daad4ed12d9ba987d1ceb0ec16ca7c12b6f45ae12a7fe6",
+     "size": 4670
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-ml/tika-parser-tess4j-module/pom.xml",
+     "sha256": "d76a7af09ded1de0910769e73788c741da8129eef661bf237994d34e1c6e2324",
+     "size": 2734
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-ml/tika-transcribe-aws/pom.xml",
+     "sha256": "fd4c3c736ad37c0273066a553c2c57f7b8c9fb49a5c4ed7fc0f7636580d589f6",
+     "size": 5006
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-ml/tika-transcribe-aws/src/test/resources/tika-config-aws-transcribe.xml",
+     "sha256": "37f288d3ac802c16e660059e54aa7c7b7c34b73f11f45a842cb6b2aae7c1dc3f",
+     "size": 1306
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-ml/tika-vlm/pom.xml",
+     "sha256": "08b7ac1bc6b91ac492f9fb2bea85208d7001b768a9dcc97c63ee51a8467035b5",
+     "size": 3528
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/pom.xml",
+     "sha256": "6e527af3b8289025a05ed40eee623222c8fad697feca531565bb3e97be721f2c",
+     "size": 4705
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/pom.xml",
+     "sha256": "5415fe71259f208f42533ceb06a01e1c315af3201709af67531d43f9a729232a",
+     "size": 9007
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/mock/embedded_then_npe.xml",
+     "sha256": "a8345d66fa077739ab77037356561f8118b3de94a2138e25e0beda0f8daf8fdf",
+     "size": 1490
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/mock/example.xml",
+     "sha256": "6b09305c17c51b882924629cb1cbfd4a68c1f0c9c7d3a78de9c4dc9c97cda9d9",
+     "size": 2457
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/mock/fake_oom.xml",
+     "sha256": "3e35014398161adffd26438543b9968fb6b5612b7cda671cdfe9f1e3e3e4485f",
+     "size": 990
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/mock/heavy_hang.xml",
+     "sha256": "921f912bd78bfd8cafd35f959a3eea048464888a63f0134b33287239a20a372f",
+     "size": 1022
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/mock/nothing_bad.xml",
+     "sha256": "582376df8cbc3cc2f253ee7e24ef822d104161ff5382949351b4dfc974b90685",
+     "size": 1114
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/mock/null_pointer.xml",
+     "sha256": "53eb13ee6ba85ec1dee149382a1fcd5171f0daa11c2077541cc0879e01bfc8b9",
+     "size": 1052
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/mock/null_pointer_no_msg.xml",
+     "sha256": "21b5874c23f25b3090ce5c11dc826821d5de53cf8ab525c6199c71702fd78e4f",
+     "size": 1015
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/mock/real_oom.xml",
+     "sha256": "b778d4364f35d39c2175575172707e9d934ffabdf2621e054d090148e9c9c5a7",
+     "size": 930
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/mock/sleep.xml",
+     "sha256": "54eafbd4e935e9e5ab5e832546f654ec06627140ad920e3fa79ba7b2b3edef95",
+     "size": 1005
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/mock/sleep_interruptible.xml",
+     "sha256": "5a029886402870b4f6edc085237e175666584214a2274bac1bc133f079446658",
+     "size": 1025
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/mock/sleep_not_interruptible.xml",
+     "sha256": "8b9dd24ce51c1ad58df23d0ea52d00980c21899aa7bbba1dc55765216d308844",
+     "size": 1026
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/mock/system_exit.xml",
+     "sha256": "ed04ab44dcbd36d0508d6e266d5456e57b642ca913bd666e6effac0408012ddc",
+     "size": 983
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/mock/thread_interrupt.xml",
+     "sha256": "90284b78cf5dc611d7b4e0bbc43f4d9c1fd6458b2dd6e48c88bf932fd68ff806",
+     "size": 988
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/mock_embedded_for_digest.xml",
+     "sha256": "19f75506cc5ee0e6b44e4300e52fd80e2de5d036a38a2e9173edb2acd4831e6d",
+     "size": 1302
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/testONIXMessage.xml",
+     "sha256": "73624a9e5098e3b8ed661862e7855e150434ac6a60d820fec1d188b5cc39e580",
+     "size": 748
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-integration-tests/src/test/resources/test-documents/testONIXMessageShort.xml",
+     "sha256": "1d71942164b3605845ae63ba93e276e4428b828a143633cd9aa886ff5faa1a7b",
+     "size": 678
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/pom.xml",
+     "sha256": "2b8974a2ea47cabfec05611d783e02822798cf567470863f81ac1be6dc9b5b96",
+     "size": 5713
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-apple-module/pom.xml",
+     "sha256": "7d9fba515e93858415b0657368e612dea95a5a9fe14503de65c735505e29196a",
+     "size": 2352
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-audiovideo-module/pom.xml",
+     "sha256": "2e34b1945442fa14fab0c0f679f54d879358ad434cc3b219ea59aa456cfb57a4",
+     "size": 2400
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-cad-module/pom.xml",
+     "sha256": "746929277bdba21373efe18d8d1eafe9185db6a8f0057a89a12830f8ab78ec03",
+     "size": 2492
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-code-module/pom.xml",
+     "sha256": "f1ef80a751449c646b19403204076ee14d6d2a2715df050cfc65d67b4c4d8ee4",
+     "size": 3408
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-code-module/src/test/resources/test-documents/test-columnar.sas.xml",
+     "sha256": "a30364d40be4379743777e1f18e267269b89add44c2f783933d619d88a44a957",
+     "size": 3330
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-crypto-module/pom.xml",
+     "sha256": "18e336c8cd0069b9ebe499b609017ad4da15fb0dfbf67ac034fe61ae50eb15dd",
+     "size": 2302
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-digest-commons/pom.xml",
+     "sha256": "757c6f000151e0fe7e9bfb8aa47fd189e98d1ffa0be2743f41c2c4d4e59d8b9c",
+     "size": 2260
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-font-module/pom.xml",
+     "sha256": "3ab8ddd24fb5d09c51a3cc24ce79fd99bf388aa12a2a79ade63df894efecef24",
+     "size": 2524
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-html-module/pom.xml",
+     "sha256": "3a7e19aec15dff3f8260ce50b35a2f4a68825ebc618e38b12f2cdb63869cc740",
+     "size": 3731
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-image-module/pom.xml",
+     "sha256": "c57e20a17fb1cb7ebd0dd9d904782afb33af3534044bea4237bdb56db677dad5",
+     "size": 3691
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-jdbc-commons/pom.xml",
+     "sha256": "5acfa7149609ff93eaf2565e7e416e25cfd486a44a221e97d9a55a5d759eb240",
+     "size": 1858
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-mail-commons/pom.xml",
+     "sha256": "1f9e84c2a79f97ddbcb308ff50356f1694399d5c6e09753ebba47174138b15b4",
+     "size": 2227
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-mail-module/pom.xml",
+     "sha256": "b58e1097618d07075b17511868a32cc3b6e529dfeca4ab68b745dc9ab00aa962",
+     "size": 3933
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-microsoft-module/pom.xml",
+     "sha256": "d8498be17baa0414e92ff8f9a8901b9ba16b3279a1653d370f6d82c92df03e3a",
+     "size": 6579
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-microsoft-module/src/test/resources/log4j2.xml",
+     "sha256": "5aaaa75e8f6253fc3b894ef342ee2a2d9f2fd8f01fb4a4cfc2852176975705de",
+     "size": 1656
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-microsoft-module/src/test/resources/test-documents/testEXCEL2003.xml",
+     "sha256": "681dc523220a2fd2cc194fd04d156c811b8df143c0f7047328bd674d20d55654",
+     "size": 3712
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-microsoft-module/src/test/resources/test-documents/testWORD2003.xml",
+     "sha256": "e2c569f2c71b898310816fc5934887a7bbfc3592ea402309c30d2a8ccef224b4",
+     "size": 237572
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-microsoft-module/src/test/resources/test-documents/testWORD_2003ml.xml",
+     "sha256": "5150758992813c1463ea93f7b8f89238f8b79feb2b7f2da9878925c498f7013c",
+     "size": 294993
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-microsoft-module/src/test/resources/test-documents/testWORD_2006ml.xml",
+     "sha256": "e41c0ddd18ed65d84239a7de5f111ce7bf7dbc0acc04eecb78e51dccd60b517f",
+     "size": 594838
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-miscoffice-module/pom.xml",
+     "sha256": "84c7dee60f6faf0b18d2b131a380fb6963bded45c6e45207d1ae43fdb5794f97",
+     "size": 4012
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-news-module/pom.xml",
+     "sha256": "f67582c56feb125ead7986932ad1cecf1edcf895c416306d6bb05d561dfa6962",
+     "size": 2626
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-ocr-module/pom.xml",
+     "sha256": "23d813878d79e284d02c65c0187e5057b635f4646e5578cd9318901f9e072f61",
+     "size": 2498
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-pdf-module/pom.xml",
+     "sha256": "47b2782356fcaf35945e23fbd6a8476a6a8da5b868e59df3c181c5b0537a0160",
+     "size": 4271
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-pdf-module/src/test/resources/log4j2.xml",
+     "sha256": "25311a4fd635ee455191a5c973d6db252727e66d347deb9831e09fcabcb65cb3",
+     "size": 1549
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-pkg-module/pom.xml",
+     "sha256": "b0a47431b7efe504214e50702a054bf7e9f18075467861762d8bafd181ac34fc",
+     "size": 3371
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-text-module/pom.xml",
+     "sha256": "708d241cb6c26d2a08f315d037c3147bb89af4b6a69c872806e69bbc904536d8",
+     "size": 3335
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-webarchive-module/pom.xml",
+     "sha256": "f9034c84e6860d8e25b7f8ada0aec4d379ca86ed05c8fa67de676cd05cdca8bd",
+     "size": 3290
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-xml-module/pom.xml",
+     "sha256": "3fcabcf8225cea455808f50ba28ba6df75894b15cc7e1cb4f6f9f4c3dc83ceaf",
+     "size": 2516
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-xml-module/src/test/resources/test-documents/testXML.xml",
+     "sha256": "6e05f1a6097355fc2635437015e3a4190f5dd043ee9d7f8f264ea8b6108050b2",
+     "size": 1611
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-xml-module/src/test/resources/test-documents/testXML2.xml",
+     "sha256": "8e4f1db472b12c7888e0744a58bd6d180bee63145ec321322969cfe80ea280ad",
+     "size": 341
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-xml-module/src/test/resources/test-documents/testXML3.xml",
+     "sha256": "b8c44911380ffc6cad5caeebc81d7a98c60032de6f8ed842614407a5b36d46d0",
+     "size": 730
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-xml-module/src/test/resources/test-documents/testXXE.xml",
+     "sha256": "2272e7ceca12fb4ef4c7a97cf3f79e3b994da38b8d27c5c0aee80bc4b7a8a160",
+     "size": 135
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-xmp-commons/pom.xml",
+     "sha256": "e1c3d5ad8fa391431857f3fe84773505093434c2003919f402d321a81ce8e325",
+     "size": 2675
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-zip-commons/pom.xml",
+     "sha256": "d51a7f34624ab3b92180eeec29702269e74bed56b80d605be830aa22c0c70f4e",
+     "size": 2168
+    },
+    {
+     "path": "tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-package/pom.xml",
+     "sha256": "1cc5a6efc1692a39659accc5dcbed6206c2f3853e66202fa11372546e31ecf86",
+     "size": 5999
+    },
+    {
+     "path": "tika/tika-pipes/pom.xml",
+     "sha256": "168c18d936bed800f56a5856a992814b174eeff993be745d4ff0f8040de7e5f8",
+     "size": 4315
+    },
+    {
+     "path": "tika/tika-pipes/tika-async-cli/pom.xml",
+     "sha256": "3bfee1fa2d2bf623a2f4f1e4553cc8ce03a5ce36b3bf801d91b01daadf01a6fe",
+     "size": 3468
+    },
+    {
+     "path": "tika/tika-pipes/tika-async-cli/src/test/resources/test-documents/basic_embedded.xml",
+     "sha256": "fdaa937c96d1ed010b8d307ccddf9d11c3b48db732a8771eaafe99d59e076d0a",
+     "size": 1409
+    },
+    {
+     "path": "tika/tika-pipes/tika-httpclient-commons/pom.xml",
+     "sha256": "0e8b334cfdc43f51b5e739bdf632bfedb5aca6c9ec80a0f9d46f14ba0aa06ece",
+     "size": 2157
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-api/pom.xml",
+     "sha256": "651077bd5d7a1ba0e4beacd0995fa96358de71ff9280ab4d83fc123a3681abc6",
+     "size": 3053
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-config-store-ignite/pom.xml",
+     "sha256": "4f8baddc5d258f3dfd52a7f84851c329f233d8bc1609bea706b10bd05cc4bb19",
+     "size": 5588
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-core/pom.xml",
+     "sha256": "d029c4dd61eb0a89c5424da24ac52590a5341169ecc349ac43ae73e17a3478ca",
+     "size": 4712
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-core/src/main/resources/pipes-fork-server-default-log4j2.xml",
+     "sha256": "67ae3e56ee2dd55ed63fa5c56bbbc5c1cbdd8ac855158a58b7de9d2e6b310a43",
+     "size": 2229
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-core/src/test/resources/test-documents/basic_embedded.xml",
+     "sha256": "fdaa937c96d1ed010b8d307ccddf9d11c3b48db732a8771eaafe99d59e076d0a",
+     "size": 1409
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-core/src/test/resources/test-documents/mock/embedded.xml",
+     "sha256": "eb5392129af0f6df5cdb9f19f5550415bca4fda5223f991916b089d7fe357f5e",
+     "size": 2217
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-core/src/test/resources/test-documents/mock/timeout-10s.xml",
+     "sha256": "6c07936fdb71c3d8ea7f7b59005c0b295f6385472d0ef7a1309424b2958808bf",
+     "size": 1023
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-core/src/test/resources/test-documents/mock_times.xml",
+     "sha256": "5f3b924303e960ce35d7f705e91d3018dd110a9c3cef0546a91fe013d6dad6fd",
+     "size": 975
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-fork-parser/pom.xml",
+     "sha256": "47df251b7c32adaf828d0a76dd65c387e78a249a9a033cf57c7a1706b01e91c9",
+     "size": 6049
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-fork-parser/src/main/assembly/assembly.xml",
+     "sha256": "d016021aedecd8b8cc62ee9553126be1ea8b7d4abcb81c55e1442be31dbb5acb",
+     "size": 1865
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-integration-tests/pom.xml",
+     "sha256": "c2e8a7337ae15c4217bc7d1516139b8633e13255b68a81027389de5b103d1bf4",
+     "size": 5912
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-integration-tests/src/test/resources/test-documents/basic_embedded.xml",
+     "sha256": "fdaa937c96d1ed010b8d307ccddf9d11c3b48db732a8771eaafe99d59e076d0a",
+     "size": 1409
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-integration-tests/src/test/resources/test-documents/mock-embedded.xml",
+     "sha256": "eb5392129af0f6df5cdb9f19f5550415bca4fda5223f991916b089d7fe357f5e",
+     "size": 2217
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-integration-tests/src/test/resources/test-documents/mock-timeout-10s.xml",
+     "sha256": "6c07936fdb71c3d8ea7f7b59005c0b295f6385472d0ef7a1309424b2958808bf",
+     "size": 1023
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-integration-tests/src/test/resources/test-documents/mock_times.xml",
+     "sha256": "5f3b924303e960ce35d7f705e91d3018dd110a9c3cef0546a91fe013d6dad6fd",
+     "size": 975
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-iterator-commons/pom.xml",
+     "sha256": "0a69391417446815add3fd7ad5704fc788df4399a981e0c9ccc15c671664e958",
+     "size": 1999
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/pom.xml",
+     "sha256": "ebfafc47e10b997837a63fde1d2077ad004996d443e1916bdaf1ebc0ba141057",
+     "size": 3713
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-atlassian-jwt/pom.xml",
+     "sha256": "afd8538dbdcf40d6f1371537aca43abac085e5cc32273476cc0f7a8024ae18f1",
+     "size": 5908
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-atlassian-jwt/src/main/assembly/assembly.xml",
+     "sha256": "a12911ca785a9a483801b049ef083803812644bad09be71a984d9c08ecd59c84",
+     "size": 2125
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-az-blob/pom.xml",
+     "sha256": "a4c904dddf09720510cc71546d68b1836a985fa3ed9f945201a33350883fce1c",
+     "size": 6140
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-az-blob/src/main/assembly/assembly.xml",
+     "sha256": "44ab1ff7fcee3f8d7626ec12f17cc380d79171ced843d930fc0d45e11b3c8fb3",
+     "size": 2369
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-csv/pom.xml",
+     "sha256": "f17220fac5d6f41bf03b247eb5cbb44e8deafdd866f4ef6d3719afe63a7467b2",
+     "size": 5622
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-csv/src/main/assembly/assembly.xml",
+     "sha256": "a12911ca785a9a483801b049ef083803812644bad09be71a984d9c08ecd59c84",
+     "size": 2125
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-es/pom.xml",
+     "sha256": "0d81be63e8dec1dd9e5e928dd60c3abc596ddbeaae6d8058fa7a483a4996a8e8",
+     "size": 6445
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-es/src/main/assembly/assembly.xml",
+     "sha256": "a12911ca785a9a483801b049ef083803812644bad09be71a984d9c08ecd59c84",
+     "size": 2125
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-file-system/pom.xml",
+     "sha256": "7f5087636990700878beb9d333071e0018f8b157e4f5ac39e5a85998f11b934d",
+     "size": 6196
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-file-system/src/main/assembly/assembly.xml",
+     "sha256": "a12911ca785a9a483801b049ef083803812644bad09be71a984d9c08ecd59c84",
+     "size": 2125
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-gcs/pom.xml",
+     "sha256": "b6ba9f04ce23d1ffe3cc633f10b8d2cac3ab210743ca1e08af51d422437a91a3",
+     "size": 6000
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-gcs/src/main/assembly/assembly.xml",
+     "sha256": "44ab1ff7fcee3f8d7626ec12f17cc380d79171ced843d930fc0d45e11b3c8fb3",
+     "size": 2369
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-google-drive/pom.xml",
+     "sha256": "5f38e2af06ceba8e4b4e6cd17162daa50c5af64a0e36548ddb53491d8729e637",
+     "size": 7678
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-google-drive/src/main/assembly/assembly.xml",
+     "sha256": "a12911ca785a9a483801b049ef083803812644bad09be71a984d9c08ecd59c84",
+     "size": 2125
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-http/pom.xml",
+     "sha256": "4beec8eb9f5a522a3a6b4d58e5bc72fdbfe23641fce211bd7abe0505f2bee771",
+     "size": 8325
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-http/src/main/assembly/assembly.xml",
+     "sha256": "a12911ca785a9a483801b049ef083803812644bad09be71a984d9c08ecd59c84",
+     "size": 2125
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-jdbc/pom.xml",
+     "sha256": "8165beb95cf52f0b7b375aa417cbb8693ce3ede60ca6ef5a27b875728b7fa0a4",
+     "size": 5938
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-jdbc/src/main/assembly/assembly.xml",
+     "sha256": "44ab1ff7fcee3f8d7626ec12f17cc380d79171ced843d930fc0d45e11b3c8fb3",
+     "size": 2369
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-jdbc/src/test/resources/log4j2.xml",
+     "sha256": "693f09fffa1c76ba04d86a8b7a908b1557f23526da138af196eafaf8b922f624",
+     "size": 1164
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-json/pom.xml",
+     "sha256": "81b54bdaa89272cfcac84abf489c4f0798c4fc88acbef19a9427cf28d6e00796",
+     "size": 5674
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-json/src/main/assembly/assembly.xml",
+     "sha256": "a12911ca785a9a483801b049ef083803812644bad09be71a984d9c08ecd59c84",
+     "size": 2125
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-kafka/pom.xml",
+     "sha256": "b3aad1530c9deb9971e0dd85fb16ce84a39659e2bc86f895b87e0754fe40159e",
+     "size": 6170
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-kafka/src/main/assembly/assembly.xml",
+     "sha256": "a12911ca785a9a483801b049ef083803812644bad09be71a984d9c08ecd59c84",
+     "size": 2125
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-kafka/src/test/resources/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-microsoft-graph/pom.xml",
+     "sha256": "2816ed81d8c5b6935f4c65abaa2664d73b464f89224655cac52418193659f109",
+     "size": 9014
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-microsoft-graph/src/main/assembly/assembly.xml",
+     "sha256": "a12911ca785a9a483801b049ef083803812644bad09be71a984d9c08ecd59c84",
+     "size": 2125
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-microsoft-graph/src/test/resources/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-opensearch/pom.xml",
+     "sha256": "dcbe9b25949eb4520205f2d7f9666658f573d41c5372f9b715ee0cfa7f390fa3",
+     "size": 6501
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-opensearch/src/main/assembly/assembly.xml",
+     "sha256": "a12911ca785a9a483801b049ef083803812644bad09be71a984d9c08ecd59c84",
+     "size": 2125
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-s3/pom.xml",
+     "sha256": "dd24081afbeb6c1d5a9844003b0101d286c42dc9bd73a756669c557be3d7ae28",
+     "size": 6244
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-s3/src/main/assembly/assembly.xml",
+     "sha256": "a12911ca785a9a483801b049ef083803812644bad09be71a984d9c08ecd59c84",
+     "size": 2125
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-s3/src/test/java/org/apache/tika/pipes/iterator/s3/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-solr/pom.xml",
+     "sha256": "14a79a9b124052e9b5bc79a6151b66b13aa9603082af45f524bf16fc66389879",
+     "size": 6625
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-solr/src/main/assembly/assembly.xml",
+     "sha256": "a12911ca785a9a483801b049ef083803812644bad09be71a984d9c08ecd59c84",
+     "size": 2125
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-plugins/tika-pipes-solr/src/test/resources/log4j2.xml",
+     "sha256": "dd6d38eac8059f5e7a7d143c5f7b2b48ec54ee61d90c7d31548e1aaf7a4b3b50",
+     "size": 1270
+    },
+    {
+     "path": "tika/tika-pipes/tika-pipes-reporter-commons/pom.xml",
+     "sha256": "7915e46da44c9d34d8536d502b346f8770efa0cc112832f80bffbaa4e2dd960c",
+     "size": 1991
+    },
+    {
+     "path": "tika/tika-plugins-core/pom.xml",
+     "sha256": "597cc7c12cb024ab75826b3a82063c70a4ba0c33546a75b5e884a3156b7a8dc2",
+     "size": 2882
+    },
+    {
+     "path": "tika/tika-serialization/pom.xml",
+     "sha256": "6a3a655e1cbfcf2b218204d19c2f7a30edd3b551208cb8343b14d007f0730944",
+     "size": 5715
+    },
+    {
+     "path": "tika/tika-serialization/src/test/resources/test-documents/example.xml",
+     "sha256": "7a1de7471ea1c3d3ce4c9ea9bc779c23fc479df63ae5b826c268dc3021e82406",
+     "size": 2221
+    },
+    {
+     "path": "tika/tika-server/pom.xml",
+     "sha256": "a70abe8394a091ce625b85965ac677346b0a93add7f0ffbea741b797aade7451",
+     "size": 2798
+    },
+    {
+     "path": "tika/tika-server/tika-server-client/pom.xml",
+     "sha256": "cc1b85107ecf3e3e839d1d2cf0c03f61d7a70aa30c3681986420f7c3cde00b42",
+     "size": 2472
+    },
+    {
+     "path": "tika/tika-server/tika-server-client/src/main/resources/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-server/tika-server-client/src/test/resources/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/pom.xml",
+     "sha256": "f56f57c9fca9c3836f94054cc32729e554faefd5b21586d1e8a8e4764b6eb5d5",
+     "size": 9357
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/main/resources/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/main/resources/tika-server-config-default.xml",
+     "sha256": "67353f86efc4a3510bd32c7744caeeb62f17c213717066157b97a9e2ad534ca4",
+     "size": 3773
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/logging/log4j2_forked.xml",
+     "sha256": "2410b492ac89de94959efd6562b090b4c4d1bc1af180d89d00c115204f6c1b72",
+     "size": 2064
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/test-documents/mock/encrypted_document_exception.xml",
+     "sha256": "f743252de4eefdfe97c6438fb5f8bafbc82dc713acf463175642852378b5d572",
+     "size": 957
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/test-documents/mock/fake_oom.xml",
+     "sha256": "c185928694e450efcaedfbaa0056d2c89dd57f50034d81abf41beb0d02ecdc5b",
+     "size": 985
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/test-documents/mock/heavy_hang_100.xml",
+     "sha256": "eb46740bacfbf70df8c0a520ae788b4b296975b86f4ccebce26f1c5947cf4bf5",
+     "size": 1019
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/test-documents/mock/heavy_hang_30000.xml",
+     "sha256": "af37eb49cac838ebd4649a5a84a371dd4eccca0b5a5479e899be2c85109c32a1",
+     "size": 1022
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/test-documents/mock/hello_world.xml",
+     "sha256": "e7445141a5e4f08014753853a12a00c576dec77d30c4542af52d21762d4c5983",
+     "size": 1095
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/test-documents/mock/hello_world_long.xml",
+     "sha256": "1e60952bc9e344beb76e3c713241cbf7aa823589e1793feb75185c1ba02ddcc1",
+     "size": 1562
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/test-documents/mock/null_pointer.xml",
+     "sha256": "80ac20e3bc813892a8af8490d1a56bd4afb4c61c10ff8aeb33e2cc28aeb47501",
+     "size": 1043
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/test-documents/mock/real_oom.xml",
+     "sha256": "b778d4364f35d39c2175575172707e9d934ffabdf2621e054d090148e9c9c5a7",
+     "size": 930
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/test-documents/mock/system_exit.xml",
+     "sha256": "bc9cb604b1bd726acbb2e1dc62236282eac73ecf49b019dad52c62a1aad85fcf",
+     "size": 982
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/test-documents/mock/testStaticStdOutErr.xml",
+     "sha256": "bac37bca2ba4d376c2f6d9638a9665c5ebef28516547c5f558ab0c8140ae63c9",
+     "size": 3095
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/test-documents/mock/testStdOutErr.xml",
+     "sha256": "a1e04ec63d4f3b965eb3b3874ea3b442e21266302e0446d1c7a56a2fbf683a8a",
+     "size": 3107
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/test-documents/mock/thread_interrupt.xml",
+     "sha256": "b7a140204b139789a3c2978149151911e4b46e854e9e31777194422de4bd5c28",
+     "size": 987
+    },
+    {
+     "path": "tika/tika-server/tika-server-core/src/test/resources/test-documents/mock/\u4e2d\u6587.xml",
+     "sha256": "e131dd74ca4176863109485d8d56035baccfceb6253223d4f9deb9a50bd4b87e",
+     "size": 1142
+    },
+    {
+     "path": "tika/tika-server/tika-server-standard/pom.xml",
+     "sha256": "ab00a43c8469f866dc108f1a76361b96e5c90b775d01ec9b4998500ee5aecef1",
+     "size": 9605
+    },
+    {
+     "path": "tika/tika-server/tika-server-standard/src/main/assembly/assembly.xml",
+     "sha256": "f2f1692f048a1f667de707e786b2721a2376138b2807f568371dbd15b1e26687",
+     "size": 2317
+    },
+    {
+     "path": "tika/tika-server/tika-server-standard/src/main/resources/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-server/tika-server-standard/src/test/resources/configs/tika-config-url-fetcher.xml",
+     "sha256": "132943efac333a83cbb9343acf3d976d1abf988480ce51dd6762a413d7913df2",
+     "size": 1107
+    },
+    {
+     "path": "tika/tika-server/tika-server-standard/src/test/resources/log4j2.xml",
+     "sha256": "97c9f062c4b5608a01dcbf1527b900524b108159fb53eadff8e55f8a1956df58",
+     "size": 1152
+    },
+    {
+     "path": "tika/tika-translate/pom.xml",
+     "sha256": "2452fb5aa3bdc0b906ac5b796e804ac0efbe0a14deb43d656a6249b1bb4aff43",
+     "size": 8248
+    },
+    {
+     "path": "tika/tika-xmp/pom.xml",
+     "sha256": "5a7ae6cffc66b76d92c565eb3573daedd2b11f22ff31c7b92f13fad2b840babb",
+     "size": 3752
+    }
+   ]
+  },
+  "ooxml_docx": {
+   "count": 16,
+   "files": [
+    {
+     "path": "ooxml-fixtures/PS-ComMVP-PS-ComMVP-idx.docx",
+     "sha256": "89abf74f6aff490fdfdcb924834c4925ef86a9751f34e4a9b0e705a9f6664200",
+     "size": 9719
+    },
+    {
+     "path": "ooxml-fixtures/PS-ComMVP-idx.docx",
+     "sha256": "0d09d33d5d92f86c4526372f1ca63ef2b11ed149d81fb23445efee7ed225e375",
+     "size": 9938
+    },
+    {
+     "path": "ooxml-fixtures/PS-ComMVP-notes-fidx-26-03-29-WK.docx",
+     "sha256": "31eba4965daaa0870a2059fef10bea7495fe5e5fd12e12ce60e7d4071dc2f364",
+     "size": 11887
+    },
+    {
+     "path": "ooxml-fixtures/PS-GEN-Delete_1-Del2-idx.docx",
+     "sha256": "effc3dec26ac1bc297bd475df9c371a0e76e033acb755131a1fb92652e9c7830",
+     "size": 9861
+    },
+    {
+     "path": "ooxml-fixtures/PS-GEN-Delete_1-idx.docx",
+     "sha256": "c27c5e753b68c78251e382769d2acb30344bf527f7633357cd28c7750cfbcda6",
+     "size": 10077
+    },
+    {
+     "path": "ooxml-fixtures/PS-GEN-idx.docx",
+     "sha256": "e74e385310ddee533fdad3b7097bd4cc60db3b434d854d1dcbc3a6dcd6022b46",
+     "size": 10129
+    },
+    {
+     "path": "ooxml-fixtures/PS-GEN-notes-cln-26-03-29-WK.docx",
+     "sha256": "2ccb933f95f934cd6efda470d8ba9bff7b173b13dd92e1807bd65d9213f63be3",
+     "size": 11368
+    },
+    {
+     "path": "ooxml-fixtures/PS-GEN-notes-fidx-26-03-29-WK.docx",
+     "sha256": "3bd60a1ef3f763b4a1313a79bec59d8bff0a388d5241ccd2fd82bf92a9e9a86d",
+     "size": 12231
+    },
+    {
+     "path": "ooxml-fixtures/PS-GEN-notes-fidx-del1-26-03-29-WK.docx",
+     "sha256": "38fe42082d55a871a30ba97766a878850e6a03a0c325bd029e3fd6de6f61226f",
+     "size": 12195
+    },
+    {
+     "path": "ooxml-fixtures/PS-GEN-notes-fidx-del2-26-03-29-WK.docx",
+     "sha256": "9a72e172299760cdea0df33c97dee3eb02314dc5c598743e48250ece09a5f2c6",
+     "size": 11970
+    },
+    {
+     "path": "ooxml-fixtures/PS-GEN-notes-idx-26-03-29-WK.docx",
+     "sha256": "fda005be6b15e4ccff1a7104f352c3b2be75f00bd3ce35084714dd25690e968b",
+     "size": 13404
+    },
+    {
+     "path": "ooxml-fixtures/PS-GEN-notes-naming-WK.docx",
+     "sha256": "fb9ca9c29fc1accfa2cbd9c5aa01bcac21b93c67224751c54b08f2d3ad926cd7",
+     "size": 12620
+    },
+    {
+     "path": "ooxml-fixtures/PS-config-AIreadme.docx",
+     "sha256": "b75a45a3f005c5da6226cb867a1d2d552051f03f14249cd0a39705c5418a9808",
+     "size": 11147
+    },
+    {
+     "path": "ooxml-fixtures/PS-config-NC.docx",
+     "sha256": "3c50299a675475ec3acf3071241288c6204f56c47203d283ea04d868e4d4175d",
+     "size": 10770
+    },
+    {
+     "path": "ooxml-fixtures/PS-idx.docx",
+     "sha256": "9aa7cbf49a3bf6f0b3cb8c61d0623342cd25085436ef3f0abf8fb06f45695583",
+     "size": 10953
+    },
+    {
+     "path": "ooxml-fixtures/sample_report.docx",
+     "sha256": "64957fa80337e51c3174093cbf250c0ae87023969daeb0b3afe416b2f28b2517",
+     "size": 1055
+    }
+   ]
+  },
+  "ooxml_xlsx": {
+   "count": 2,
+   "files": [
+    {
+     "path": "ooxml-fixtures/AAA Garden Grove Intersection Imp.xlsx",
+     "sha256": "7f32ddc225b0437cc7c021c610256b84e6309eb34860ae151d270c5280a32ed6",
+     "size": 13068
+    },
+    {
+     "path": "ooxml-fixtures/Nick Lopez Excel Bid Form 01-29-2025 Sewer-Water-SD Bid Form.xlsx",
+     "sha256": "01e519ad24d3f0f2c5b1dbfe27e94b621bfb68c69ff9322dd9ca5dd022a6d3cf",
+     "size": 20165
+    }
+   ]
+  }
+ },
+ "aggregate_sha256": "71c006a43215e5f9c4c86abd4ae42bb2e06eebd742c48491f013b1487ce8528d",
+ "total_files": 302
+}
