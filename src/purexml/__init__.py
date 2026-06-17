@@ -27,15 +27,20 @@ from ._expat_security import (
 )
 from ._parser import XMLParser, fromstring, fromstringlist, iterparse, parse
 from .errors import (
+    AttributesExceeded,
+    DepthExceeded,
     DTDForbidden,
     EntitiesForbidden,
     ExternalReferenceForbidden,
+    LimitExceeded,
     PureXMLError,
+    SizeExceeded,
 )
+from .limits import RECOMMENDED_LIMITS, Limits
 
 XML = fromstring
 
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 
 __all__ = [
     # the ElementTree family (also at purexml.ElementTree)
@@ -53,6 +58,13 @@ __all__ = [
     "DTDForbidden",
     "EntitiesForbidden",
     "ExternalReferenceForbidden",
+    # opt-in structural-DoS limits (v0.4 mirror-plus)
+    "Limits",
+    "RECOMMENDED_LIMITS",
+    "LimitExceeded",
+    "DepthExceeded",
+    "AttributesExceeded",
+    "SizeExceeded",
     # libexpat version awareness (v0.1.2) — opt-in
     "EXPAT_VERSION",
     "SAFE_EXPAT_VERSION",
