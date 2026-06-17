@@ -108,7 +108,7 @@ Run the relevant checklist AT the moment, not from memory of having read it.
 - [ ] Are those findings logged in `scratch/review/`?
 - [ ] Is this implementation (PR-worthy), not a draft (conversation)?
 - [ ] Did I re-introduce anything in `Excluded decisions`?
-- [ ] **libexpat currency:** ran `scratch/review/check_expat_currency.py` (IN-SYNC, or
+- [ ] **libexpat currency:** ran `python tools/check_expat_currency.py` (IN-SYNC, or
   drift surfaced)? See the libexpat Known decision.
 
 **Before merge (minors):**
@@ -555,7 +555,7 @@ blame`.
   map gated on its fix version — a **minor** (mitigation-set change → RFC), as v0.6 did.
   This is the maintained-successor promise in mechanism; don't let the floor go stale.
   **Standing check (the proactive gate):** run
-  `./.venv/bin/python scratch/review/check_expat_currency.py` — it compares the latest
+  `python tools/check_expat_currency.py` (tracked — runnable from any clone) — it compares the latest
   upstream libexpat release (`gh` API, no new deps) against `RECOMMENDED_EXPAT_VERSION`
   and prints IN-SYNC or DRIFT + the review checklist (exit 1 on drift). It is a
   **release-time + on-touch gate**, fired at the moments drift actually matters:
