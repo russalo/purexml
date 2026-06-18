@@ -24,6 +24,7 @@ below.
 
 | Version | Schema | Date | Notable | Spec | Compliance |
 |---|---|---|---|---|---|
+| 0.8.0 | n/a | _RFC approved; unreleased_ | **Ship types** — annotate the public surface + a PEP 561 `py.typed` marker so a consumer's type-checker uses purexml's own types instead of `Any`. `mypy`-clean, gated by a CI typecheck job; honest `types: mypy` badge. The verbatim-mirror `_setevents` redefinitions + the structural-stdlib-drop-in friction are resolved with documented `# type: ignore`s (mirror preserved). No runtime/parse change — but `py.typed` is a new consumer-facing guarantee. SCHEMA n/a; LOGIC unchanged. | [v0.8.0_RFC_Specification.md](docs/v0.8.0_RFC_Specification.md) _(approved 2026-06-18)_ | [COMPLIANCE-v0.8.md](docs/COMPLIANCE-v0.8.md) _(due before merge)_ |
 | 0.7.0 | n/a | 2026-06-17 (PR #15) | **Posture CLI** — `python -m purexml` over `security_report()`: default human report (informs, exit 0), `--json` (machine-readable, PROVISIONAL, for provenance), `--check [--min-expat X.Y.Z]` (opt-in CI gate, exit code; pin-your-floor), `--version`; plus `SecurityReport.as_dict()`. First build of the publish-worthy-debut push (the 10-second demo a cold evaluator runs). `__main__.py` is the one I/O boundary (no-I/O guard carve-out: CLI-output stdlib only, still under FORBIDDEN). Report-only — no parse-behavior change; LOGIC unchanged, SCHEMA n/a. | [v0.7.0_RFC_Specification.md](docs/v0.7.0_RFC_Specification.md) _(approved 2026-06-17)_ | [COMPLIANCE-v0.7.md](docs/COMPLIANCE-v0.7.md) |
 | 0.6.0 | n/a | 2026-06-17 (PR #11) | **Complete the posture map** — adds the two newer expat-layer DoS classes (reachable via normal parse paths) as first-class `security_report().mitigations` entries with per-class fix-version gating: `content_token_overflow_cve_2026_25210` (expat 2.7.4) and `attribute_collision_dos_cve_2026_45186` (expat 2.8.1; opt-in `max_attributes` partially bounds it). Report-only — **no parse-behavior change**; LOGIC unchanged (reported, not blocked), SCHEMA n/a. CVE-2026-41080 left unmapped (ungrounded) under the generic floor advisory. | [v0.6.0_RFC_Specification.md](docs/v0.6.0_RFC_Specification.md) _(approved 2026-06-17)_ | [COMPLIANCE-v0.6.md](docs/COMPLIANCE-v0.6.md) |
 | 0.5.1 | n/a | 2026-06-17 | **Patch** — adversarial soak + expat-floor currency (no parse-behavior change): a 17-vector red-team soak module (`test_hardening_soak.py` — distinct DoS classes, the unparsed-entity/NDATA path, sub-cap nested bomb, and **encoding-vector** attacks proving the block is encoding-independent), backed by a 60k-comparison heavy differential soak (0 divergences). **Refreshed `RECOMMENDED_EXPAT_VERSION` 2.7.2 → 2.8.1** after the 2026 libexpat 2.7.4–2.8.1 DoS release train (CVE-2026-25210/41080/45186 reach normal parse paths; 24515/32776 don't), and **decoupled** `disproportionate_memory` onto its own 2.7.2 fix version so the moving floor can't mis-gate it. `security_report()`/`assert_expat_secure()` now recommend latest-stable (fail-safe; opt-in surface, PROVISIONAL). Adding the two newly-reachable DoS classes to the mitigation map is **deferred** (a mitigation-set change). LOGIC unchanged (no parse-or-block change), SCHEMA n/a. _(HISTORY only, no RFC — part of v0.5.)_ | _(no RFC — patch)_ | _(part of v0.5)_ |
@@ -46,19 +47,20 @@ List any RFCs currently in draft (`docs/v{X.Y.Z}_RFC_DRAFT.md`). When none are
 open, state so explicitly rather than deleting the section — the empty-but-named
 state is the signal:
 
-> No drafts in flight. **v0.7.0 shipped** 2026-06-17 (PR #15) — the `python -m purexml`
-> posture CLI, first build of the **publish-worthy-debut** push (the new 1.0 frame:
-> ecosystem debut, not a single consumer — see
-> [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md)). Remaining to 1.0: the
-> publish-worthy first-impression layer (public README/story, trust signals), G1
-> file-observer adoption (first validation track), G5 packaging/license/name (Russell's
-> strategic-timing call), G6 freeze.
+> No drafts in flight. The **v0.8.0 RFC is approved** (2026-06-18) and in implementation —
+> [`docs/v0.8.0_RFC_Specification.md`](docs/v0.8.0_RFC_Specification.md) (ship types:
+> annotate the public surface + `py.typed`), continuing the **publish-worthy-debut** push
+> (the new 1.0 frame: ecosystem debut, not a single consumer — see
+> [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md)). Remaining to 1.0: G1 file-observer
+> adoption (first validation track), G5 packaging/license/name (Russell's strategic-timing
+> call), G6 freeze.
 >
 > (Shipped: v0.1.0 fromstring (PR #1); v0.1.1 floor→3.10 (PR #2); v0.1.2 durability +
 > expat awareness (PR #3); v0.2.0 non-streaming ElementTree surface + forbid_* knobs
 > (PR #4); v0.3.0 iterparse — family complete (PR #5); v0.4.0 opt-in structural-DoS
 > caps (PR #7); v0.5.0 trust surface (PR #8); v0.5.1 soak + expat-floor currency (PR #10);
-> v0.6.0 posture-map completion (PR #11); v0.7.0 posture CLI (PR #15).)
+> v0.6.0 posture-map completion (PR #11); v0.7.0 posture CLI (PR #15).
+> Plus tooling/quality: lint+coverage gates (PR #19); typed surface in flight (v0.8).)
 
 ---
 

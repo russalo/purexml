@@ -271,6 +271,7 @@ The frozen-at-1.0 *mirror* surface vs the PROVISIONAL *defense-in-depth*:
 | `EXPAT_VERSION`, `SAFE_EXPAT_VERSION`, `RECOMMENDED_EXPAT_VERSION`, `expat_is_secure`, `assert_expat_secure` | libexpat version awareness | v0.1.2 | PROVISIONAL |
 | `security_report`, `SecurityReport`, `BLOCKED`, `EXPAT_MITIGATED`, `OPT_IN`, `LIVE` | posture report (trust surface) | v0.5 | PROVISIONAL |
 | `SecurityReport.as_dict()`; `python -m purexml` CLI (`--json`/`--check`/`--version`) | posture CLI + JSON shape | v0.7 | PROVISIONAL |
+| Public type annotations + `py.typed` (PEP 561) | typed package (consumers' checkers use our types) | v0.8 | the *signatures* freeze with the mirror at 1.0 |
 
 Source of truth: `src/purexml/__init__.py` `__all__` (a test asserts version sync;
 keep this table in step when exports change). The CLI surface lives in

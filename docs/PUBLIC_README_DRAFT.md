@@ -18,11 +18,12 @@
 ![pure standard library](https://img.shields.io/badge/pure-stdlib-blue)
 ![coverage ≥90%](https://img.shields.io/badge/coverage-%E2%89%A590%25-brightgreen)
 ![lint: ruff](https://img.shields.io/badge/lint-ruff-30173D)
+![types: mypy](https://img.shields.io/badge/types-mypy-blue)
 ![differentially fuzzed](https://img.shields.io/badge/differentially-fuzzed-blueviolet)
 <!-- BADGE ROADMAP — three tiers (honesty discipline: only show what's true today).
    HAVE NOW (shown above; static, render anywhere, all true today): Python matrix
      (CI-grounded) · runtime-deps-zero + pure-stdlib (structurally-guarded contracts) ·
-     coverage ≥90% (CI --cov-fail-under=90; currently ~94%) · lint ruff (CI ruff check) ·
+     coverage ≥90% (CI --cov-fail-under=90; ~94%) · lint ruff + types mypy (CI) ·
      differentially-fuzzed (CI gate + opt-in Atheris harness).
    FLIPS ON AT PUBLISH (true already, ~zero effort — just need the public repo / the
      name+license decisions; uncomment then):

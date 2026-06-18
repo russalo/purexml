@@ -12,9 +12,13 @@ recommended-latest is 2.8.1). The enforce-vs-warn *policy* is a 1.0-freeze decis
 this module only exposes the data + an explicit opt-in check, with **no import-time
 behavior change.**
 """
+from __future__ import annotations
+
 import xml.parsers.expat as _expat
 from collections import namedtuple
+from collections.abc import Mapping, Sequence
 from types import MappingProxyType
+from typing import Any
 
 from .limits import RECOMMENDED_LIMITS
 
@@ -70,7 +74,7 @@ _ATTRIBUTE_COLLISION_FIXED = (2, 8, 1)      # CVE-2026-45186 (quadratic attr-nam
 _HIGHEST_UNMAPPED_FIX = (2, 8, 0)
 
 
-def _as_version_tuple(v):
+def _as_version_tuple(v: str | Sequence[int]) -> tuple[int, ...]:
     """Normalize a version to a tuple of ints. Accepts a ``"x.y.z"`` string or a
     sequence of ints, so callers can pass either form (PR#3 Gemini)."""
     if isinstance(v, str):
@@ -78,7 +82,7 @@ def _as_version_tuple(v):
     return tuple(int(p) for p in v)
 
 
-def expat_is_secure(minimum=RECOMMENDED_EXPAT_VERSION):
+def expat_is_secure(minimum: str | Sequence[int] = RECOMMENDED_EXPAT_VERSION) -> bool:
     """Return ``True`` if the runtime libexpat meets *minimum*.
 
     Defaults to the **conservative** floor (`RECOMMENDED_EXPAT_VERSION`, fail-safe).
@@ -89,7 +93,7 @@ def expat_is_secure(minimum=RECOMMENDED_EXPAT_VERSION):
     return EXPAT_VERSION >= _as_version_tuple(minimum)
 
 
-def assert_expat_secure(minimum=RECOMMENDED_EXPAT_VERSION):
+def assert_expat_secure(minimum: str | Sequence[int] = RECOMMENDED_EXPAT_VERSION) -> None:
     """Raise ``RuntimeError`` if the runtime libexpat is below *minimum* (default
     the conservative `RECOMMENDED_EXPAT_VERSION`).
 
@@ -135,17 +139,14 @@ OPT_IN = "opt-in (pass Limits)"
 LIVE = "LIVE (not mitigated on this runtime)"
 
 
-_ReportFields = [
+class SecurityReport(namedtuple("SecurityReport", [
     "expat_version",
     "expat_meets_safe_floor",
     "expat_meets_recommended",
     "recommended_limits",
     "mitigations",
     "notes",
-]
-
-
-class SecurityReport(namedtuple("SecurityReport", _ReportFields)):
+])):
     """The runtime's XML-security posture, as computed by `security_report`.
 
     A frozen, printable value object (a ``namedtuple`` subclass — typed fields +
@@ -173,8 +174,10 @@ class SecurityReport(namedtuple("SecurityReport", _ReportFields)):
 
     __slots__ = ()
 
-    def __new__(cls, expat_version, expat_meets_safe_floor, expat_meets_recommended,
-                recommended_limits, mitigations, notes):
+    def __new__(cls, expat_version: tuple[int, ...], expat_meets_safe_floor: bool,
+                expat_meets_recommended: bool, recommended_limits: Any,
+                mitigations: Mapping[str, str],
+                notes: Sequence[str]) -> SecurityReport:
         # Normalize the container fields so EVERY construction path — direct
         # construction AND ``_replace()`` — yields a genuinely immutable report,
         # not just ``security_report()``'s output (PR#8 Codex P2). ``mitigations``
@@ -184,12 +187,13 @@ class SecurityReport(namedtuple("SecurityReport", _ReportFields)):
             recommended_limits, MappingProxyType(dict(mitigations)), tuple(notes))
 
     @classmethod
-    def _make(cls, iterable):
+    def _make(cls, iterable: Any) -> SecurityReport:  # type: ignore[override]
         # Route _make (used by _replace) through __new__ so it normalizes too;
-        # the default _make bypasses __new__ via tuple.__new__.
+        # the default _make bypasses __new__ via tuple.__new__. (Deliberate override
+        # of namedtuple's generic _make — the signature differs but the intent stands.)
         return cls(*iterable)
 
-    def as_dict(self):
+    def as_dict(self) -> dict[str, Any]:
         """A JSON-safe ``dict`` of the report (version tuples → ``"x.y.z"`` strings,
         ``mitigations`` → plain dict, ``recommended_limits`` → dict-or-None, ``notes``
         → list). Backs `python -m purexml --json`. PROVISIONAL with the report."""
@@ -207,7 +211,7 @@ class SecurityReport(namedtuple("SecurityReport", _ReportFields)):
             "notes": list(self.notes),
         }
 
-    def __str__(self):
+    def __str__(self) -> str:
         ver = ".".join(map(str, self.expat_version))
         lines = [
             "purexml security posture",
@@ -238,7 +242,7 @@ class SecurityReport(namedtuple("SecurityReport", _ReportFields)):
         return "\n".join(lines)
 
 
-def security_report():
+def security_report() -> SecurityReport:
     """Return a `SecurityReport` describing this runtime's XML-security posture.
 
     Read-only and deterministic: it reads only ``pyexpat`` constants and

@@ -13,6 +13,12 @@ per-release record (RFCs, compliance, internal axes) lives in
 ## [Unreleased]
 - Publish-prep: public README, this changelog, packaging metadata.
 
+## [0.8.0] — 2026-06-18
+### Added
+- **Type annotations + `py.typed`** (PEP 561): the public API is annotated and the
+  package ships its types, so your type-checker uses purexml's types instead of `Any`.
+  `mypy`-clean, enforced by a CI typecheck job.
+
 ## [0.7.0] — 2026-06-17
 ### Added
 - `python -m purexml` posture CLI over `security_report()`: default human report
