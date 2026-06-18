@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import xml.parsers.expat as _expat
 from collections.abc import Iterable, Iterator
-from typing import IO, Any
+from typing import IO, Any, Protocol
 from xml.etree.ElementTree import Element, ElementTree, ParseError, TreeBuilder
 from xml.etree.ElementTree import iterparse as _stdlib_iterparse
 from xml.etree.ElementTree import parse as _stdlib_parse
@@ -36,6 +36,13 @@ from .limits import Limits
 __all__ = ["XMLParser", "fromstring", "parse", "fromstringlist", "iterparse"]
 
 
+class _PathLike(Protocol):
+    """Structural match for ``os.PathLike`` (e.g. ``pathlib.Path``) — so `parse`/
+    `iterparse` accept path objects without importing the I/O-guard-forbidden ``os``."""
+
+    def __fspath__(self) -> str | bytes: ...
+
+
 class XMLParser:
     """Hardened drop-in for ``xml.etree.ElementTree.XMLParser`` / defusedxml's
     ``DefusedXMLParser``. ``feed()``/``close()`` are compatible with
@@ -49,8 +56,8 @@ class XMLParser:
         self.parser = parser
         self.target = target if target is not None else TreeBuilder()
         self._error = _expat.error
-        self._names: dict[Any, Any] = {}
-        self.entity: dict[Any, Any] = {}  # always empty when forbid_entities (every decl blocked)
+        self._names: dict[str, str] = {}
+        self.entity: dict[str, str] = {}  # always empty when forbid_entities (every decl blocked)
 
         # --- opt-in structural-DoS limits (v0.4 mirror-plus; None == no cap) ---
         # Extracted to scalars so the default path is a cheap `is not None` check.
@@ -294,7 +301,7 @@ def fromstring(text: str | bytes, forbid_dtd: bool = False,
     return parser.close()
 
 
-def parse(source: str | IO[Any], parser: XMLParser | None = None,
+def parse(source: str | bytes | _PathLike | IO[Any], parser: XMLParser | None = None,
           forbid_dtd: bool = False, forbid_entities: bool = True,
           forbid_external: bool = True, *, limits: Limits | None = None) -> ElementTree:
     """Parse XML from *source* (a filename or file-like) into a hardened
@@ -344,7 +351,7 @@ def fromstringlist(sequence: Iterable[str | bytes], parser: XMLParser | None = N
     return parser.close()
 
 
-def iterparse(source: str | IO[Any], events: Iterable[str] | None = None,
+def iterparse(source: str | bytes | _PathLike | IO[Any], events: Iterable[str] | None = None,
               parser: XMLParser | None = None, forbid_dtd: bool = False,
               forbid_entities: bool = True, forbid_external: bool = True,
               *, limits: Limits | None = None) -> Iterator[tuple[str, Any]]:

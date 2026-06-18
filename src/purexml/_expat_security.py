@@ -174,6 +174,15 @@ class SecurityReport(namedtuple("SecurityReport", [
 
     __slots__ = ()
 
+    # Class-level field annotations so consumers' type-checkers learn the field types
+    # (a namedtuple() subclass alone exposes them as Any — PR#21 Codex/Gemini).
+    expat_version: tuple[int, ...]
+    expat_meets_safe_floor: bool
+    expat_meets_recommended: bool
+    recommended_limits: Any
+    mitigations: Mapping[str, str]
+    notes: Sequence[str]
+
     def __new__(cls, expat_version: tuple[int, ...], expat_meets_safe_floor: bool,
                 expat_meets_recommended: bool, recommended_limits: Any,
                 mitigations: Mapping[str, str],
