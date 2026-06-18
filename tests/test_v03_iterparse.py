@@ -10,7 +10,7 @@ import itertools
 import pytest
 
 import purexml
-from conftest import IOTouched, assert_no_io, requires_oracle
+from conftest import assert_no_io, requires_oracle
 
 EVENT_MODES = [None, ("start",), ("end",), ("start", "end"),
                ("start", "end", "start-ns", "end-ns")]
