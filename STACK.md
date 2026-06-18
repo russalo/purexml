@@ -62,11 +62,17 @@ exists: `python -m purexml` (+ `--json` / `--check [--min-expat]` / `--version`,
 
 ## CI
 
-`.github/workflows/tests.yml`: a **matrix over Python 3.10–3.13** (grounds the
-floor), tag-pinned actions (`actions/checkout@v6`, `actions/setup-python@v6`),
-`pip install -e ".[dev]"` then `python -m pytest tests/ -q`. Tag-pinning (vs
-digest-pinning) is the right tradeoff for a pure-Python project on a small action
-surface.
+`.github/workflows/tests.yml`: two jobs, tag-pinned actions (`actions/checkout@v6`,
+`actions/setup-python@v6`) —
+- **`lint`** (single Python): `ruff check src/ tests/ fuzz/ tools/` (default rules; lint
+  is version-independent, so it runs once not per matrix).
+- **`test`** (matrix over Python 3.10–3.13, grounds the floor): `pip install -e ".[dev]"`
+  then `python -m pytest tests/ -q --cov=purexml --cov-fail-under=90` — the coverage floor
+  (currently ~94%) is enforced on every Python.
+
+Dev tooling (in the `[dev]` extra): `pytest`, `defusedxml` (oracle), `ruff`, `pytest-cov`.
+Tag-pinning (vs digest-pinning) is the right tradeoff for a pure-Python project on a small
+action surface.
 
 ## Packaging / distribution
 

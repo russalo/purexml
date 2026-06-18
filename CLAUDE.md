@@ -589,9 +589,14 @@ blame`.
   engineer evaluating it on publish day** (the first 60 seconds), not for FO's needs. FO is
   the **anchor consumer + first validation track** (G1, alive), NOT the definition of done.
   **Publishing (PyPI/name/license) stays deferred for STRATEGIC TIMING + first-impression
-  quality — Russell's call — not for lack of readiness.** Next work = the first-impression
-  layer (public README/story, trust signals). See `docs/ROADMAP-to-1.0.md` (Reframe note)
-  and `scratch/README_public_draft.md`.
+  quality — Russell's call — not for lack of readiness.** Build for the first-impression
+  layer. **Publish-prep progress (as of 2026-06-18):** done — public README candidate
+  (`docs/PUBLIC_README_DRAFT.md`, swaps to README.md at publish), `CHANGELOG.md`,
+  `COMPATIBILITY.md`, `SECURITY.md` CVE/maintenance policy, and an honest CI-gated badge row
+  (python · zero-deps · stdlib · coverage≥90% · ruff · fuzzed). Remaining: `typed`
+  (real annotation work — deferred, not faked), OpenSSF/Codecov (publish-gated), and the
+  strategic calls (name/license/timing/disclosure channel). **Live tracker:
+  `scratch/publish_prep_checklist.md`**; also `docs/ROADMAP-to-1.0.md` (Reframe note).
 - **Version-assertion enforce-vs-warn: leaning INFORM-by-default** (1.0 decision, not yet
   ratified). `security_report()` informs; `assert_expat_secure()` stays opt-in. A
   hard-fail-by-default on a *moving* floor would make a consumer's gate
