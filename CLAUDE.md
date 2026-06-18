@@ -592,7 +592,7 @@ blame`.
   quality — Russell's call — not for lack of readiness.** Build for the first-impression
   layer. **Publish-prep progress (as of 2026-06-18):** done — public README candidate
   (`docs/PUBLIC_README_DRAFT.md`, swaps to README.md at publish), `CHANGELOG.md`,
-  `COMPATIBILITY.md`, SECURITY.md CVE/maintenance policy, and an honest CI-gated badge row
+  `COMPATIBILITY.md`, `SECURITY.md` CVE/maintenance policy, and an honest CI-gated badge row
   (python · zero-deps · stdlib · coverage≥90% · ruff · fuzzed). Remaining: `typed`
   (real annotation work — deferred, not faked), OpenSSF/Codecov (publish-gated), and the
   strategic calls (name/license/timing/disclosure channel). **Live tracker:
