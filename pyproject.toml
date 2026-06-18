@@ -33,7 +33,10 @@ dependencies = []
 [project.optional-dependencies]
 # defusedxml is the dev/test ORACLE only (RFC §3/§5) — never a runtime dependency,
 # never imported under src/. It is the incumbent purexml is validated against.
-dev = ["pytest", "defusedxml"]
+# ruff (lint) + pytest-cov (coverage gate) are dev-only quality tooling, run in CI;
+# never runtime deps. (mypy is intentionally NOT here yet — see the typed-badge note
+# in scratch/publish_prep_checklist.md: the surface needs annotating first.)
+dev = ["pytest", "defusedxml", "ruff", "pytest-cov"]
 
 # Coverage-guided differential fuzzing (v0.5 RFC §3/§4). DEV-ONLY, opt-in — Atheris
 # is heavier tooling (libFuzzer/clang) for on-demand deep sweeps; the always-run
@@ -61,3 +64,11 @@ where = ["src"]
 # both errors on collection AND writes __pycache__/*.pyc into shared dirs.
 testpaths = ["tests"]
 pythonpath = ["src"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.coverage.run]
+source = ["purexml"]
+# CI runs: pytest --cov=purexml --cov-fail-under=90 (enforced floor; currently ~94%).

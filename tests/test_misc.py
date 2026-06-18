@@ -24,7 +24,7 @@ def test_version_surface_sync():
     root = pathlib.Path(__file__).resolve().parent.parent
     pyproject = (root / "pyproject.toml").read_text()
     # crude but dependency-free: find the [project] version line
-    line = next(l for l in pyproject.splitlines() if l.strip().startswith("version ="))
+    line = next(ln for ln in pyproject.splitlines() if ln.strip().startswith("version ="))
     manifest_version = line.split("=", 1)[1].strip().strip('"')
     assert purexml.__version__ == manifest_version
 
