@@ -43,7 +43,9 @@ scaffolding side-by-side; the Go half was deleted when purexml chose Python.)
   `limits.py` (opt-in structural-DoS caps — `Limits`/`RECOMMENDED_LIMITS`, v0.4),
   `_expat_security.py` (opt-in libexpat version awareness + `security_report()`
   posture API, v0.5), `__main__.py` (the `python -m purexml` posture CLI, v0.7 —
-  the package's one I/O boundary).
+  the package's one I/O boundary), `py.typed` (PEP 561 marker, v0.8 — the package ships
+  its annotations). The public surface is type-annotated (v0.8); `from __future__ import
+  annotations` keeps them lazy/runtime-inert.
 - `tests/` at repo root, plain `pytest` (no `tests/__init__.py` — flat layout so
   `conftest.py` imports cleanly). See **Architecture** in `CLAUDE.md`.
 - `fuzz/` at repo root — the opt-in Atheris coverage-guided harness (dev-only,
@@ -64,13 +66,13 @@ exists: `python -m purexml` (+ `--json` / `--check [--min-expat]` / `--version`,
 
 `.github/workflows/tests.yml`: two jobs, tag-pinned actions (`actions/checkout@v6`,
 `actions/setup-python@v6`) —
-- **`lint`** (single Python): `ruff check src/ tests/ fuzz/ tools/` (default rules; lint
-  is version-independent, so it runs once not per matrix).
+- **`lint`** (single Python): `ruff check src/ tests/ fuzz/ tools/` (default rules) +
+  `mypy` (typecheck the annotated surface; v0.8). Both version-independent — run once.
 - **`test`** (matrix over Python 3.10–3.13, grounds the floor): `pip install -e ".[dev]"`
   then `python -m pytest tests/ -q --cov=purexml --cov-fail-under=90` — the coverage floor
   (currently ~94%) is enforced on every Python.
 
-Dev tooling (in the `[dev]` extra): `pytest`, `defusedxml` (oracle), `ruff`, `pytest-cov`.
+Dev tooling (in the `[dev]` extra): `pytest`, `defusedxml` (oracle), `ruff`, `pytest-cov`, `mypy`.
 Tag-pinning (vs digest-pinning) is the right tradeoff for a pure-Python project on a small
 action surface.
 

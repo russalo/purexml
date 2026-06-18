@@ -8,6 +8,8 @@ that reaches the network / filesystem / subprocess. `tests/test_no_io` enforces 
 halves: the parse surface stays strict stdlib-`xml`, and this file may add only those
 CLI-output modules, never a forbidden one.
 """
+from __future__ import annotations
+
 import argparse
 import json
 import sys
@@ -16,11 +18,11 @@ from . import __version__, security_report
 from . import _expat_security as _es
 
 
-def _ver(t):
+def _ver(t: tuple[int, ...]) -> str:
     return ".".join(map(str, t))
 
 
-def _build_parser():
+def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="python -m purexml",
         description="Report this runtime's XML-security posture (purexml).")
@@ -35,7 +37,7 @@ def _build_parser():
     return p
 
 
-def main(argv=None):
+def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
 

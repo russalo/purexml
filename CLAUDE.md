@@ -341,6 +341,13 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.8.0** *(approved 2026-06-18, in implementation)* — **ship types**: annotate the
+  public surface + a PEP 561 `py.typed` marker (consumers' type-checkers use purexml's
+  types, not `Any`); `mypy`-clean gated by a CI typecheck job; `types: mypy` badge. The
+  verbatim-mirror `_setevents` redefinitions + the structural-stdlib-drop-in friction kept
+  via documented `# type: ignore`s (mirror preserved). Added `typing`/`__future__` to the
+  no-I/O allowlist (pure, lazy annotations). No runtime/parse change; SCHEMA n/a; LOGIC
+  unchanged. [RFC](docs/v0.8.0_RFC_Specification.md).
 - **v0.7.0** *(shipped 2026-06-17, PR #15)* — **posture CLI**:
   `python -m purexml` over `security_report()` — default human report (informs, exit 0),
   `--json` (machine-readable, PROVISIONAL), `--check [--min-expat X.Y.Z]` (opt-in CI gate,

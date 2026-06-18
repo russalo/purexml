@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "purexml"
-version = "0.7.0"
+version = "0.8.0"
 description = "Safely parse untrusted XML using only the Python standard library — a zero-dependency defusedxml replacement."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -36,7 +36,7 @@ dependencies = []
 # ruff (lint) + pytest-cov (coverage gate) are dev-only quality tooling, run in CI;
 # never runtime deps. (mypy is intentionally NOT here yet — see the typed-badge note
 # in scratch/publish_prep_checklist.md: the surface needs annotating first.)
-dev = ["pytest", "defusedxml", "ruff", "pytest-cov"]
+dev = ["pytest", "defusedxml", "ruff", "pytest-cov", "mypy"]
 
 # Coverage-guided differential fuzzing (v0.5 RFC §3/§4). DEV-ONLY, opt-in — Atheris
 # is heavier tooling (libFuzzer/clang) for on-demand deep sweeps; the always-run
@@ -58,6 +58,10 @@ Issues = "https://github.com/russalo/purexml/issues"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# Ship the PEP 561 marker so downstream type-checkers consume purexml's types (v0.8).
+[tool.setuptools.package-data]
+purexml = ["py.typed"]
+
 [tool.pytest.ini_options]
 # Only collect the project's own tests. Prevents `pytest` from walking the repo
 # root and importing test files inside scratch/ or any harvested corpora — that
@@ -72,3 +76,11 @@ line-length = 100
 [tool.coverage.run]
 source = ["purexml"]
 # CI runs: pytest --cov=purexml --cov-fail-under=90 (enforced floor; currently ~94%).
+
+[tool.mypy]
+files = ["src/purexml"]
+python_version = "3.10"
+warn_unused_ignores = true
+warn_redundant_casts = true
+# Sane bar (v0.8): the public surface is annotated and clean. --strict (disallow-
+# untyped-defs etc.) is deferred — see the v0.8.0 RFC §7.

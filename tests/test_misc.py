@@ -7,6 +7,13 @@ import pytest
 import purexml
 
 
+def test_py_typed_marker_shipped():
+    """PEP 561 marker must sit in the package so downstream type-checkers use our
+    types (v0.8). Guards against it being dropped from the package/wheel."""
+    marker = pathlib.Path(purexml.__file__).resolve().parent / "py.typed"
+    assert marker.is_file(), "py.typed marker missing — typed package guarantee broken"
+
+
 def test_malformed_raises_parseerror():
     with pytest.raises(ET.ParseError):
         purexml.fromstring("<r><a></r>")

@@ -14,8 +14,12 @@ stdlib's / defusedxml's, and installs blocking handlers per the ``forbid_*`` fla
 forbid_external=True``). It exposes ``feed``/``close`` so it is drop-in for
 ``xml.etree.ElementTree.parse(source, parser=...)``.
 """
+from __future__ import annotations
+
 import xml.parsers.expat as _expat
-from xml.etree.ElementTree import ParseError, TreeBuilder
+from collections.abc import Iterable, Iterator
+from typing import IO, Any, Protocol
+from xml.etree.ElementTree import Element, ElementTree, ParseError, TreeBuilder
 from xml.etree.ElementTree import iterparse as _stdlib_iterparse
 from xml.etree.ElementTree import parse as _stdlib_parse
 
@@ -27,8 +31,16 @@ from .errors import (
     ExternalReferenceForbidden,
     SizeExceeded,
 )
+from .limits import Limits
 
 __all__ = ["XMLParser", "fromstring", "parse", "fromstringlist", "iterparse"]
+
+
+class _PathLike(Protocol):
+    """Structural match for ``os.PathLike`` (e.g. ``pathlib.Path``) — so `parse`/
+    `iterparse` accept path objects without importing the I/O-guard-forbidden ``os``."""
+
+    def __fspath__(self) -> str | bytes: ...
 
 
 class XMLParser:
@@ -37,14 +49,15 @@ class XMLParser:
     ``xml.etree.ElementTree.parse``.
     """
 
-    def __init__(self, *, target=None, encoding=None, forbid_dtd=False,
-                 forbid_entities=True, forbid_external=True, limits=None):
+    def __init__(self, *, target: Any = None, encoding: str | None = None,
+                 forbid_dtd: bool = False, forbid_entities: bool = True,
+                 forbid_external: bool = True, limits: Limits | None = None) -> None:
         parser = _expat.ParserCreate(encoding, "}")
         self.parser = parser
         self.target = target if target is not None else TreeBuilder()
         self._error = _expat.error
-        self._names = {}
-        self.entity = {}  # always empty when forbid_entities (every decl is blocked)
+        self._names: dict[str, str] = {}
+        self.entity: dict[str, str] = {}  # always empty when forbid_entities (every decl blocked)
 
         # --- opt-in structural-DoS limits (v0.4 mirror-plus; None == no cap) ---
         # Extracted to scalars so the default path is a cheap `is not None` check.
@@ -75,8 +88,8 @@ class XMLParser:
             parser.CommentHandler = self.target.comment
         if hasattr(self.target, "pi"):
             parser.ProcessingInstructionHandler = self.target.pi
-        parser.buffer_text = 1
-        parser.ordered_attributes = 1
+        parser.buffer_text = 1       # type: ignore[assignment]  # verbatim stdlib value (1, not True)
+        parser.ordered_attributes = 1  # type: ignore[assignment]
 
         # --- security handlers (defusedxml-equivalent, per the flags) ---
         if forbid_dtd:
@@ -157,12 +170,15 @@ class XMLParser:
             if event_name == "start":
                 parser.ordered_attributes = 1
 
+                # NB: _setevents is a verbatim mirror of CPython XMLParser._setevents;
+                # the per-event `handler` redefinitions are deliberate (do not rename —
+                # see Known decisions). mypy flags the redefinitions; ignore[misc] them.
                 def handler(tag, attrib_in, event=event_name, append=append,
                             start=self._start):
                     append((event, start(tag, attrib_in)))
                 parser.StartElementHandler = handler
             elif event_name == "end":
-                def handler(tag, event=event_name, append=append, end=self._end):
+                def handler(tag, event=event_name, append=append, end=self._end):  # type: ignore[misc]
                     append((event, end(tag)))
                 parser.EndElementHandler = handler
             elif event_name == "start-ns":
@@ -171,20 +187,20 @@ class XMLParser:
                                 start_ns=self._start_ns):
                         append((event, start_ns(prefix, uri)))
                 else:
-                    def handler(prefix, uri, event=event_name, append=append):
+                    def handler(prefix, uri, event=event_name, append=append):  # type: ignore[misc]
                         append((event, (prefix or "", uri or "")))
                 parser.StartNamespaceDeclHandler = handler
             elif event_name == "end-ns":
                 if hasattr(self.target, "end_ns"):
-                    def handler(prefix, event=event_name, append=append,
+                    def handler(prefix, event=event_name, append=append,  # type: ignore[misc]
                                 end_ns=self._end_ns):
                         append((event, end_ns(prefix)))
                 else:
-                    def handler(prefix, event=event_name, append=append):
+                    def handler(prefix, event=event_name, append=append):  # type: ignore[misc]
                         append((event, None))
                 parser.EndNamespaceDeclHandler = handler
             elif event_name == "comment":
-                def handler(text, event=event_name, append=append, self=self):
+                def handler(text, event=event_name, append=append, self=self):  # type: ignore[misc]
                     append((event, self.target.comment(text)))
                 parser.CommentHandler = handler
             elif event_name == "pi":
@@ -231,7 +247,7 @@ class XMLParser:
         self.target = None
 
     # ---- feed/close (compatible with xml.etree.ElementTree.parse) ----
-    def feed(self, data):
+    def feed(self, data: str | bytes) -> None:
         if self._max_bytes is not None:
             # Count true bytes (PR#7 Codex): a str chunk is measured by its UTF-8
             # byte length, not code-point count, so the documented byte cap can't be
@@ -252,7 +268,7 @@ class XMLParser:
             self._cleanup()
             raise
 
-    def close(self):
+    def close(self) -> Any:  # returns the target's result (Element for the default)
         try:
             try:
                 self.parser.Parse(b"", True)
@@ -263,8 +279,9 @@ class XMLParser:
             self._cleanup()
 
 
-def fromstring(text, forbid_dtd=False, forbid_entities=True, forbid_external=True,
-               *, limits=None):
+def fromstring(text: str | bytes, forbid_dtd: bool = False,
+               forbid_entities: bool = True, forbid_external: bool = True,
+               *, limits: Limits | None = None) -> Element:
     """Parse XML *text* into an ``xml.etree.ElementTree.Element``, safely.
 
     Behaviorally equivalent to ``defusedxml.ElementTree.fromstring``: entity
@@ -284,8 +301,9 @@ def fromstring(text, forbid_dtd=False, forbid_entities=True, forbid_external=Tru
     return parser.close()
 
 
-def parse(source, parser=None, forbid_dtd=False, forbid_entities=True,
-          forbid_external=True, *, limits=None):
+def parse(source: str | bytes | _PathLike | IO[Any], parser: XMLParser | None = None,
+          forbid_dtd: bool = False, forbid_entities: bool = True,
+          forbid_external: bool = True, *, limits: Limits | None = None) -> ElementTree:
     """Parse XML from *source* (a filename or file-like) into a hardened
     ``ElementTree``. Mirrors ``defusedxml.ElementTree.parse``. *limits* (opt-in,
     keyword-only) applies only when building the default parser."""
@@ -296,15 +314,19 @@ def parse(source, parser=None, forbid_dtd=False, forbid_entities=True,
         parser = XMLParser(forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
                            forbid_external=forbid_external, limits=limits)
         try:
-            return _stdlib_parse(source, parser)
+            # purexml.XMLParser is a structural drop-in for the stdlib parser
+            # (feed/close), not a nominal subclass — typeshed can't express that.
+            return _stdlib_parse(source, parser)  # type: ignore[arg-type, return-value]
         finally:
             if parser.parser is not None:  # not already cleaned by feed/close
                 parser._cleanup()
-    return _stdlib_parse(source, parser)
+    return _stdlib_parse(source, parser)  # type: ignore[arg-type, return-value]
 
 
-def fromstringlist(sequence, parser=None, forbid_dtd=False, forbid_entities=True,
-                   forbid_external=True, *, limits=None):
+def fromstringlist(sequence: Iterable[str | bytes], parser: XMLParser | None = None,
+                   forbid_dtd: bool = False, forbid_entities: bool = True,
+                   forbid_external: bool = True, *,
+                   limits: Limits | None = None) -> Element:
     """Parse a *sequence* of XML string fragments into an ``Element``, safely.
 
     Stdlib-parity addition (``defusedxml.ElementTree`` does not provide
@@ -329,8 +351,10 @@ def fromstringlist(sequence, parser=None, forbid_dtd=False, forbid_entities=True
     return parser.close()
 
 
-def iterparse(source, events=None, parser=None, forbid_dtd=False,
-              forbid_entities=True, forbid_external=True, *, limits=None):
+def iterparse(source: str | bytes | _PathLike | IO[Any], events: Iterable[str] | None = None,
+              parser: XMLParser | None = None, forbid_dtd: bool = False,
+              forbid_entities: bool = True, forbid_external: bool = True,
+              *, limits: Limits | None = None) -> Iterator[tuple[str, Any]]:
     """Incrementally parse XML from *source*, yielding ``(event, elem)`` pairs, safely.
 
     Mirrors ``defusedxml.ElementTree.iterparse``. Reuses the stdlib `iterparse`
@@ -348,4 +372,5 @@ def iterparse(source, events=None, parser=None, forbid_dtd=False,
     if parser is None:
         parser = XMLParser(forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
                            forbid_external=forbid_external, limits=limits)
-    return _stdlib_iterparse(source, events, parser)
+    # structural drop-in parser (see parse()); typeshed's iterparse is nominally typed.
+    return _stdlib_iterparse(source, events, parser)  # type: ignore[call-overload]

@@ -11,13 +11,15 @@ import pathlib
 
 import purexml
 
-#: The top-level (non-relative) imports the runtime is permitted: the stdlib XML
-#: parser, `collections` (pure data structures — `namedtuple` for `Limits`, no
-#: I/O), and `types` (`MappingProxyType` — a read-only mapping view for the
-#: `SecurityReport.mitigations` trust surface; pure, no I/O). Adding anything here
-#: must be a conscious decision (a pure parser's import surface is part of its
-#: security guarantee — each entry is justified inline).
-ALLOWED_TOPLEVEL = {"xml", "collections", "types"}
+#: The top-level (non-relative) imports the runtime is permitted — all pure, no I/O:
+#:   xml         — the stdlib XML parser (the whole point)
+#:   collections — `namedtuple` (Limits/SecurityReport)
+#:   types       — `MappingProxyType` (read-only mitigations view)
+#:   typing      — type annotations (v0.8 typed surface); pure, evaluated lazily
+#:   __future__  — `annotations` (PEP 563 lazy annotations)
+#: Adding anything here must be a conscious decision (a pure parser's import surface
+#: is part of its security guarantee — each entry is justified inline).
+ALLOWED_TOPLEVEL = {"xml", "collections", "types", "typing", "__future__"}
 
 #: The CLI entry point (`__main__.py`, v0.7) is the package's ONE explicit I/O
 #: boundary — it prints the posture report, so it may import the CLI-output stdlib on

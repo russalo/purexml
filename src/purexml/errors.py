@@ -32,7 +32,8 @@ class DTDForbidden(PureXMLError):
     ``DTDForbidden``.
     """
 
-    def __init__(self, name, sysid=None, pubid=None):
+    def __init__(self, name: str, sysid: str | None = None,
+                 pubid: str | None = None) -> None:
         super().__init__(
             "DTDForbidden(name=%r, system_id=%r, public_id=%r)" % (name, sysid, pubid)
         )
@@ -49,7 +50,8 @@ class EntitiesForbidden(PureXMLError):
     ``forbid_entities``).
     """
 
-    def __init__(self, name, sysid=None, pubid=None):
+    def __init__(self, name: str, sysid: str | None = None,
+                 pubid: str | None = None) -> None:
         super().__init__(
             "EntitiesForbidden(name=%r, system_id=%r, public_id=%r)"
             % (name, sysid, pubid)
@@ -65,7 +67,7 @@ class ExternalReferenceForbidden(PureXMLError):
     pass through a forbidden entity declaration.
     """
 
-    def __init__(self, sysid=None, pubid=None):
+    def __init__(self, sysid: str | None = None, pubid: str | None = None) -> None:
         super().__init__(
             "ExternalReferenceForbidden(system_id=%r, public_id=%r)" % (sysid, pubid)
         )
@@ -84,7 +86,7 @@ class LimitExceeded(PureXMLError):
 class DepthExceeded(LimitExceeded):
     """Element nesting deeper than `limits.max_depth`."""
 
-    def __init__(self, depth, limit):
+    def __init__(self, depth: int, limit: int) -> None:
         super().__init__("DepthExceeded(depth=%d, max_depth=%d)" % (depth, limit))
         self.depth = depth
         self.limit = limit
@@ -93,7 +95,7 @@ class DepthExceeded(LimitExceeded):
 class AttributesExceeded(LimitExceeded):
     """An element with more attributes than `limits.max_attributes`."""
 
-    def __init__(self, tag, count, limit):
+    def __init__(self, tag: str, count: int, limit: int) -> None:
         super().__init__(
             "AttributesExceeded(element=%r, count=%d, max_attributes=%d)"
             % (tag, count, limit)
@@ -106,7 +108,7 @@ class AttributesExceeded(LimitExceeded):
 class SizeExceeded(LimitExceeded):
     """Total input fed exceeds `limits.max_bytes`."""
 
-    def __init__(self, size, limit):
+    def __init__(self, size: int, limit: int) -> None:
         super().__init__("SizeExceeded(bytes=%d, max_bytes=%d)" % (size, limit))
         self.size = size
         self.limit = limit
