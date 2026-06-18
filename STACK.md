@@ -67,7 +67,8 @@ exists: `python -m purexml` (+ `--json` / `--check [--min-expat]` / `--version`,
 `.github/workflows/tests.yml`: two jobs, tag-pinned actions (`actions/checkout@v6`,
 `actions/setup-python@v6`) —
 - **`lint`** (single Python): `ruff check src/ tests/ fuzz/ tools/` (default rules) +
-  `mypy` (typecheck the annotated surface; v0.8). Both version-independent — run once.
+  `mypy` (typecheck the annotated surface — **`--strict`** since v0.8.1). Both
+  version-independent — run once.
 - **`test`** (matrix over Python 3.10–3.13, grounds the floor): `pip install -e ".[dev]"`
   then `python -m pytest tests/ -q --cov=purexml --cov-fail-under=90` — the coverage floor
   (currently ~94%) is enforced on every Python.
