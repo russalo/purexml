@@ -78,9 +78,35 @@ def test_xinclude_parses_without_fetching():
 
 @pytest.mark.parametrize("name", list(BLOCK_VECTORS))
 def test_block_vector_raises_entitiesforbidden_no_io(name):
+    # Asserts the SPECIFIC defense exception (EntitiesForbidden), not just "raises" — a
+    # ParseError wouldn't satisfy this, so a block can't false-green on an incidental
+    # parse rejection (bestiary's "no crash != defense exercised").
     with assert_no_io():
         with pytest.raises(purexml.EntitiesForbidden):
             purexml.fromstring(BLOCK_VECTORS[name])
+
+
+def test_entity_defense_materially_engages_on_vs_off():
+    """Anti-false-green, gold standard (bestiary universal soak finding 2026-06-19): prove
+    the DEFENSE caused the block, not an incidental raise — via on-vs-off difference on a
+    BENIGN (non-bomb) entity. Default (forbid_entities=True) blocks it; forbid_entities=False
+    parses it and the entity resolves — so the entity defense is materially what blocks."""
+    benign = '<?xml version="1.0"?><!DOCTYPE r [ <!ENTITY x "value"> ]><r>&x;</r>'
+    with pytest.raises(purexml.EntitiesForbidden):       # defense ON (default) → blocked
+        purexml.fromstring(benign)
+    root = purexml.fromstring(benign, forbid_entities=False)   # defense OFF → parses
+    assert root.text == "value"                          # entity resolved → on/off differ
+
+
+def test_structural_defense_is_opt_in_off_by_default():
+    """The structural-DoS defense (Limits) is OPT-IN / off by default — a deep-but-legal
+    doc parses with no caps (strict-mirror default). Records bestiary's case #2 for the
+    standing battery: structural/DTD specimens must be soaked WITH the knob enabled
+    (limits=/forbid_dtd=True), else default purexml correctly parses them (not a finding)."""
+    deep = "<r>" + "<a>" * 50 + "</a>" * 50 + "</r>"
+    purexml.fromstring(deep)  # no raise: structural caps are opt-in
+    with pytest.raises(purexml.DepthExceeded):
+        purexml.fromstring(deep, limits=purexml.Limits(max_depth=10))  # engaged when enabled
 
 
 @requires_oracle
