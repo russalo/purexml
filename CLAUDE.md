@@ -346,7 +346,10 @@ One-line bullets per version (newest first; copy the shape from
   entropy (CWE-331, expat 2.8.0, LOW) reachable via normal name-interning; added to
   `security_report().mitigations` as `hash_flooding_cve_2026_41080`. Because it's a
   *hardening* of an existing defense (not a present/absent hole), introduces a 5th status
-  **`EXPAT_PARTIAL`** (never `LIVE`: PARTIAL <2.8.0, MITIGATED at/above) and **retires
+  **`EXPAT_PARTIAL`** — **never `LIVE`**, and (refined per PR#27 Codex, CVE-2026-7210)
+  reported **conservatively PARTIAL on every runtime**: full 16-byte-salt mitigation needs
+  BOTH expat ≥2.8.0 AND CPython's `pyexpat` fix (which purexml can't verify at runtime), so
+  it never claims `MITIGATED` on the expat version alone. Also **retires
   `_HIGHEST_UNMAPPED_FIX`** + the generic untracked-gap advisory — every *reachable* expat
   fix is now individually tracked. Report-only; no parse-behavior change; SCHEMA n/a; LOGIC
   unchanged (reported, not blocked); status vocabulary PROVISIONAL. Four-leg review (legs
@@ -613,7 +616,12 @@ blame`.
   (SipHash present below the fix, salt merely weaker), it uses the new **`EXPAT_PARTIAL`** status,
   **never `LIVE`** (bare `LIVE` would overstate). `_HIGHEST_UNMAPPED_FIX` + the generic untracked-gap
   advisory were retired (every reachable fix is now mapped). The grounding rule held: ground first,
-  *then* map — and grounding determined HOW to map (PARTIAL, not LIVE).
+  *then* map — and grounding determined HOW to map (PARTIAL, not LIVE). **Two-layer refinement (PR#27
+  Codex, grounded vs CVE-2026-7210 / gh-149018):** full 16-byte-salt mitigation needs BOTH expat
+  ≥2.8.0 AND CPython's `pyexpat` calling `XML_SetHashSalt16Bytes` (`pyexpat` sets the salt itself and
+  passed only 4–8 bytes until patched). purexml can't verify the wrapper at runtime, so
+  `hash_flooding` is reported **PARTIAL on every runtime** — never a version-only `MITIGATED`
+  (false-green). Don't "simplify" it back to an expat-version gate.
 - **The 1.0 gate is the publish-worthy ECOSYSTEM DEBUT, not one consumer** (reframed
   2026-06-17). Stress-tested by assuming file-observer gone entirely: purexml's reason to
   exist *survives the loss of any single consumer* — it's the maintained, zero-dep successor

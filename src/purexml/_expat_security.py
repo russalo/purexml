@@ -297,12 +297,15 @@ def security_report() -> SecurityReport:
         # Opt-in max_attributes also bounds the count this is quadratic in (see notes).
         "attribute_collision_dos_cve_2026_45186":
             EXPAT_MITIGATED if EXPAT_VERSION >= _ATTRIBUTE_COLLISION_FIXED else LIVE,
-        # hash flooding via weak SipHash salt entropy — expat-layer HARDENING, not a hole:
-        # SipHash hash-flood protection is present on all supported expat; 2.8.0 widens the
-        # salt (4-8 bytes -> 16) + adds getentropy seeding. NEVER LIVE — PARTIAL below the
-        # hardening, MITIGATED at/above. (CVE-2026-41080, CWE-331, LOW; v0.9.)
-        "hash_flooding_cve_2026_41080":
-            EXPAT_MITIGATED if EXPAT_VERSION >= _HASH_FLOODING_FIXED else EXPAT_PARTIAL,
+        # hash flooding via weak SipHash salt entropy — NEVER LIVE (hash-flood protection is
+        # present on every supported expat). But FULL 16-byte-salt hardening needs BOTH layers:
+        # expat >=2.8.0 (CVE-2026-41080 — adds XML_SetHashSalt16Bytes) AND CPython's pyexpat
+        # actually calling it (CVE-2026-7210 / gh-149018; pyexpat sets the salt itself and kept
+        # calling the 4-8-byte XML_SetHashSalt until patched). purexml drives parsers through
+        # pyexpat and CANNOT verify the wrapper at runtime, so it conservatively reports PARTIAL
+        # (fail-safe; never a false MITIGATED on the expat version alone). (CWE-331, LOW; v0.9,
+        # refined per PR#27 Codex.)
+        "hash_flooding_cve_2026_41080": EXPAT_PARTIAL,
         # structural DoS (depth / attributes / size) — purexml opt-in caps only.
         "structural_dos_depth_attrs_size": OPT_IN,
     }
@@ -323,12 +326,24 @@ def security_report() -> SecurityReport:
             msg += ("; the tracked class(es) %s are live on this runtime"
                     % ", ".join(live))
         notes.append(msg + " — upgrade Python or the system expat.")
-    if mitigations["hash_flooding_cve_2026_41080"] == EXPAT_PARTIAL:
+    # hash_flooding is reported PARTIAL on EVERY runtime (never LIVE, never a version-only
+    # MITIGATED): the 16-byte-salt hardening needs both expat>=2.8.0 AND CPython's pyexpat
+    # fix (CVE-2026-7210), and purexml can't verify the wrapper at runtime. Tailor the note
+    # to whether expat even exposes the 16-byte API yet.
+    if EXPAT_VERSION >= _HASH_FLOODING_FIXED:
         notes.append(
-            "hash_flooding_cve_2026_41080 is PARTIAL on this expat (<2.8.0): libexpat's "
-            "SipHash hash-flood defense is present but seeded with weaker salt entropy "
-            "(4-8 bytes vs 16; CVE-2026-41080, CWE-331, LOW severity). Upgrade to expat "
-            ">=2.8.0 for the hardened 16-byte salt + getentropy seeding.")
+            "hash_flooding_cve_2026_41080 is PARTIAL: libexpat >=2.8.0 has the 16-byte "
+            "hash-salt API (CVE-2026-41080 fixed at the expat layer), but full mitigation "
+            "also requires CPython's pyexpat to call XML_SetHashSalt16Bytes (CVE-2026-7210, "
+            "gh-149018) — which purexml cannot verify at runtime, so it is reported "
+            "conservatively as PARTIAL. If your Python includes that fix, the class is fully "
+            "mitigated (LOW severity).")
+    else:
+        notes.append(
+            "hash_flooding_cve_2026_41080 is PARTIAL: libexpat's SipHash hash-flood defense "
+            "is present but seeded with weaker salt entropy (4-8 bytes vs 16; CVE-2026-41080, "
+            "CWE-331, LOW). Full mitigation needs expat >=2.8.0 AND CPython's pyexpat fix "
+            "(CVE-2026-7210) — upgrade both.")
     if mitigations["attribute_collision_dos_cve_2026_45186"] == LIVE:
         notes.append(
             "attribute_collision_dos is live on this expat (<2.8.1): opt-in "

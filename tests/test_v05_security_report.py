@@ -106,15 +106,19 @@ _P = purexml.EXPAT_PARTIAL
 _L = purexml.LIVE
 
 
+# hash_flooding (hashf) is PARTIAL at EVERY version: never LIVE (hash-flood protection is
+# present on all supported expat) and never a version-only MITIGATED (full 16-byte-salt
+# hardening also needs CPython's pyexpat fix for CVE-2026-7210, which purexml can't verify
+# at runtime — so it is reported conservatively as PARTIAL; v0.9 + PR#27 Codex).
 @pytest.mark.parametrize("ver,large,memory,content,hashf,attr,safe,rec", [
-    ((2, 5, 0), _L, _L, _L, _P, _L, False, False),  # pre-2.6 (hash_flooding PARTIAL, never LIVE)
+    ((2, 5, 0), _L, _L, _L, _P, _L, False, False),  # pre-2.6
     ((2, 6, 0), _M, _L, _L, _P, _L, True,  False),  # safe floor (large fixed)
     ((2, 6, 1), _M, _L, _L, _P, _L, True,  False),  # between
     ((2, 7, 2), _M, _M, _L, _P, _L, True,  False),  # memory fixed
     ((2, 7, 4), _M, _M, _M, _P, _L, True,  False),  # content fixed (v0.6)
-    ((2, 8, 0), _M, _M, _M, _M, _L, True,  False),  # hash_flooding fixed (v0.9), attr still live
-    ((2, 8, 1), _M, _M, _M, _M, _M, True,  True),   # attr fixed = recommended-latest
-    ((2, 9, 0), _M, _M, _M, _M, _M, True,  True),   # above
+    ((2, 8, 0), _M, _M, _M, _P, _L, True,  False),  # expat has 16-byte API; wrapper unverifiable -> still PARTIAL
+    ((2, 8, 1), _M, _M, _M, _P, _M, True,  True),   # attr fixed = recommended-latest
+    ((2, 9, 0), _M, _M, _M, _P, _M, True,  True),   # above
 ])
 def test_version_gating(monkeypatch, ver, large, memory, content, hashf, attr, safe, rec):
     monkeypatch.setattr(S, "EXPAT_VERSION", ver)
@@ -174,22 +178,26 @@ def test_floor_advisory_no_longer_claims_untracked_gap(monkeypatch):
     assert "attribute_collision_dos_cve_2026_45186" in joined
 
 
-def test_hash_flooding_partial_below_fix_mitigated_at_or_above(monkeypatch):
-    # The v0.9 hardening-not-hole class: PARTIAL below expat 2.8.0 (SipHash present but
-    # weaker salt — NOT live), MITIGATED at/above, never LIVE. The PARTIAL note must cite
-    # CVE-2026-41080 + the salt-entropy nuance below the fix, and vanish at/above it.
+def test_hash_flooding_always_partial_two_layer(monkeypatch):
+    # The v0.9 hardening-not-hole class, refined per PR#27 Codex (CVE-2026-7210): full
+    # 16-byte-salt mitigation needs BOTH expat>=2.8.0 AND CPython's pyexpat fix, and purexml
+    # can't verify the wrapper at runtime — so it reports PARTIAL on EVERY runtime (never
+    # LIVE, never a version-only MITIGATED). The note is tailored by expat version.
+    # Below the expat fix: salt-entropy nuance + CVE-2026-41080.
     monkeypatch.setattr(S, "EXPAT_VERSION", (2, 7, 4))
     r = purexml.security_report()
     assert r.mitigations["hash_flooding_cve_2026_41080"] == purexml.EXPAT_PARTIAL
     joined = " ".join(r.notes)
-    assert "CVE-2026-41080" in joined
-    assert "PARTIAL" in joined and "salt" in joined
+    assert "CVE-2026-41080" in joined and "salt" in joined
 
-    # At 2.8.0 the class is fully mitigated — status flips and the PARTIAL note is gone.
-    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 8, 0))
+    # At/above the expat fix: still PARTIAL (NOT mitigated on expat alone), and the note must
+    # surface the pyexpat wrapper requirement (CVE-2026-7210) that purexml can't verify.
+    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 8, 1))
     r2 = purexml.security_report()
-    assert r2.mitigations["hash_flooding_cve_2026_41080"] == purexml.EXPAT_MITIGATED
-    assert "CVE-2026-41080" not in " ".join(r2.notes)
+    assert r2.mitigations["hash_flooding_cve_2026_41080"] == purexml.EXPAT_PARTIAL
+    assert r2.mitigations["hash_flooding_cve_2026_41080"] != purexml.EXPAT_MITIGATED
+    joined2 = " ".join(r2.notes)
+    assert "CVE-2026-7210" in joined2
 
 
 def test_attribute_collision_live_surfaces_max_attributes_lever(monkeypatch):
