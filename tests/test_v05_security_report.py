@@ -15,14 +15,15 @@ from purexml import _expat_security as S
 
 def test_exports_present():
     for name in ("security_report", "SecurityReport",
-                 "BLOCKED", "EXPAT_MITIGATED", "OPT_IN", "LIVE"):
+                 "BLOCKED", "EXPAT_MITIGATED", "EXPAT_PARTIAL", "OPT_IN", "LIVE"):
         assert hasattr(purexml, name), name
 
 
 def test_status_constants_distinct_strings():
-    vals = [purexml.BLOCKED, purexml.EXPAT_MITIGATED, purexml.OPT_IN, purexml.LIVE]
+    vals = [purexml.BLOCKED, purexml.EXPAT_MITIGATED, purexml.EXPAT_PARTIAL,
+            purexml.OPT_IN, purexml.LIVE]
     assert all(isinstance(v, str) for v in vals)
-    assert len(set(vals)) == 4
+    assert len(set(vals)) == 5
 
 
 def test_report_is_frozen_printable_value():
@@ -98,23 +99,24 @@ def test_structural_class_is_opt_in():
 
 # Each expat-layer class gates on its OWN fix version, decoupled from the moving
 # recommended-latest floor (2.8.1): large=2.6.0, memory=2.7.2, content=2.7.4 (v0.6),
-# attr_collision=2.8.1 (v0.6). So a version can report a class mitigated while still
-# sitting below the recommended-latest floor.
+# hash_flooding=2.8.0 (v0.9), attr_collision=2.8.1 (v0.6). So a version can report a
+# class mitigated while still sitting below the recommended-latest floor.
 _M = purexml.EXPAT_MITIGATED
+_P = purexml.EXPAT_PARTIAL
 _L = purexml.LIVE
 
 
-@pytest.mark.parametrize("ver,large,memory,content,attr,safe,rec", [
-    ((2, 5, 0), _L, _L, _L, _L, False, False),  # pre-2.6
-    ((2, 6, 0), _M, _L, _L, _L, True,  False),  # safe floor (large fixed)
-    ((2, 6, 1), _M, _L, _L, _L, True,  False),  # between
-    ((2, 7, 2), _M, _M, _L, _L, True,  False),  # memory fixed
-    ((2, 7, 4), _M, _M, _M, _L, True,  False),  # content fixed (v0.6)
-    ((2, 8, 0), _M, _M, _M, _L, True,  False),  # 41080 fixed but attr still live, < recommended
-    ((2, 8, 1), _M, _M, _M, _M, True,  True),   # attr fixed = recommended-latest
-    ((2, 9, 0), _M, _M, _M, _M, True,  True),   # above
+@pytest.mark.parametrize("ver,large,memory,content,hashf,attr,safe,rec", [
+    ((2, 5, 0), _L, _L, _L, _P, _L, False, False),  # pre-2.6 (hash_flooding PARTIAL, never LIVE)
+    ((2, 6, 0), _M, _L, _L, _P, _L, True,  False),  # safe floor (large fixed)
+    ((2, 6, 1), _M, _L, _L, _P, _L, True,  False),  # between
+    ((2, 7, 2), _M, _M, _L, _P, _L, True,  False),  # memory fixed
+    ((2, 7, 4), _M, _M, _M, _P, _L, True,  False),  # content fixed (v0.6)
+    ((2, 8, 0), _M, _M, _M, _M, _L, True,  False),  # hash_flooding fixed (v0.9), attr still live
+    ((2, 8, 1), _M, _M, _M, _M, _M, True,  True),   # attr fixed = recommended-latest
+    ((2, 9, 0), _M, _M, _M, _M, _M, True,  True),   # above
 ])
-def test_version_gating(monkeypatch, ver, large, memory, content, attr, safe, rec):
+def test_version_gating(monkeypatch, ver, large, memory, content, hashf, attr, safe, rec):
     monkeypatch.setattr(S, "EXPAT_VERSION", ver)
     r = purexml.security_report()
     assert r.expat_version == ver
@@ -123,7 +125,11 @@ def test_version_gating(monkeypatch, ver, large, memory, content, attr, safe, re
     assert r.mitigations["large_tokens_cve_2023_52425"] == large
     assert r.mitigations["disproportionate_memory"] == memory
     assert r.mitigations["content_token_overflow_cve_2026_25210"] == content
+    assert r.mitigations["hash_flooding_cve_2026_41080"] == hashf
     assert r.mitigations["attribute_collision_dos_cve_2026_45186"] == attr
+    # hash_flooding is a HARDENING class — present on every supported expat, so it must
+    # NEVER report LIVE (that would overstate; v0.9 design): PARTIAL below 2.8.0, else MITIGATED.
+    assert r.mitigations["hash_flooding_cve_2026_41080"] != purexml.LIVE
     # purexml's own handlers are version-independent — a regression that
     # accidentally version-gated a BLOCKED class must be caught below the floor too.
     for cls in ("billion_laughs", "quadratic_blowup",
@@ -152,28 +158,38 @@ def test_at_recommended_no_floor_advisory(monkeypatch):
     assert any("opt-in" in n for n in notes)
 
 
-def test_recommended_gap_always_names_unmapped_cve(monkeypatch):
-    # Below recommended-latest, the advisory must ALWAYS surface the unmapped gap
-    # (e.g. CVE-2026-41080) even when some mapped classes are already mitigated —
-    # so a runtime never silently under-reports (PR#10 Codex P2). At 2.7.4 the
-    # content class is fixed but attr-collision is still live AND 41080 is unmapped.
+def test_floor_advisory_no_longer_claims_untracked_gap(monkeypatch):
+    # v0.9: every expat fix REACHABLE through purexml's paths is now individually tracked
+    # (CVE-2026-41080 became the mapped hash_flooding PARTIAL class), so the generic floor
+    # advisory must NOT claim an "untracked"/"not individually tracked" gap — that would be
+    # false. It still fires below recommended-latest and names the LIVE tracked classes.
     monkeypatch.setattr(S, "EXPAT_VERSION", (2, 7, 4))
     r = purexml.security_report()
     assert r.expat_meets_recommended is False
     joined = " ".join(r.notes)
     assert "recommended-latest floor" in joined
-    assert "CVE-2026-41080" in joined
+    assert "not individually tracked" not in joined
+    assert "untracked" not in joined
+    # the still-live tracked class is named so a runtime below the floor never under-reports
+    assert "attribute_collision_dos_cve_2026_45186" in joined
 
-    # At 2.8.0, CVE-2026-41080 IS fixed — so the advisory must NOT cite it as a
-    # potential missing fix (precision; PR#11 Gemini). The floor note still fires
-    # (2.8.0 < recommended 2.8.1) and names the still-live tracked class.
+
+def test_hash_flooding_partial_below_fix_mitigated_at_or_above(monkeypatch):
+    # The v0.9 hardening-not-hole class: PARTIAL below expat 2.8.0 (SipHash present but
+    # weaker salt — NOT live), MITIGATED at/above, never LIVE. The PARTIAL note must cite
+    # CVE-2026-41080 + the salt-entropy nuance below the fix, and vanish at/above it.
+    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 7, 4))
+    r = purexml.security_report()
+    assert r.mitigations["hash_flooding_cve_2026_41080"] == purexml.EXPAT_PARTIAL
+    joined = " ".join(r.notes)
+    assert "CVE-2026-41080" in joined
+    assert "PARTIAL" in joined and "salt" in joined
+
+    # At 2.8.0 the class is fully mitigated — status flips and the PARTIAL note is gone.
     monkeypatch.setattr(S, "EXPAT_VERSION", (2, 8, 0))
     r2 = purexml.security_report()
-    assert r2.expat_meets_recommended is False
-    joined2 = " ".join(r2.notes)
-    assert "recommended-latest floor" in joined2
-    assert "CVE-2026-41080" not in joined2
-    assert "attribute_collision_dos_cve_2026_45186" in joined2  # the real live gap
+    assert r2.mitigations["hash_flooding_cve_2026_41080"] == purexml.EXPAT_MITIGATED
+    assert "CVE-2026-41080" not in " ".join(r2.notes)
 
 
 def test_attribute_collision_live_surfaces_max_attributes_lever(monkeypatch):

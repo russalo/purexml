@@ -21,6 +21,7 @@ from . import ElementTree
 from ._expat_security import (
     BLOCKED,
     EXPAT_MITIGATED,
+    EXPAT_PARTIAL,
     EXPAT_VERSION,
     LIVE,
     OPT_IN,
@@ -46,7 +47,7 @@ from .limits import RECOMMENDED_LIMITS, Limits
 
 XML = fromstring
 
-__version__ = "0.8.1"
+__version__ = "0.9.0"
 
 __all__ = [
     # the ElementTree family (also at purexml.ElementTree)
@@ -82,6 +83,7 @@ __all__ = [
     "SecurityReport",
     "BLOCKED",
     "EXPAT_MITIGATED",
+    "EXPAT_PARTIAL",
     "OPT_IN",
     "LIVE",
     "__version__",
