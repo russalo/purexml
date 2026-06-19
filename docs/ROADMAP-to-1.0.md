@@ -79,13 +79,14 @@ default-off):
   a stranger's issue, download/awareness). FO's two scanner-side validation items
   (adversarial soak + 2nd consumer) feed this but don't bound it. *Equivalence already
   proven; the gap is presentation + reach, not capability.*
-  - **Adversarial soak — ✅ GREEN (bestiary M2, vs 0.7.0, relayed 2026-06-19).** bestiary
-    Claude's XML attack battery (FO's defusedxml→purexml adoption gate, M2): all 7
-    specimens clear — billion-laughs / param-entity-bomb / quadratic-blowup BOUNDED
-    (rejected cleanly, no OOM/hang); xxe / external-param-entity / external-dtd /
-    xinclude-system NO-ESCAPE (`escaped=False`). **Independently grounded here** (own
-    repro matches exactly). Carries to 0.8.1 (parse behavior unchanged since 0.7.0; sweep
-    372/0 each release). Re-soak vs current accepted → bestiary becomes a standing battery.
+  - **Adversarial soak — ✅ GREEN, confirmed vs current 0.8.1 (bestiary M2 + re-soak,
+    2026-06-19).** bestiary Claude's XML attack battery (FO's defusedxml→purexml adoption
+    gate, M2): all 7 specimens clear — billion-laughs / param-entity-bomb /
+    quadratic-blowup BOUNDED (rejected cleanly, no OOM/hang); xxe / external-param-entity /
+    external-dtd / xinclude-system NO-ESCAPE (`escaped=False`). First run vs 0.7.0,
+    **re-soak vs 0.8.1 GREEN** (identical), **independently grounded here** (own repro
+    matches exactly). **bestiary is now purexml's STANDING per-release adversarial battery**
+    — re-run each cycle; any non-survival is a real new finding.
 - **G3 — build the ElementTree family — ✅ COMPLETE (2026-06-16).**
   - **v0.2** ✅ (PR #4) — `parse` + `fromstringlist` + `XML`/`tostring` + `XMLParser`
     + the `forbid_*` knobs.
