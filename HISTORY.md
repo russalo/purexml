@@ -24,6 +24,7 @@ below.
 
 | Version | Schema | Date | Notable | Spec | Compliance |
 |---|---|---|---|---|---|
+| 0.10.0 | n/a | 2026-06-19 (PR #28) | **`purexml.minidom` drop-in + `purexml.common` shim** — first breadth beyond ElementTree, scoped by measured defusedxml usage (minidom = 457 sites, the #2 consumer surface). `parse`/`parseString` return a stdlib `xml.dom.minidom.Document` with defusedxml's `forbid_*` signature + defaults; hardening mirrors defusedxml (subclass stdlib `xml.dom.expatbuilder`, install blocking handlers raising purexml's exceptions). A caller-supplied `parser` → `NotSupportedError` (a foreign parser would bypass hardening — stricter than defusedxml). `purexml.common` aliases `DefusedXmlException = PureXMLError` so `except DefusedXmlException` survives `s/defusedxml/purexml/` across every module. New parse surface → **LOGIC extended** (minidom path); SCHEMA n/a (stdlib `Document`); zero runtime dep intact. Oracle-gated parity (9 ALLOW `toxml`-equal, 6 attacks block on both); no-fetch proven on the DOM external-DTD edge. Full four-leg (security-load-bearing); minidom+common 100% cov. | [v0.10.0_RFC_Specification.md](docs/v0.10.0_RFC_Specification.md) _(approved 2026-06-19)_ | [COMPLIANCE-v0.10.md](docs/COMPLIANCE-v0.10.md) |
 | 0.9.0 | n/a | 2026-06-19 (PR #27) | **Map CVE-2026-41080 (hash-flooding)** — closes the class v0.6 deferred "until grounded". Grounded as insufficient SipHash salt entropy (CWE-331, expat 2.8.0, LOW) reachable via normal name-interning; added to `security_report().mitigations` as `hash_flooding_cve_2026_41080`. Because it's a **hardening** of an existing defense (not a present/absent hole), introduces a 5th status **`EXPAT_PARTIAL`** — **never `LIVE`**, and (refined per PR-bot review, CVE-2026-7210) reported **conservatively PARTIAL on every runtime**: full 16-byte-salt mitigation needs BOTH expat ≥2.8.0 AND CPython's `pyexpat` fix, which purexml can't verify at runtime, so it never claims `MITIGATED` on the expat version alone. Also **retires `_HIGHEST_UNMAPPED_FIX`** + the generic untracked-gap advisory (every *reachable* expat fix is now individually tracked; the two NULL-deref classes purexml doesn't reach stay unmapped). Report-only — no parse-behavior change; LOGIC unchanged (reported, not blocked), SCHEMA n/a. Status vocabulary PROVISIONAL. | [v0.9.0_RFC_Specification.md](docs/v0.9.0_RFC_Specification.md) _(approved 2026-06-19)_ | [COMPLIANCE-v0.9.md](docs/COMPLIANCE-v0.9.md) |
 | 0.8.0 | n/a | 2026-06-18 (PR #21) | **Ship types** — annotate the public surface + a PEP 561 `py.typed` marker so a consumer's type-checker uses purexml's own types instead of `Any`. `mypy`-clean, gated by a CI typecheck job; honest `types: mypy` badge. The verbatim-mirror `_setevents` redefinitions + the structural-stdlib-drop-in friction are resolved with documented `# type: ignore`s (mirror preserved). No runtime/parse change — but `py.typed` is a new consumer-facing guarantee. SCHEMA n/a; LOGIC unchanged. | [v0.8.0_RFC_Specification.md](docs/v0.8.0_RFC_Specification.md) _(approved 2026-06-18)_ | [COMPLIANCE-v0.8.md](docs/COMPLIANCE-v0.8.md) |
 | 0.8.1 | n/a | 2026-06-18 | **Patch** — tighten mypy to `--strict` (no behavior/API change): annotated all internal `_parser.py` methods, resolved the `Any` leaks (`cast` on the pluggable-target `close()`), and kept the verbatim `_setevents` mirror byte-for-byte via documented `# type: ignore[misc, no-untyped-def]`. The dynamically-used expat handle + pluggable target are typed `Any` (honest). CI `mypy` job now runs strict. Rigor within the approved v0.8 typed design. SCHEMA n/a; LOGIC unchanged. _(HISTORY only, no RFC — part of v0.8.)_ | _(no RFC — patch)_ | _(part of v0.8)_ |
@@ -49,21 +50,25 @@ List any RFCs currently in draft (`docs/v{X.Y.Z}_RFC_DRAFT.md`). When none are
 open, state so explicitly rather than deleting the section — the empty-but-named
 state is the signal:
 
-> No drafts in flight. **v0.9.0 shipped** 2026-06-19 (PR #27) — current; it mapped the last
-> reachable expat DoS class (CVE-2026-41080), closing the gap v0.6 deferred. The
-> **publish-worthy-debut** push continues (the new 1.0 frame: ecosystem debut, not a
-> single consumer — see [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md)). Remaining to
-> 1.0: G1 file-observer adoption + the bestiary adversarial-soak (✅ green, standing) as
-> the validation track, G5 packaging/license/name (Russell's strategic-timing call), G6
-> freeze. Next-minor candidates (optional; feature-complete): iterparse early-break cleanup,
-> or converge to freeze.
+> No drafts in flight. **v0.10.0 shipped** 2026-06-19 (PR #28) — current; first breadth
+> beyond ElementTree (`purexml.minidom` + `purexml.common`). **Scope reframed 2026-06-19
+> (Russell):** an ElementTree-only surface is the slice *one* adopter (file-observer) needs —
+> not a publishable 1.0. The earned 1.0 = **the maintained, zero-dep successor that replaces
+> defusedxml across the surface the ecosystem actually imports**, grounded by a usage
+> measurement (`scratch/research/2026-06-19_defusedxml-usage-measurement.md`): ElementTree ✅,
+> **minidom ✅ (v0.10)**, **sax next** (375 sites), xmlrpc TBD (distinct monkeypatch shape),
+> pulldom/expatreader deferred (measured-negligible), **lxml excluded** (third-party dep →
+> breaks zero-dep). Then a 1.0 freeze over a surface that genuinely replaces defusedxml. Other
+> gates: G1 file-observer adoption + bestiary soak (✅ green, standing); G5 packaging/license/
+> name (Russell's call); G6 freeze. **Next: the `sax` breadth minor.**
 >
 > (Shipped: v0.1.0 fromstring (PR #1); v0.1.1 floor→3.10 (PR #2); v0.1.2 durability +
 > expat awareness (PR #3); v0.2.0 non-streaming ElementTree surface + forbid_* knobs
 > (PR #4); v0.3.0 iterparse — family complete (PR #5); v0.4.0 opt-in structural-DoS
 > caps (PR #7); v0.5.0 trust surface (PR #8); v0.5.1 soak + expat-floor currency (PR #10);
 > v0.6.0 posture-map completion (PR #11); v0.7.0 posture CLI (PR #15); v0.8.0 typed +
-> py.typed (PR #21); v0.8.1 mypy --strict (PR #22); v0.9.0 map CVE-2026-41080 (PR #27).
+> py.typed (PR #21); v0.8.1 mypy --strict (PR #22); v0.9.0 map CVE-2026-41080 (PR #27);
+> v0.10.0 minidom + common (PR #28).
 > Plus tooling/quality: lint+coverage gates (PR #19); typed surface in flight (v0.8).)
 
 ---

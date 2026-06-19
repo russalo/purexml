@@ -144,8 +144,13 @@ directly. As of **v0.3 the consumer surface is the full `defusedxml.ElementTree`
 family** — `fromstring`, `parse`, `iterparse`, `fromstringlist`, `XML`,
 `XMLParser`, `tostring`, the `forbid_*` knobs — under a canonical
 `purexml.ElementTree` namespace, so migration is a literal `s/defusedxml/purexml/`.
-The anchor consumer is **file-observer** (it uses only `fromstring`), but the 1.0
-identity is the *complete* ElementTree drop-in (see Known decisions). This is a
+**As of v0.10 the surface is broadening beyond ElementTree** — `purexml.minidom` (the #2
+real consumer surface) ships, with `purexml.common` for catch-site compat. The anchor
+consumer is **file-observer** (it uses only `fromstring`), but the **1.0 identity reframed
+2026-06-19**: not the ElementTree slice one adopter needs, but *the maintained, zero-dep
+successor that replaces defusedxml across the surface the ecosystem actually imports*
+(measured: ElementTree ✅, minidom ✅, **sax next**, xmlrpc TBD, lxml excluded on zero-dep
+identity — see Known/Excluded decisions + `docs/ROADMAP-to-1.0.md`). This is a
 *security control*, not a format reader — owning it means owning the audit burden,
 which is why the adversarial review leg carries extra weight here. Capability
 north star: [`docs/FO_REQUIRED_COMPATIBILITY.md`](docs/FO_REQUIRED_COMPATIBILITY.md); the
@@ -341,6 +346,15 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.10.0** *(shipped 2026-06-19, PR #28)* — **`purexml.minidom` drop-in + `purexml.common`
+  shim**: first breadth beyond ElementTree, scoped by measured defusedxml usage (minidom = 457
+  sites, #2 surface). `parse`/`parseString` → stdlib `xml.dom.minidom.Document`, defusedxml's
+  `forbid_*` signature + defaults; hardening mirrors defusedxml (subclass `xml.dom.expatbuilder`,
+  install blocking handlers raising purexml's exceptions). Custom `parser=` → `NotSupportedError`
+  (stricter than defusedxml). `purexml.common` aliases `DefusedXmlException = PureXMLError` for
+  catch-site migration. New parse surface → LOGIC extended; SCHEMA n/a; zero-dep intact.
+  Full four-leg (security-load-bearing; legs 1–3 clean, Gemini APPROVED); minidom+common 100% cov.
+  [RFC](docs/v0.10.0_RFC_Specification.md) · [compliance](docs/COMPLIANCE-v0.10.md).
 - **v0.9.0** *(shipped 2026-06-19, PR #27)* — **map CVE-2026-41080 (hash-flooding)**:
   closes the class v0.6 deferred "until grounded". Grounded as insufficient SipHash salt
   entropy (CWE-331, expat 2.8.0, LOW) reachable via normal name-interning; added to
@@ -471,6 +485,17 @@ Small by design (~300 lines of `src/`). The whole engine is one class.
   mirroring `defusedxml.ElementTree` (the `s/defusedxml/purexml/` surface):
   re-exports the family + `XML`/`XMLParse`/`XMLTreeBuilder` aliases + stdlib
   `ParseError`/`tostring`.
+- **`src/purexml/minidom.py`** — `purexml.minidom`, the hardened drop-in for
+  `defusedxml.minidom` (v0.10). `parse`/`parseString` → stdlib `xml.dom.minidom.Document`.
+  Hardening mirrors defusedxml: a `_DefusedExpatBuilder` / `_DefusedExpatBuilderNS` subclass of
+  stdlib `xml.dom.expatbuilder.ExpatBuilder`/`Namespaces` whose `install()` adds the SAME
+  blocking handlers as `_parser.py` (arg-mapped to purexml's exception signatures). A
+  caller-supplied `parser=` raises `NotSupportedError` (a foreign parser would bypass hardening —
+  stricter than defusedxml's parser-patching); `bufsize=` accepted for compat, result identical.
+- **`src/purexml/common.py`** — `purexml.common`, the exception-compat shim (v0.10): re-exports
+  the block exceptions + `NotSupportedError` and aliases `DefusedXmlException = PureXMLError`, so
+  `except DefusedXmlException` survives `s/defusedxml/purexml/` across every module. Compat layer
+  only — the top-level `purexml` namespace stays purexml-native.
 - **`src/purexml/__init__.py`** — top-level convenience re-exports of the family +
   exceptions + the expat-version API + `__version__`; imports the `ElementTree` submodule.
 - **`src/purexml/__main__.py`** — the `python -m purexml` posture CLI (v0.7): prints
@@ -558,13 +583,19 @@ blame`.
   (C1+C2) ships in one slice because value is only realized when "same parses
   succeed" and "same attacks blocked" hold *together* (RFC §1). Small surface,
   load-bearing correctness.
-- **1.0 identity = complete drop-in for `defusedxml.ElementTree`** (ratified
-  2026-06-16, grounded by `/deep-research` — see `scratch/research/2026-06-16_1.0-scope-research.md`
-  and `docs/ROADMAP-to-1.0.md`). Scope = the ElementTree family (`fromstring`,
-  `parse`, `iterparse`, `fromstringlist`, `XMLParser`, `XML`/`tostring`,
-  `ParseError`); minidom/sax/pulldom/xmlrpc/lxml **deferred, not excluded**.
-  purexml's value beyond a 1:1 mirror: it *tracks current CPython/libexpat
-  mitigations* defusedxml (frozen 2021, abandoned) never got.
+- **1.0 identity — REFRAMED 2026-06-19: the maintained zero-dep successor across the surface
+  the ecosystem actually imports, NOT the ElementTree slice one adopter needs** (ratified by
+  Russell, grounded by the usage measurement `scratch/research/2026-06-19_defusedxml-usage-measurement.md`).
+  Supersedes the 2026-06-16 "complete drop-in for `defusedxml.ElementTree`" call (kept as a
+  tombstone: ElementTree was the right *first* axis, not the whole 1.0). The forcing function:
+  ElementTree-only gives a stranger no reason to adopt unless they use exactly that slice —
+  "you'll never get more if you stop there." **Earned 1.0 scope:** ElementTree ✅ (v0.1–v0.3),
+  **minidom ✅ (v0.10, 457 sites)**, **sax (375 sites) — next breadth minor**, xmlrpc (343,
+  distinct monkeypatch shape) TBD as its own slice; pulldom/expatreader **deferred**
+  (measured-negligible); **lxml excluded** on zero-dep identity (Excluded ledger). Two axes make
+  the 1.0: **breadth** (cover what the ecosystem imports → a stranger *can* adopt) + **depth**
+  (the maintained libexpat/pyexpat tracking + posture report → *why* purexml beats staying on
+  abandoned defusedxml). Don't regress to "ElementTree is enough."
 - **`forbid_*` knobs are IN scope** (re-opened 2026-06-16; was Excluded for
   v0.1.0). A true drop-in must accept defusedxml's parameterized signature
   (`forbid_dtd`/`forbid_entities`/`forbid_external`, identical defaults). They
@@ -679,6 +710,16 @@ Russell."
 - **Publishing to PyPI / claiming the `purexml` name** — explicitly held until
   the adoption model (vendor vs first-party dep) is decided. Free-name status is
   recorded, not acted on. (Cross-reference: Known decisions, last bullet.)
+- **`defusedxml.lxml` coverage** — **excluded on zero-dep identity** (ratified 2026-06-19).
+  `defusedxml.lxml` wraps the third-party `lxml` library; covering it would require depending on
+  `lxml`, breaking purexml's stdlib-only, zero-runtime-dependency contract (and it's deprecated
+  upstream). The usage measurement found **390 import sites** — so this is a *principled*
+  exclusion, not a demand-based one. Do not "add the popular one" without re-opening: the only
+  way in would be an optional non-stdlib extra, which is a different product. See
+  `scratch/research/2026-06-19_defusedxml-usage-measurement.md`.
+- **`pulldom` / `expatreader` as consumer-facing modules** — deferred (measured-negligible:
+  48 / 14 sites). `expatbuilder` is used *internally* as the minidom engine but not exposed.
+  Not excluded — add if demand appears.
 
 ## Test fixtures
 

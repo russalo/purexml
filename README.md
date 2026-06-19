@@ -6,9 +6,10 @@ purexml is a pure-Python, zero-runtime-dependency replacement for `defusedxml`:
 it returns the same parse results the stdlib parser would (standard `xml.etree`
 objects) while blocking the known XML attack classes — entity-expansion bombs,
 external-entity resolution (XXE), and external DTD retrieval — exactly as
-`defusedxml` does. As of v0.3 it mirrors **`defusedxml.ElementTree`'s full
-surface** (`fromstring`, `parse`, `iterparse`, `fromstringlist`, `XML`,
-`XMLParser`, `tostring`, the `forbid_*` knobs), so migrating off `defusedxml` is a
+`defusedxml` does. It mirrors **`defusedxml.ElementTree`'s full surface**
+(`fromstring`, `parse`, `iterparse`, `fromstringlist`, `XML`, `XMLParser`,
+`tostring`, the `forbid_*` knobs) and, **as of v0.10, `defusedxml.minidom`**
+(`parse`/`parseString`) + `defusedxml.common`, so migrating off `defusedxml` is a
 literal `s/defusedxml/purexml/`. It is a security control, not a format reader;
 correctness is validated oracle-gated against `defusedxml`.
 
@@ -20,12 +21,14 @@ promise is never violated; you get a clean mirror until you ask for more.
 
 ## Status
 
-**Working — current v0.8.0 (2026-06-18); complete `defusedxml.ElementTree`
-drop-in** (the family completed at v0.3.0). Since then, opt-in mirror-plus:
-v0.4 structural-DoS caps (`Limits`, default-off) and the **trust surface**
-(`security_report()` + shipped audit evidence, v0.5; posture map extended with the
-newer expat DoS classes in v0.6; the `python -m purexml` posture CLI in v0.7; a typed
-public surface + `py.typed` in v0.8). All ElementTree parse entry points
+**Working — current v0.10.0 (2026-06-19); complete `defusedxml.ElementTree`
+drop-in** (the family completed at v0.3.0) **plus `defusedxml.minidom` + `.common`
+(v0.10)** — the first breadth beyond ElementTree, scoped by measured real-world usage
+(`sax` is next). Opt-in mirror-plus along the way: v0.4 structural-DoS caps (`Limits`,
+default-off) and the **trust surface** (`security_report()` + shipped audit evidence, v0.5;
+posture map extended with the newer expat DoS classes in v0.6 and CVE-2026-41080 in v0.9;
+the `python -m purexml` posture CLI in v0.7; a typed public surface + `py.typed` in v0.8).
+All ElementTree parse entry points
 are implemented, stdlib-only, and validated against `defusedxml` as an oracle (C14N
 same-parse + event-stream equivalence over a real corpus, an adversarial attack
 battery, seeded differential fuzz, and a 3.10–3.13 CI matrix — see
