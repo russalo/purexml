@@ -3,7 +3,7 @@
 > **Status: ratified 2026-06-16** (by Russell). Grounded by `/deep-research` run
 > wf_5ea8ed7c-044 (findings: `scratch/research/2026-06-16_1.0-scope-research.md`,
 > 25/25 claims confirmed vs primary sources). This is the living plan from the
-> shipped v0.8.1 to the 1.0 contract freeze.
+> shipped v0.9.0 to the 1.0 contract freeze.
 
 ## What 1.0 means
 Per the russalo version philosophy, **1.0 = a governance declaration on a
@@ -44,12 +44,13 @@ default-off):
   XXE *and* billion-laughs). (v0.2.)
 - **Opt-in structural-DoS caps** (`Limits` — `max_depth`/`max_attributes`/`max_bytes`;
   v0.4) — bound the pathological-but-legal inputs neither defusedxml nor the expat cap cover.
-- **Trust surface** (`security_report()`; v0.5, posture map completed v0.6) — a read-only
-  report mapping each attack class to where it's handled on the runtime, with per-class
-  libexpat fix-version gating (incl. the 2026 DoS classes). The maintained-successor
-  promise made legible: the living library tells you your posture, and **demonstrably
-  tracks the moving target** (v0.5.1 + v0.6 folded the 2026 libexpat 2.7.4–2.8.1 train in
-  within days); the frozen incumbent couldn't.
+- **Trust surface** (`security_report()`; v0.5, posture map completed v0.6, **all reachable
+  classes mapped v0.9**) — a read-only report mapping each attack class to where it's handled
+  on the runtime, with per-class libexpat fix-version gating (incl. the 2026 DoS classes). The
+  maintained-successor promise made legible: the living library tells you your posture, and
+  **demonstrably tracks the moving target** (v0.5.1 + v0.6 folded the 2026 libexpat 2.7.4–2.8.1
+  train in within days; v0.9 grounded + mapped the last reachable class, CVE-2026-41080, with a
+  non-overstating `EXPAT_PARTIAL` status); the frozen incumbent couldn't.
 
 > **Reframe (2026-06-17) — the gate is the ecosystem debut, not one consumer.**
 > Stress-tested by removing file-observer entirely: purexml's reason to exist
