@@ -84,6 +84,31 @@ def test_forbid_dtd_raises_dtdforbidden():
         PM.parseString(doc_with_dtd, forbid_dtd=True)
 
 
+def test_no_reference_cycle_on_minidom_error():
+    # PR#28 Codex: a malformed/blocked DOM payload must not leave a builder<->parser cycle
+    # for cyclic GC — the builder must be reclaimable by refcounting alone, matching the
+    # ElementTree path's guarantee. (The stdlib ExpatBuilder only clears _parser on success.)
+    import gc
+    import weakref
+
+    from purexml.minidom import _DefusedExpatBuilderNS
+
+    gc.disable()
+    try:
+        for payload in ("<r>",  # malformed
+                        '<?xml version="1.0"?><!DOCTYPE r [ <!ENTITY x "v"> ]><r>&x;</r>'):  # blocked
+            b = _DefusedExpatBuilderNS()
+            ref = weakref.ref(b)
+            try:
+                b.parseString(payload)
+            except Exception:  # noqa: BLE001
+                pass
+            del b
+            assert ref() is None, "builder<->parser cycle survived refcounting on error path"
+    finally:
+        gc.enable()
+
+
 def test_custom_parser_not_supported():
     # A caller-supplied parser would bypass hardening — refused, not honored.
     with pytest.raises(purexml.NotSupportedError):
@@ -110,6 +135,22 @@ def test_common_shim_is_drop_in_for_catch_sites():
 
 
 # -- oracle-gated parity (the equivalence guarantee) --------------------------------
+
+@requires_oracle
+def test_path_object_matches_oracle_rejection(tmp_path):
+    # Deliberate parity (PR#28 Gemini — declined with grounding): stdlib xml.dom.minidom.parse
+    # AND defusedxml.minidom.parse both REJECT a pathlib.Path (str-only file handling); purexml
+    # matches them. Accepting a Path would over-support beyond the oracle and DIVERGE from the
+    # strict-mirror contract. This pins the parity so a future "fix" can't silently regress it.
+    import defusedxml.minidom as DM
+
+    p = tmp_path / "d.xml"
+    p.write_text("<r/>")
+    with pytest.raises(Exception) as oracle_exc:  # noqa: BLE001, PT011
+        DM.parse(p)
+    with pytest.raises(type(oracle_exc.value)):
+        PM.parse(p)
+
 
 @requires_oracle
 @pytest.mark.parametrize("name", list(ALLOW_CASES))

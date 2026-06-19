@@ -77,6 +77,23 @@ class _DefusedExpatBuilder(_ExpatBuilder):
         if self.forbid_external:
             parser.ExternalEntityRefHandler = self._forbid_external_ref
 
+    # The stdlib ExpatBuilder clears `self._parser` only on the SUCCESS path; a malformed
+    # (or blocked) payload raises first, leaving the builder<->parser handler cycle to wait
+    # for cyclic GC. Clear it on EVERY path so the builder is reclaimable by refcounting
+    # alone — the same guarantee the ElementTree path makes (test_no_reference_cycle_after_parse;
+    # PR#28 Codex). No parse-result change: the returned Document / raised exception is identical.
+    def parseString(self, string: Any) -> Document:
+        try:
+            return super().parseString(string)
+        finally:
+            self._parser = None
+
+    def parseFile(self, file: Any) -> Document:
+        try:
+            return super().parseFile(file)
+        finally:
+            self._parser = None
+
 
 class _DefusedExpatBuilderNS(_Namespaces, _DefusedExpatBuilder):
     """Namespace-aware variant — mirror of ``defusedxml``'s ``DefusedExpatBuilderNS``."""
