@@ -341,6 +341,20 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.9.0** *(shipped 2026-06-19, PR #27)* — **map CVE-2026-41080 (hash-flooding)**:
+  closes the class v0.6 deferred "until grounded". Grounded as insufficient SipHash salt
+  entropy (CWE-331, expat 2.8.0, LOW) reachable via normal name-interning; added to
+  `security_report().mitigations` as `hash_flooding_cve_2026_41080`. Because it's a
+  *hardening* of an existing defense (not a present/absent hole), introduces a 5th status
+  **`EXPAT_PARTIAL`** — **never `LIVE`**, and (refined per PR#27 Codex, CVE-2026-7210)
+  reported **conservatively PARTIAL on every runtime**: full 16-byte-salt mitigation needs
+  BOTH expat ≥2.8.0 AND CPython's `pyexpat` fix (which purexml can't verify at runtime), so
+  it never claims `MITIGATED` on the expat version alone. Also **retires
+  `_HIGHEST_UNMAPPED_FIX`** + the generic untracked-gap advisory — every *reachable* expat
+  fix is now individually tracked. Report-only; no parse-behavior change; SCHEMA n/a; LOGIC
+  unchanged (reported, not blocked); status vocabulary PROVISIONAL. Four-leg review (legs
+  1–3 clean; report-only tier). [RFC](docs/v0.9.0_RFC_Specification.md) ·
+  [compliance](docs/COMPLIANCE-v0.9.md).
 - **v0.8.0** *(shipped 2026-06-18, PR #21)* — **ship types**: annotate the
   public surface + a PEP 561 `py.typed` marker (consumers' type-checkers use purexml's
   types, not `Any`); `mypy`-clean gated by a CI typecheck job; `types: mypy` badge. The
@@ -473,8 +487,12 @@ Small by design (~300 lines of `src/`). The whole engine is one class.
   `RECOMMENDED_EXPAT_VERSION`, **latest-stable**, bumped as libexpat ships fixes) **+
   the `security_report()` posture API** (v0.5): a read-only, immutable `SecurityReport`
   whose `mitigations` map gates each attack class on its OWN expat fix version
-  (`_DISPROPORTIONATE_MEMORY_FIXED`/`_CONTENT_TOKEN_OVERFLOW_FIXED`/`_ATTRIBUTE_COLLISION_FIXED`),
-  decoupled from the moving recommended-latest floor.
+  (`_DISPROPORTIONATE_MEMORY_FIXED`/`_CONTENT_TOKEN_OVERFLOW_FIXED`/`_HASH_FLOODING_FIXED`/`_ATTRIBUTE_COLLISION_FIXED`),
+  decoupled from the moving recommended-latest floor. Status vocabulary is `BLOCKED`/
+  `EXPAT_MITIGATED`/`EXPAT_PARTIAL`/`OPT_IN`/`LIVE` — `EXPAT_PARTIAL` (v0.9) is for a
+  *hardening-not-hole* class (CVE-2026-41080: defense present, the fix strengthens it), so it
+  is **never `LIVE`**. As of v0.9 every *reachable* expat fix is individually mapped, so there
+  is no generic untracked-gap advisory (`_HIGHEST_UNMAPPED_FIX` retired).
 - **`tests/`** — the falsify-first battery: `test_equivalence` / `test_v02_surface`
   / `test_v03_iterparse` (C14N same-parse + event-stream + knob-matrix equivalence
   vs the oracle), `test_attacks` + `test_fuzz_equivalence` + `test_hardening_soak` +
@@ -589,10 +607,21 @@ blame`.
   ships months apart, and the harness's recurring scheduler auto-expires in 7 days, so a
   cron would be theater here. On drift, follow the printed checklist and **surface to
   Russell — never auto-PR/merge.** Currency is now a gate, not a thing remembered.
-- **CVE-2026-41080 deliberately UNMAPPED** (v0.6) — its cause/reachability vs purexml's
-  paths isn't grounded, so it is NOT a named map class; the generic floor advisory cites
-  it only when the runtime is below its 2.8.0 fix (`_HIGHEST_UNMAPPED_FIX`). Don't add it
-  to the map without grounding it first (grounding rule).
+- **CVE-2026-41080 GROUNDED + MAPPED** (v0.9, 2026-06-19 — reverses the v0.6 "deliberately
+  UNMAPPED" decision, which is kept here as a tombstone). It was unmapped in v0.6 *pending
+  grounding* (the grounding rule). Grounding (`scratch/review/v0.9.0_grounding_cve_2026_41080.md`)
+  confirmed it is **insufficient SipHash salt entropy** (CWE-331, expat 2.8.0, LOW) and **is
+  reachable** via normal name-interning — so it became the named class `hash_flooding_cve_2026_41080`,
+  gated on `_HASH_FLOODING_FIXED=(2,8,0)`. Because it's a *hardening* of an existing defense
+  (SipHash present below the fix, salt merely weaker), it uses the new **`EXPAT_PARTIAL`** status,
+  **never `LIVE`** (bare `LIVE` would overstate). `_HIGHEST_UNMAPPED_FIX` + the generic untracked-gap
+  advisory were retired (every reachable fix is now mapped). The grounding rule held: ground first,
+  *then* map — and grounding determined HOW to map (PARTIAL, not LIVE). **Two-layer refinement (PR#27
+  Codex, grounded vs CVE-2026-7210 / gh-149018):** full 16-byte-salt mitigation needs BOTH expat
+  ≥2.8.0 AND CPython's `pyexpat` calling `XML_SetHashSalt16Bytes` (`pyexpat` sets the salt itself and
+  passed only 4–8 bytes until patched). purexml can't verify the wrapper at runtime, so
+  `hash_flooding` is reported **PARTIAL on every runtime** — never a version-only `MITIGATED`
+  (false-green). Don't "simplify" it back to an expat-version gate.
 - **The 1.0 gate is the publish-worthy ECOSYSTEM DEBUT, not one consumer** (reframed
   2026-06-17). Stress-tested by assuming file-observer gone entirely: purexml's reason to
   exist *survives the loss of any single consumer* — it's the maintained, zero-dep successor

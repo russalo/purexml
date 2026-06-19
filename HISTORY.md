@@ -24,6 +24,7 @@ below.
 
 | Version | Schema | Date | Notable | Spec | Compliance |
 |---|---|---|---|---|---|
+| 0.9.0 | n/a | 2026-06-19 (PR #27) | **Map CVE-2026-41080 (hash-flooding)** — closes the class v0.6 deferred "until grounded". Grounded as insufficient SipHash salt entropy (CWE-331, expat 2.8.0, LOW) reachable via normal name-interning; added to `security_report().mitigations` as `hash_flooding_cve_2026_41080`. Because it's a **hardening** of an existing defense (not a present/absent hole), introduces a 5th status **`EXPAT_PARTIAL`** — **never `LIVE`**, and (refined per PR-bot review, CVE-2026-7210) reported **conservatively PARTIAL on every runtime**: full 16-byte-salt mitigation needs BOTH expat ≥2.8.0 AND CPython's `pyexpat` fix, which purexml can't verify at runtime, so it never claims `MITIGATED` on the expat version alone. Also **retires `_HIGHEST_UNMAPPED_FIX`** + the generic untracked-gap advisory (every *reachable* expat fix is now individually tracked; the two NULL-deref classes purexml doesn't reach stay unmapped). Report-only — no parse-behavior change; LOGIC unchanged (reported, not blocked), SCHEMA n/a. Status vocabulary PROVISIONAL. | [v0.9.0_RFC_Specification.md](docs/v0.9.0_RFC_Specification.md) _(approved 2026-06-19)_ | [COMPLIANCE-v0.9.md](docs/COMPLIANCE-v0.9.md) |
 | 0.8.0 | n/a | 2026-06-18 (PR #21) | **Ship types** — annotate the public surface + a PEP 561 `py.typed` marker so a consumer's type-checker uses purexml's own types instead of `Any`. `mypy`-clean, gated by a CI typecheck job; honest `types: mypy` badge. The verbatim-mirror `_setevents` redefinitions + the structural-stdlib-drop-in friction are resolved with documented `# type: ignore`s (mirror preserved). No runtime/parse change — but `py.typed` is a new consumer-facing guarantee. SCHEMA n/a; LOGIC unchanged. | [v0.8.0_RFC_Specification.md](docs/v0.8.0_RFC_Specification.md) _(approved 2026-06-18)_ | [COMPLIANCE-v0.8.md](docs/COMPLIANCE-v0.8.md) |
 | 0.8.1 | n/a | 2026-06-18 | **Patch** — tighten mypy to `--strict` (no behavior/API change): annotated all internal `_parser.py` methods, resolved the `Any` leaks (`cast` on the pluggable-target `close()`), and kept the verbatim `_setevents` mirror byte-for-byte via documented `# type: ignore[misc, no-untyped-def]`. The dynamically-used expat handle + pluggable target are typed `Any` (honest). CI `mypy` job now runs strict. Rigor within the approved v0.8 typed design. SCHEMA n/a; LOGIC unchanged. _(HISTORY only, no RFC — part of v0.8.)_ | _(no RFC — patch)_ | _(part of v0.8)_ |
 | 0.7.0 | n/a | 2026-06-17 (PR #15) | **Posture CLI** — `python -m purexml` over `security_report()`: default human report (informs, exit 0), `--json` (machine-readable, PROVISIONAL, for provenance), `--check [--min-expat X.Y.Z]` (opt-in CI gate, exit code; pin-your-floor), `--version`; plus `SecurityReport.as_dict()`. First build of the publish-worthy-debut push (the 10-second demo a cold evaluator runs). `__main__.py` is the one I/O boundary (no-I/O guard carve-out: CLI-output stdlib only, still under FORBIDDEN). Report-only — no parse-behavior change; LOGIC unchanged, SCHEMA n/a. | [v0.7.0_RFC_Specification.md](docs/v0.7.0_RFC_Specification.md) _(approved 2026-06-17)_ | [COMPLIANCE-v0.7.md](docs/COMPLIANCE-v0.7.md) |
@@ -48,20 +49,21 @@ List any RFCs currently in draft (`docs/v{X.Y.Z}_RFC_DRAFT.md`). When none are
 open, state so explicitly rather than deleting the section — the empty-but-named
 state is the signal:
 
-> No drafts in flight. **v0.8.1 shipped** 2026-06-18 (PR #22) — current. The
+> No drafts in flight. **v0.9.0 shipped** 2026-06-19 (PR #27) — current; it mapped the last
+> reachable expat DoS class (CVE-2026-41080), closing the gap v0.6 deferred. The
 > **publish-worthy-debut** push continues (the new 1.0 frame: ecosystem debut, not a
 > single consumer — see [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md)). Remaining to
 > 1.0: G1 file-observer adoption + the bestiary adversarial-soak (✅ green, standing) as
 > the validation track, G5 packaging/license/name (Russell's strategic-timing call), G6
-> freeze. Next-minor candidates (optional; feature-complete): ground+map CVE-2026-41080,
-> iterparse early-break cleanup, or converge to freeze.
+> freeze. Next-minor candidates (optional; feature-complete): iterparse early-break cleanup,
+> or converge to freeze.
 >
 > (Shipped: v0.1.0 fromstring (PR #1); v0.1.1 floor→3.10 (PR #2); v0.1.2 durability +
 > expat awareness (PR #3); v0.2.0 non-streaming ElementTree surface + forbid_* knobs
 > (PR #4); v0.3.0 iterparse — family complete (PR #5); v0.4.0 opt-in structural-DoS
 > caps (PR #7); v0.5.0 trust surface (PR #8); v0.5.1 soak + expat-floor currency (PR #10);
 > v0.6.0 posture-map completion (PR #11); v0.7.0 posture CLI (PR #15); v0.8.0 typed +
-> py.typed (PR #21); v0.8.1 mypy --strict (PR #22).
+> py.typed (PR #21); v0.8.1 mypy --strict (PR #22); v0.9.0 map CVE-2026-41080 (PR #27).
 > Plus tooling/quality: lint+coverage gates (PR #19); typed surface in flight (v0.8).)
 
 ---

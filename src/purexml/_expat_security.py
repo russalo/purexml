@@ -32,6 +32,7 @@ __all__ = [
     "SecurityReport",
     "BLOCKED",
     "EXPAT_MITIGATED",
+    "EXPAT_PARTIAL",
     "OPT_IN",
     "LIVE",
 ]
@@ -62,16 +63,19 @@ RECOMMENDED_EXPAT_VERSION = (2, 8, 1)
 
 #: Per-class fix versions — each attack class in the mitigation map gates on the
 #: expat release that fixed IT, NOT the moving recommended-latest floor, so the map
-#: stays accurate as RECOMMENDED advances. (See v0.6.0 RFC.)
+#: stays accurate as RECOMMENDED advances. (See v0.6.0 / v0.9.0 RFCs.)
 _DISPROPORTIONATE_MEMORY_FIXED = (2, 7, 2)
 _CONTENT_TOKEN_OVERFLOW_FIXED = (2, 7, 4)   # CVE-2026-25210 (doContent integer overflow)
+_HASH_FLOODING_FIXED = (2, 8, 0)            # CVE-2026-41080 (SipHash salt entropy; hardening)
 _ATTRIBUTE_COLLISION_FIXED = (2, 8, 1)      # CVE-2026-45186 (quadratic attr-name checks)
 
-#: Highest expat fix NOT individually mapped above (CVE-2026-41080, fixed 2.8.0,
-#: ungrounded against purexml's paths). The generic floor advisory only claims an
-#: untracked gap when the runtime is actually below this — at/above it, every gap to
-#: the recommended-latest floor is a class tracked in the map.
-_HIGHEST_UNMAPPED_FIX = (2, 8, 0)
+# As of v0.9.0 every expat fix REACHABLE through purexml's parse paths is individually
+# tracked in the mitigation map below, so there is no generic "untracked-gap" advisory
+# (the old `_HIGHEST_UNMAPPED_FIX` was retired when CVE-2026-41080 was grounded + mapped).
+# The only unmapped expat fixes are the two NULL-deref classes purexml does NOT reach
+# (CVE-2026-24515 @ 2.7.4, unused unknown-encoding handler; CVE-2026-32776 @ 2.7.5,
+# blocked external-param-entity path). If a future *reachable* expat fix lands, add a
+# per-class constant here and a map entry below (the v0.6 / v0.9 pattern).
 
 
 def _as_version_tuple(v: str | Sequence[int]) -> tuple[int, ...]:
@@ -129,6 +133,13 @@ BLOCKED = "blocked-by-purexml"
 #: adopter knows the protection rides on the expat version.
 EXPAT_MITIGATED = "mitigated-by-libexpat"
 
+#: PARTIALLY mitigated by the libexpat layer: the defense for this class is PRESENT on
+#: this runtime, but a later expat release HARDENS it (e.g. a stronger hash-flood salt).
+#: Distinct from `EXPAT_MITIGATED` (fully hardened) and `LIVE` (no mitigation at all) —
+#: used for a *hardening-not-hole* class where bare `LIVE` would overstate exposure and
+#: bare `EXPAT_MITIGATED` would understate it. (v0.9: CVE-2026-41080 hash-salt entropy.)
+EXPAT_PARTIAL = "partial-by-libexpat (defense present; upgrade hardens it)"
+
 #: Covered only if the caller opts in (passes a ``Limits`` to the parse entry
 #: point). Default-off — the strict defusedxml mirror does not bound this.
 OPT_IN = "opt-in (pass Limits)"
@@ -160,7 +171,7 @@ class SecurityReport(namedtuple("SecurityReport", [
     - ``expat_meets_recommended`` — bool vs `RECOMMENDED_EXPAT_VERSION` (2.8.1).
     - ``recommended_limits`` — the `RECOMMENDED_LIMITS` preset (opt-in caps).
     - ``mitigations`` — a mapping ``{attack_class: status}`` where status is one
-      of `BLOCKED` / `EXPAT_MITIGATED` / `OPT_IN` / `LIVE`.
+      of `BLOCKED` / `EXPAT_MITIGATED` / `EXPAT_PARTIAL` / `OPT_IN` / `LIVE`.
     - ``notes`` — a tuple of human-readable advisory strings (empty when the
       runtime is fully covered).
 
@@ -286,6 +297,15 @@ def security_report() -> SecurityReport:
         # Opt-in max_attributes also bounds the count this is quadratic in (see notes).
         "attribute_collision_dos_cve_2026_45186":
             EXPAT_MITIGATED if EXPAT_VERSION >= _ATTRIBUTE_COLLISION_FIXED else LIVE,
+        # hash flooding via weak SipHash salt entropy — NEVER LIVE (hash-flood protection is
+        # present on every supported expat). But FULL 16-byte-salt hardening needs BOTH layers:
+        # expat >=2.8.0 (CVE-2026-41080 — adds XML_SetHashSalt16Bytes) AND CPython's pyexpat
+        # actually calling it (CVE-2026-7210 / gh-149018; pyexpat sets the salt itself and kept
+        # calling the 4-8-byte XML_SetHashSalt until patched). purexml drives parsers through
+        # pyexpat and CANNOT verify the wrapper at runtime, so it conservatively reports PARTIAL
+        # (fail-safe; never a false MITIGATED on the expat version alone). (CWE-331, LOW; v0.9,
+        # refined per PR#27 Codex.)
+        "hash_flooding_cve_2026_41080": EXPAT_PARTIAL,
         # structural DoS (depth / attributes / size) — purexml opt-in caps only.
         "structural_dos_depth_attrs_size": OPT_IN,
     }
@@ -295,20 +315,35 @@ def security_report() -> SecurityReport:
         cur = ".".join(map(str, EXPAT_VERSION))
         rec = ".".join(map(str, RECOMMENDED_EXPAT_VERSION))
         live = sorted(k for k, v in mitigations.items() if v == LIVE)
-        # Below the recommended-latest floor. Claim an UNTRACKED gap only when the
-        # runtime actually lacks the highest unmapped fix (CVE-2026-41080, 2.8.0) —
-        # at/above 2.8.0 every remaining gap to 2.8.1 is a class tracked in the map,
-        # so citing 41080 there would overstate (PR#11 Gemini). The mapped LIVE
-        # classes are always named so a runtime below the floor never under-reports
-        # (the PR#10 Codex P2 guarantee).
+        # Below the recommended-latest floor. As of v0.9 every expat fix REACHABLE
+        # through purexml's paths is individually tracked in the map, so there is no
+        # generic "untracked-gap" clause — it would be false (CVE-2026-41080 is now the
+        # mapped `hash_flooding_*` PARTIAL class; the only unmapped fixes are the two
+        # NULL-deref classes purexml does not reach). The mapped LIVE classes are always
+        # named so a runtime below the floor never under-reports (PR#10 Codex P2).
         msg = "libexpat %s is below the recommended-latest floor %s" % (cur, rec)
-        if EXPAT_VERSION < _HIGHEST_UNMAPPED_FIX:
-            msg += (": it may be missing expat DoS fixes not individually tracked "
-                    "here (e.g. CVE-2026-41080, expat 2.8.0)")
         if live:
-            msg += ("; the tracked class(es) %s are also live on this runtime"
+            msg += ("; the tracked class(es) %s are live on this runtime"
                     % ", ".join(live))
         notes.append(msg + " — upgrade Python or the system expat.")
+    # hash_flooding is reported PARTIAL on EVERY runtime (never LIVE, never a version-only
+    # MITIGATED): the 16-byte-salt hardening needs both expat>=2.8.0 AND CPython's pyexpat
+    # fix (CVE-2026-7210), and purexml can't verify the wrapper at runtime. Tailor the note
+    # to whether expat even exposes the 16-byte API yet.
+    if EXPAT_VERSION >= _HASH_FLOODING_FIXED:
+        notes.append(
+            "hash_flooding_cve_2026_41080 is PARTIAL: libexpat >=2.8.0 has the 16-byte "
+            "hash-salt API (CVE-2026-41080 fixed at the expat layer), but full mitigation "
+            "also requires CPython's pyexpat to call XML_SetHashSalt16Bytes (CVE-2026-7210, "
+            "gh-149018) — which purexml cannot verify at runtime, so it is reported "
+            "conservatively as PARTIAL. If your Python includes that fix, the class is fully "
+            "mitigated (LOW severity).")
+    else:
+        notes.append(
+            "hash_flooding_cve_2026_41080 is PARTIAL: libexpat's SipHash hash-flood defense "
+            "is present but seeded with weaker salt entropy (4-8 bytes vs 16; CVE-2026-41080, "
+            "CWE-331, LOW). Full mitigation needs expat >=2.8.0 AND CPython's pyexpat fix "
+            "(CVE-2026-7210) — upgrade both.")
     if mitigations["attribute_collision_dos_cve_2026_45186"] == LIVE:
         notes.append(
             "attribute_collision_dos is live on this expat (<2.8.1): opt-in "
