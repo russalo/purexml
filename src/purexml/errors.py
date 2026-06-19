@@ -12,6 +12,7 @@ __all__ = [
     "DTDForbidden",
     "EntitiesForbidden",
     "ExternalReferenceForbidden",
+    "NotSupportedError",
     "LimitExceeded",
     "DepthExceeded",
     "AttributesExceeded",
@@ -73,6 +74,14 @@ class ExternalReferenceForbidden(PureXMLError):
         )
         self.sysid = sysid
         self.pubid = pubid
+
+
+class NotSupportedError(PureXMLError):
+    """A requested operation is not supported by purexml (mirrors defusedxml's
+    ``NotSupportedError``). Raised, e.g., when `purexml.minidom.parse` is handed a
+    caller-supplied ``parser`` — a foreign parser would bypass purexml's hardening, so a
+    security control refuses it rather than honor it unhardened.
+    """
 
 
 class LimitExceeded(PureXMLError):
