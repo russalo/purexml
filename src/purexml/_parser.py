@@ -19,6 +19,7 @@ from __future__ import annotations
 import xml.parsers.expat as _expat
 from collections.abc import Iterable, Iterator
 from typing import IO, Any, Protocol, cast
+from xml.parsers.expat import XMLParserType
 from xml.etree.ElementTree import Element, ElementTree, ParseError, TreeBuilder
 from xml.etree.ElementTree import iterparse as _stdlib_iterparse
 from xml.etree.ElementTree import parse as _stdlib_parse
@@ -53,7 +54,7 @@ class XMLParser:
                  forbid_dtd: bool = False, forbid_entities: bool = True,
                  forbid_external: bool = True, limits: Limits | None = None) -> None:
         parser = _expat.ParserCreate(encoding, "}")
-        self.parser: Any = parser  # dynamically-used expat handle (None after cleanup)
+        self.parser: XMLParserType = parser  # expat handle (transiently None after cleanup)
         self.target: Any = target if target is not None else TreeBuilder()  # pluggable
         self._error = _expat.error
         self._names: dict[str, str] = {}
@@ -164,7 +165,7 @@ class XMLParser:
         return self.target.end_ns(prefix or "")
 
     # ---- incremental event API (drives stdlib iterparse / XMLPullParser) ----
-    def _setevents(self, events_queue: Any, events_to_report: Any) -> None:
+    def _setevents(self, events_queue: Any, events_to_report: Iterable[str]) -> None:
         # Internal API used by xml.etree's XMLPullParser/iterparse. Faithful mirror
         # of the stdlib XMLParser._setevents (wires expat handlers to append
         # (event, data) to the queue). The blocking handlers installed in __init__
@@ -173,7 +174,7 @@ class XMLParser:
         append = events_queue.append
         for event_name in events_to_report:
             if event_name == "start":
-                parser.ordered_attributes = 1
+                parser.ordered_attributes = 1  # type: ignore[assignment]
 
                 # NB: _setevents is a verbatim mirror of CPython XMLParser._setevents;
                 # the per-event `handler` redefinitions are deliberate (do not rename —
@@ -185,7 +186,7 @@ class XMLParser:
             elif event_name == "end":
                 def handler(tag, event=event_name, append=append, end=self._end):  # type: ignore[misc, no-untyped-def]
                     append((event, end(tag)))
-                parser.EndElementHandler = handler
+                parser.EndElementHandler = handler  # type: ignore[assignment]
             elif event_name == "start-ns":
                 if hasattr(self.target, "start_ns"):
                     def handler(prefix, uri, event=event_name, append=append,  # type: ignore[no-untyped-def]
@@ -203,11 +204,11 @@ class XMLParser:
                 else:
                     def handler(prefix, event=event_name, append=append):  # type: ignore[misc, no-untyped-def]
                         append((event, None))
-                parser.EndNamespaceDeclHandler = handler
+                parser.EndNamespaceDeclHandler = handler  # type: ignore[assignment]
             elif event_name == "comment":
                 def handler(text, event=event_name, append=append, self=self):  # type: ignore[misc, no-untyped-def]
                     append((event, self.target.comment(text)))
-                parser.CommentHandler = handler
+                parser.CommentHandler = handler  # type: ignore[assignment]
             elif event_name == "pi":
                 def handler(pi_target, data, event=event_name, append=append, self=self):  # type: ignore[no-untyped-def]
                     append((event, self.target.pi(pi_target, data)))
@@ -236,7 +237,7 @@ class XMLParser:
                 err.offset = self.parser.ErrorColumnNumber
                 raise err
 
-    def _raiseerror(self, value: Any) -> None:
+    def _raiseerror(self, value: _expat.ExpatError) -> None:
         err = ParseError(value)
         err.code = value.code
         err.position = (value.lineno, value.offset)
@@ -248,7 +249,7 @@ class XMLParser:
         # GC. Must run on EVERY termination path — success or error — or a malformed
         # / blocked untrusted input leaks the cycle (v0.1.2 fix; regressed and
         # restored after the v0.2 feed/close split, PR#4 review).
-        self.parser = None
+        self.parser = None  # type: ignore[assignment]
         self.target = None
 
     # ---- feed/close (compatible with xml.etree.ElementTree.parse) ----
