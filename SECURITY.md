@@ -91,6 +91,10 @@ incumbent froze.** Concretely, that means:
   oracle (C14N-equivalent-or-both-raise) over a real corpus + a fuzzer; the result is a
   committed [`docs/EQUIVALENCE.md`](docs/EQUIVALENCE.md). New XML-attack research becomes
   new corpus + tests.
+- **Independent adversarial soak per cycle.** A standing external attack battery
+  (out-of-tree, run by a separate reviewer) soaks each release — XML bombs, XXE, external
+  entities/DTD, XInclude — judging on raw evidence (timed-out / mem-exceeded / escaped).
+  Green at every release to date; any non-survival is a real finding.
 - **Reviewed.** Every change runs the four-leg decorrelated review; findings are grounded
   against the real code before action.
 
