@@ -57,7 +57,23 @@ ALLOW_VECTORS = {
     "valid_utf8_bom_bytes": b"\xef\xbb\xbf" + "<r>ok</r>".encode("utf-8"),
     "default_ns_redefinition": '<r xmlns="urn:a"><c xmlns="urn:b"><d/></c></r>',
     "xml_reserved_attrs": '<r xml:lang="en" xml:space="preserve"> text </r>',
+    # XInclude is NOT auto-processed by ElementTree/defusedxml — the xi:include element
+    # is left in the tree, NOTHING is fetched. Internalized from bestiary's M2 XML soak
+    # (`xinclude_system`, NO-ESCAPE) — relay 2026-06-19; my battery lacked it.
+    "xinclude_system":
+        '<root xmlns:xi="http://www.w3.org/2001/XInclude">'
+        '<xi:include href="file:///etc/hostname" parse="text"/></root>',
 }
+
+
+def test_xinclude_parses_without_fetching():
+    """XInclude (a separate mechanism from entities) is not expanded by the parser —
+    the element survives into the tree and NO I/O is attempted (bestiary M2 NO-ESCAPE)."""
+    doc = ALLOW_VECTORS["xinclude_system"]
+    with assert_no_io():
+        root = purexml.fromstring(doc)
+    # the xi:include element is present (left unprocessed), proving non-expansion
+    assert any("include" in el.tag for el in root.iter())
 
 
 @pytest.mark.parametrize("name", list(BLOCK_VECTORS))
