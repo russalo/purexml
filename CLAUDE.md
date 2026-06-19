@@ -341,7 +341,7 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
-- **v0.8.0** *(approved 2026-06-18, in implementation)* — **ship types**: annotate the
+- **v0.8.0** *(shipped 2026-06-18, PR #21)* — **ship types**: annotate the
   public surface + a PEP 561 `py.typed` marker (consumers' type-checkers use purexml's
   types, not `Any`); `mypy`-clean gated by a CI typecheck job; `types: mypy` badge. The
   verbatim-mirror `_setevents` redefinitions + the structural-stdlib-drop-in friction kept

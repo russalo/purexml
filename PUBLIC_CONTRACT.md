@@ -1,6 +1,6 @@
 # purexml Public Contract
 
-> **⚠️ NOT YET BINDING — purexml is pre-1.0 (currently v0.7.0).** No public
+> **⚠️ NOT YET BINDING — purexml is pre-1.0 (currently v0.8.1).** No public
 > contract is frozen. The de-facto surface today is the full
 > `defusedxml.ElementTree` family (`fromstring`, `parse`, `iterparse`,
 > `fromstringlist`, `XML`, `XMLParser`, `tostring`, `ParseError`, the `forbid_*`
