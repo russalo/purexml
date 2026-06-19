@@ -3,14 +3,17 @@
 purexml does one thing — safely parse untrusted XML, behaviorally equivalent to
 `defusedxml.ElementTree`. This document states plainly what it does **not** do.
 
-## It is the `ElementTree` family — not all of defusedxml, not a writer
+## It is the `ElementTree` family + `minidom` — not yet all of defusedxml, not a writer
 
-As of v0.3, purexml mirrors `defusedxml.ElementTree`'s full surface (`fromstring`,
-`parse`, `iterparse`, `fromstringlist`, `XML`, `XMLParser`, `tostring`, the
-`forbid_*` knobs). It does **not** provide:
-- the **other defusedxml submodules** — `minidom`, `sax`, `pulldom`,
-  `expatreader`/`expatbuilder`, `xmlrpc`, the deprecated `lxml` shim. Deferred,
-  not excluded — added post-1.0 only if a consumer needs them (`docs/ROADMAP-to-1.0.md`);
+purexml mirrors `defusedxml.ElementTree`'s full surface (`fromstring`, `parse`, `iterparse`,
+`fromstringlist`, `XML`, `XMLParser`, `tostring`, the `forbid_*` knobs) and, **as of v0.10,
+`defusedxml.minidom`** (`parse`/`parseString`) + `defusedxml.common` (the `DefusedXmlException`
+catch alias). Coverage is being broadened by **measured** demand (`docs/ROADMAP-to-1.0.md`). It
+does **not** (yet) provide:
+- the **remaining defusedxml submodules** — `sax` (**next**), `xmlrpc` (a distinct
+  monkeypatch-the-stdlib shape, TBD), `pulldom` / `expatreader` (deferred, measured-negligible).
+  The deprecated **`lxml`** shim is **excluded** — it wraps the third-party `lxml` library, which
+  would break purexml's zero-dependency, stdlib-only contract;
 - any XML **writing** / serialization beyond re-exporting stdlib `tostring` — it
   is a hardened *reader*;
 - a non-pyexpat code path — see *Threat model* (IronPython/Jython out of scope).

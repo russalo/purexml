@@ -3,7 +3,7 @@
 > **Status: ratified 2026-06-16** (by Russell). Grounded by `/deep-research` run
 > wf_5ea8ed7c-044 (findings: `scratch/research/2026-06-16_1.0-scope-research.md`,
 > 25/25 claims confirmed vs primary sources). This is the living plan from the
-> shipped v0.9.0 to the 1.0 contract freeze.
+> shipped v0.10.0 to the 1.0 contract freeze.
 
 ## What 1.0 means
 Per the russalo version philosophy, **1.0 = a governance declaration on a
@@ -11,20 +11,30 @@ Per the russalo version philosophy, **1.0 = a governance declaration on a
 features at the freeze. Road to 1.0 = scope → build it → validate (incl. real
 adoption) → freeze.
 
-## 1.0 identity & scope (ratified)
-**purexml 1.0 = the complete, maintained, zero-dependency safe replacement for
-`defusedxml.ElementTree`** — and, beyond defusedxml, one that *tracks current
-CPython/libexpat mitigations* (defusedxml froze in 2021 and is effectively
-abandoned; OWASP/Python still point users to it — that gap is purexml's reason to
-exist beyond file-observer).
+## 1.0 identity & scope — REFRAMED 2026-06-19 (ratified)
+**purexml 1.0 = the maintained, zero-dependency safe replacement for `defusedxml` across the
+surface the ecosystem actually imports** — not just the `ElementTree` slice one adopter needs.
+Beyond defusedxml, one that *tracks current CPython/libexpat mitigations* (defusedxml froze in
+2021 and is effectively abandoned; OWASP/Python still point users to it — that gap is purexml's
+reason to exist beyond file-observer).
 
-- **In scope (the ElementTree family):** `fromstring` (done), `parse`,
-  `iterparse`, `fromstringlist`, the hardened `XMLParser` class, `XML`/`tostring`
-  aliases, `ParseError`.
-- **Out of 1.0 (deferred, not excluded):** `minidom`, `sax`, `pulldom`,
-  `expatreader`/`expatbuilder`, `xmlrpc`, deprecated `lxml`. Add post-1.0 only if
-  demand appears. *(Caveat: real-world per-module usage was not measured — this is
-  a reasoned line; deferring rather than excluding keeps it safe.)*
+> **Reframe (2026-06-19, Russell):** the prior scope ("complete drop-in for
+> `defusedxml.ElementTree`") was the slice file-observer needs — a one-adopter ceiling, not a
+> publishable 1.0. *"You'll never get more if you stop there. Earn a reason to go 1.0."* The
+> earned reason = breadth (cover what the ecosystem imports → a stranger *can* adopt) + depth
+> (the maintained tracking → *why* purexml beats staying on abandoned defusedxml). Scope is now
+> **measured, not guessed** (`scratch/research/2026-06-19_defusedxml-usage-measurement.md`).
+
+- **In scope — ElementTree family (done, v0.1–v0.3):** `fromstring`, `parse`, `iterparse`,
+  `fromstringlist`, `XMLParser`, `XML`/`tostring`, `ParseError`.
+- **In scope — breadth (promoted from "deferred" 2026-06-19, by measured demand):**
+  **`minidom` ✅ (v0.10, 457 sites)** + `purexml.common` compat shim; **`sax` — next (375 sites)**.
+- **TBD as its own slice:** `xmlrpc` (343 sites, but a distinct *monkeypatch-the-stdlib* shape,
+  not a parser wrapper) — decide after sax.
+- **Deferred (measured-negligible):** `pulldom` (48), `expatreader` (14); `expatbuilder` is the
+  internal minidom engine, not exposed.
+- **Excluded (zero-dep identity, not demand):** `lxml` (390 sites) — wraps third-party `lxml`,
+  breaks stdlib-only/zero-dep; deprecated upstream. A principled exclusion.
 
 ## Posture: behavioral mirror + bounded defense-in-depth
 Stay a behavioral mirror of defusedxml's **defaults** (`forbid_dtd=False,

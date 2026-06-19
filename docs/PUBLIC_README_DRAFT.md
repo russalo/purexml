@@ -170,8 +170,11 @@ Default behavior stays a strict mirror of `defusedxml`; you opt into more only b
 
 The **`defusedxml.ElementTree` family** — the part the large majority of projects use:
 `fromstring`, `parse`, `iterparse`, `fromstringlist`, `XML`, `XMLParser`, `tostring`,
-`ParseError`, the `forbid_*` knobs. `minidom` / `sax` / `pulldom` are not yet covered —
-open an issue if you need them. Assumes CPython's `pyexpat` (the standard runtime).
+`ParseError`, the `forbid_*` knobs — **plus `defusedxml.minidom`** (`parse`/`parseString`)
+and `defusedxml.common` (the `DefusedXmlException` catch alias). `sax` is next; coverage
+tracks measured real-world usage. `pulldom` isn't covered yet (open an issue), and the
+deprecated `lxml` shim is out of scope (it needs the third-party `lxml`, which would break
+zero-dependency). Assumes CPython's `pyexpat` (the standard runtime).
 
 ## Requirements
 

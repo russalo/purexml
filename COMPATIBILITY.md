@@ -1,8 +1,10 @@
 # Compatibility with defusedxml
 
-purexml is a drop-in for the **`defusedxml.ElementTree` family**: migration is
-`s/defusedxml/purexml/`. This document is the honest detail behind "drop-in" — what
-matches exactly, the few edges, and the evidence.
+purexml is a drop-in for **`defusedxml`**: migration is `s/defusedxml/purexml/`. It covers the
+**`defusedxml.ElementTree` family** plus, as of v0.10, **`defusedxml.minidom`** and
+**`defusedxml.common`** — the surface scoped to what the ecosystem actually imports (`sax` next;
+see the scope table). This document is the honest detail behind "drop-in" — what matches exactly,
+the few edges, and the evidence.
 
 ## The contract
 
@@ -34,11 +36,14 @@ So these keep working unchanged after the swap:
 - `except EntitiesForbidden:` (etc.) — **equivalent**, because the `s/defusedxml/purexml/`
   swap moves the import too (`purexml.EntitiesForbidden`).
 
-**The one edge:** if you catch defusedxml's **base class by name** —
-`except defusedxml.common.DefusedXmlException:` — purexml's exceptions are **not** that
-class (they share the same `ValueError` ancestry, not the `DefusedXmlException` base).
-Catch [`purexml.PureXMLError`](src/purexml/errors.py) instead, or narrow to `ValueError`.
-This is the only catch-clause that needs a change beyond the import swap.
+**The base-class catch (closed in v0.10):** code that catches defusedxml's base by name —
+`except defusedxml.common.DefusedXmlException:` — now also survives `s/defusedxml/purexml/`,
+because **`purexml.common` provides `DefusedXmlException` as an alias for
+[`purexml.PureXMLError`](src/purexml/errors.py)** (the swap moves the import:
+`from purexml.common import DefusedXmlException`). The two share `ValueError` ancestry, so the
+`except` clause behaves identically. (You may still catch `purexml.PureXMLError` or narrow to
+`ValueError` directly.) With v0.10 there is no remaining catch-clause that needs a change beyond
+the literal import swap.
 
 ## Deliberate behavioral edges (matching the oracle exactly)
 
@@ -57,13 +62,19 @@ stays byte-for-byte the defusedxml mirror. See [`LIMITATIONS.md`](LIMITATIONS.md
 
 ## Scope — what's covered
 
+Coverage is **scoped by measured real-world usage** (GitHub code search; see
+`docs/ROADMAP-to-1.0.md`), not guessed:
+
 | defusedxml module | purexml | notes |
 |---|---|---|
 | `defusedxml.ElementTree` | ✅ full family | the surface most projects use |
 | `defusedxml` top-level (`fromstring`, …) | ✅ | re-exported at `purexml` top level |
-| `defusedxml.minidom` / `.sax` / `.pulldom` | ⬜ not yet | open an issue if you need them |
-| `defusedxml.expatreader` / `.expatbuilder` | ⬜ not yet | — |
-| `defusedxml.xmlrpc` / deprecated `.lxml` | ⬜ not planned | — |
+| `defusedxml.common` | ✅ (v0.10) | `purexml.common` — incl. the `DefusedXmlException` catch alias |
+| `defusedxml.minidom` | ✅ (v0.10) | `purexml.minidom` — `parse`/`parseString` → stdlib `Document` |
+| `defusedxml.sax` | ⬜ next | the next breadth module (375 sites) |
+| `defusedxml.pulldom` / `.expatreader` | ⬜ deferred | measured-negligible; open an issue if you need them |
+| `defusedxml.xmlrpc` | ⬜ TBD | a distinct *monkeypatch-the-stdlib* shape — its own slice |
+| deprecated `defusedxml.lxml` | ⛔ excluded | wraps third-party `lxml` → breaks purexml's zero-dep, stdlib-only contract |
 
 purexml is a hardened **reader**, not a writer or a validator, and assumes CPython's
 `pyexpat` (the standard runtime).
