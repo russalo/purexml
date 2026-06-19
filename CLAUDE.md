@@ -348,6 +348,11 @@ One-line bullets per version (newest first; copy the shape from
   via documented `# type: ignore`s (mirror preserved). Added `typing`/`__future__` to the
   no-I/O allowlist (pure, lazy annotations). No runtime/parse change; SCHEMA n/a; LOGIC
   unchanged. [RFC](docs/v0.8.0_RFC_Specification.md).
+- **v0.8.1** *(2026-06-18)* — **patch**: tighten mypy to `--strict` (no behavior/API
+  change). Annotated all internal `_parser.py` methods; `Any` leaks resolved (`cast` on
+  the pluggable-target `close()`); the verbatim `_setevents` mirror kept byte-for-byte via
+  `# type: ignore[misc, no-untyped-def]`; expat handle + target typed `Any`. CI `mypy`
+  now runs strict. _HISTORY only._
 - **v0.7.0** *(shipped 2026-06-17, PR #15)* — **posture CLI**:
   `python -m purexml` over `security_report()` — default human report (informs, exit 0),
   `--json` (machine-readable, PROVISIONAL), `--check [--min-expat X.Y.Z]` (opt-in CI gate,
