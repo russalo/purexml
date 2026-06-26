@@ -17,7 +17,7 @@ The common entry points are also re-exported at the top level for convenience::
 """
 from xml.etree.ElementTree import ParseError, tostring
 
-from . import ElementTree, common, minidom
+from . import ElementTree, common, expatreader, minidom, sax
 from ._expat_security import (
     BLOCKED,
     EXPAT_MITIGATED,
@@ -48,7 +48,7 @@ from .limits import RECOMMENDED_LIMITS, Limits
 
 XML = fromstring
 
-__version__ = "0.11.0"
+__version__ = "0.12.0"
 
 __all__ = [
     # the ElementTree family (also at purexml.ElementTree)
@@ -61,9 +61,11 @@ __all__ = [
     "XMLParser",
     "tostring",
     "ParseError",
-    # other defusedxml-surface modules (v0.10) — import-compatible submodules
-    "minidom",
-    "common",
+    # other defusedxml-surface modules — import-compatible submodules
+    "minidom",          # v0.10
+    "common",           # v0.10
+    "sax",              # v0.12
+    "expatreader",      # v0.12 (sax engine)
     # exception hierarchy
     "PureXMLError",
     "DTDForbidden",
