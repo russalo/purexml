@@ -24,6 +24,7 @@ MAX_DATA = 30 * 1024 * 1024
 
 # Lazily-built caches (option C: nothing network-capable imported at module top).
 _defused_parser_cls: Any = None
+_orig_fast_parser: Any = None
 _orig_gzip_decode: Any = None
 _orig_gzip_response: Any = None
 _patched = False
@@ -86,7 +87,13 @@ def defused_gzip_decode(data: bytes, limit: int | None = None) -> bytes:
     if limit is None:
         limit = MAX_DATA
     with BytesIO(data) as f, gzip.GzipFile(mode="rb", fileobj=f) as gzf:
-        decoded = gzf.read() if limit < 0 else gzf.read(limit + 1)
+        try:
+            decoded = gzf.read() if limit < 0 else gzf.read(limit + 1)
+        except OSError:
+            # malformed gzip (incl. gzip.BadGzipFile, an OSError) -> ValueError, matching
+            # defusedxml + the stdlib contract that xmlrpc's gzip_decode raises ValueError on
+            # bad data (so SimpleXMLRPCRequestHandler returns 400 instead of letting it escape).
+            raise ValueError("invalid data") from None
     if limit >= 0 and len(decoded) > limit:
         raise ValueError("max gzipped payload length exceeded")
     return decoded
@@ -114,7 +121,10 @@ def _build_gzip_response_cls() -> Any:
         def read(self, n: int = -1) -> bytes:  # type: ignore[override]
             if self.limit >= 0:
                 left = self.limit - (self.readlength or 0)
-                n = min(n, left + 1)
+                # a negative n (the file-like default `read()`) would otherwise decompress the
+                # WHOLE remaining stream into memory before the post-read check — a gzip bomb
+                # could allocate past MAX_DATA before raising. Cap it to the limit. (PR#34.)
+                n = left + 1 if n < 0 else min(n, left + 1)
                 data = super().read(n)
                 self.readlength = (self.readlength or 0) + len(data)
                 if self.readlength > self.limit:
@@ -133,13 +143,16 @@ def monkey_patch() -> None:
     """Make the stdlib ``xmlrpc.client`` safe: install the defused parser (`FastParser`) + bounded
     gzip on ``xmlrpc.client`` (and ``xmlrpc.server``'s `gzip_decode`). Idempotent; reversible via
     `unmonkey_patch`. **This is the opt-in boundary where the `xmlrpc`/`gzip` import happens.**"""
-    global _orig_gzip_decode, _orig_gzip_response, _patched
+    global _orig_fast_parser, _orig_gzip_decode, _orig_gzip_response, _patched
     from xmlrpc import client as xmlrpc_client
     try:
         from xmlrpc import server as xmlrpc_server
     except ImportError:  # pragma: no cover
         xmlrpc_server = None  # type: ignore[assignment]
     if not _patched:
+        # Capture the ORIGINALS for a faithful undo (a prior patcher's FastParser is restored,
+        # not clobbered to None). stdlib default FastParser is None — but capture, don't assume.
+        _orig_fast_parser = getattr(xmlrpc_client, "FastParser", None)
         _orig_gzip_decode = getattr(xmlrpc_client, "gzip_decode", None)
         _orig_gzip_response = getattr(xmlrpc_client, "GzipDecodedResponse", None)
     # setattr (not direct assignment) so dynamically patching the stdlib module's typed
@@ -160,7 +173,7 @@ def unmonkey_patch() -> None:
         from xmlrpc import server as xmlrpc_server
     except ImportError:  # pragma: no cover
         xmlrpc_server = None  # type: ignore[assignment]
-    setattr(xmlrpc_client, "FastParser", None)
+    setattr(xmlrpc_client, "FastParser", _orig_fast_parser)
     if _orig_gzip_response is not None:
         setattr(xmlrpc_client, "GzipDecodedResponse", _orig_gzip_response)
     if _orig_gzip_decode is not None:

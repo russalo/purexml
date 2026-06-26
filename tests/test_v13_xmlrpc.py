@@ -6,6 +6,8 @@ entity/DTD/external attacks with purexml's exceptions; (2) the gzip-bomb cap (`M
 (3) **option C** — `import purexml.xmlrpc` performs NO network-capable import until `monkey_patch()`
 is called (proven in a subprocess); (4) `monkey_patch`/`unmonkey_patch` round-trips cleanly.
 """
+import os
+import pathlib
 import subprocess
 import sys
 
@@ -42,6 +44,25 @@ def test_unmonkey_patch_restores_default():
     PX.unmonkey_patch()
     import xmlrpc.client as C
     assert C.FastParser is None  # stdlib default
+
+
+def test_unmonkey_restores_prior_fast_parser():
+    # PR#34: a faithful undo restores whatever FastParser was there before (not None) —
+    # so a co-installed patcher's parser survives a purexml patch/unpatch cycle.
+    import xmlrpc.client as C
+
+    PX.unmonkey_patch()  # clean baseline (_patched -> False so the next patch captures fresh)
+
+    class _PriorParser:
+        pass
+    C.FastParser = _PriorParser
+    try:
+        PX.monkey_patch()
+        assert C.FastParser is not _PriorParser  # ours installed
+        PX.unmonkey_patch()
+        assert C.FastParser is _PriorParser       # prior restored, NOT clobbered to None
+    finally:
+        C.FastParser = None  # restore stdlib default for other tests
 
 
 def _defused_parser():
@@ -116,6 +137,28 @@ def test_gzip_decode_bomb_blocked():
     assert PX.defused_gzip_decode(bomb, limit=-1) == b"A" * 5000
 
 
+def test_gzip_decode_invalid_data_raises_valueerror():
+    # PR#34 Codex: malformed gzip must surface as ValueError (not gzip.BadGzipFile), so
+    # xmlrpc.server's request handler returns 400 instead of letting it escape.
+    with pytest.raises(ValueError, match="invalid data"):
+        PX.defused_gzip_decode(b"not gzip at all")
+
+
+def test_gzip_response_read_default_negative_n_is_bounded():
+    # PR#34 (Gemini security-high / Codex): `read()` with the file-like default n=-1 must NOT
+    # decompress the whole stream — it caps to the limit. Within the cap it returns; past it,
+    # it raises having read at most left+1 (never the full bomb).
+    cls = PX._build_gzip_response_cls()
+    gzipped = gzip.compress(b"A" * 5000)
+    r = cls(io.BytesIO(gzipped), limit=10_000)
+    assert r.read(-1) == b"A" * 5000          # within cap: default read works
+    r.close()
+    r2 = cls(io.BytesIO(gzipped), limit=100)  # over cap: default read raises, bounded
+    with pytest.raises(ValueError, match="max payload length exceeded"):
+        r2.read(-1)
+    r2.close()
+
+
 def test_gzip_decoded_response_bounds_payload():
     cls = PX._build_gzip_response_cls()
     gzipped = gzip.compress(b"A" * 5000)
@@ -140,7 +183,11 @@ def test_import_is_lazy_no_network():
         "assert 'xmlrpc.client' in sys.modules, 'monkey_patch did not import the transport'\n"
         "print('LAZY-OK')\n"
     )
-    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+    # the fresh subprocess doesn't inherit pytest's `pythonpath = src`, so pass the src dir
+    # explicitly — works in a source checkout AND an installed package (PR#34 Codex).
+    src = str(pathlib.Path(purexml.__file__).resolve().parent.parent)
+    env = {**os.environ, "PYTHONPATH": src + os.pathsep + os.environ.get("PYTHONPATH", "")}
+    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=env)
     assert out.returncode == 0, out.stderr
     assert "LAZY-OK" in out.stdout
 
