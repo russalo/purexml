@@ -8,9 +8,9 @@ objects) while blocking the known XML attack classes — entity-expansion bombs,
 external-entity resolution (XXE), and external DTD retrieval — exactly as
 `defusedxml` does. It mirrors **`defusedxml.ElementTree`'s full surface**
 (`fromstring`, `parse`, `iterparse`, `fromstringlist`, `XML`, `XMLParser`,
-`tostring`, the `forbid_*` knobs) and, **as of v0.10, `defusedxml.minidom`**
-(`parse`/`parseString`) + `defusedxml.common`, so migrating off `defusedxml` is a
-literal `s/defusedxml/purexml/`. It is a security control, not a format reader;
+`tostring`, the `forbid_*` knobs) and, by measured demand, **`defusedxml.minidom`**
+(v0.10), **`defusedxml.sax`** + **`.expatreader`** (v0.12), and `defusedxml.common`, so
+migrating off `defusedxml` is a literal `s/defusedxml/purexml/`. It is a security control, not a format reader;
 correctness is validated oracle-gated against `defusedxml`.
 
 Beyond the strict mirror, purexml adds **opt-in, default-off** defense-in-depth
@@ -21,10 +21,11 @@ promise is never violated; you get a clean mirror until you ask for more.
 
 ## Status
 
-**Working — current v0.10.0 (2026-06-19); complete `defusedxml.ElementTree`
+**Working — current v0.12.0 (2026-06-26); complete `defusedxml.ElementTree`
 drop-in** (the family completed at v0.3.0) **plus `defusedxml.minidom` + `.common`
-(v0.10)** — the first breadth beyond ElementTree, scoped by measured real-world usage
-(`sax` is next). Opt-in mirror-plus along the way: v0.4 structural-DoS caps (`Limits`,
+(v0.10) and `defusedxml.sax` + `.expatreader` (v0.12)** — breadth scoped by measured
+real-world usage (ElementTree + minidom + sax now cover the bulk; `xmlrpc` TBD). Opt-in
+mirror-plus along the way: v0.4 structural-DoS caps (`Limits`,
 default-off) and the **trust surface** (`security_report()` + shipped audit evidence, v0.5;
 posture map extended with the newer expat DoS classes in v0.6 and CVE-2026-41080 in v0.9;
 the `python -m purexml` posture CLI in v0.7; a typed public surface + `py.typed` in v0.8).

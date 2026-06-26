@@ -6,11 +6,12 @@ That raises the bar on this policy: a defect here is a security defect.
 ## Scope
 
 purexml mirrors the `defusedxml.ElementTree` surface (`fromstring`, `parse`,
-`iterparse`, `fromstringlist`, `XMLParser`, the `forbid_*` knobs) and, as of v0.10,
-`defusedxml.minidom` (`parse`/`parseString`) — behaviorally equivalent to `defusedxml`
-at its defaults. On **fully untrusted** XML input (the caller is trusted; the XML is the
-attacker-controlled surface) it — across every entry point, including incremental
-`iterparse` streaming and the minidom DOM builder:
+`iterparse`, `fromstringlist`, `XMLParser`, the `forbid_*` knobs) and, as of v0.10–v0.12,
+`defusedxml.minidom` (`parse`/`parseString`) and `defusedxml.sax` (`make_parser`/`parse`/
+`parseString`) — behaviorally equivalent to `defusedxml` at its defaults. On **fully untrusted**
+XML input (the caller is trusted; the XML is the attacker-controlled surface) it — across every
+entry point, including incremental `iterparse` streaming, the minidom DOM builder, and the
+event-driven SAX reader:
 
 - **blocks** entity-expansion bombs (billion-laughs / quadratic), XXE via
   external entities (local file + network), and external reference resolution —
@@ -52,8 +53,8 @@ then-published support window).
 
 | Version | Supported |
 |---|---|
-| 0.11.x | Yes (current) |
-| < 0.11 | No (pre-1.0 moves fast; upgrade) |
+| 0.12.x | Yes (current) |
+| < 0.12 | No (pre-1.0 moves fast; upgrade) |
 
 ## Security advisories & CVE handling
 

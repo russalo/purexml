@@ -172,11 +172,12 @@ Default behavior stays a strict mirror of `defusedxml`; you opt into more only b
 
 The **`defusedxml.ElementTree` family** — the part the large majority of projects use:
 `fromstring`, `parse`, `iterparse`, `fromstringlist`, `XML`, `XMLParser`, `tostring`,
-`ParseError`, the `forbid_*` knobs — **plus `defusedxml.minidom`** (`parse`/`parseString`)
-and `defusedxml.common` (the `DefusedXmlException` catch alias). `sax` is next; coverage
-tracks measured real-world usage. `pulldom` isn't covered yet (open an issue), and the
-deprecated `lxml` shim is out of scope (it needs the third-party `lxml`, which would break
-zero-dependency). Assumes CPython's `pyexpat` (the standard runtime).
+`ParseError`, the `forbid_*` knobs — **plus `defusedxml.minidom`** (v0.10) and **`defusedxml.sax`**
++ **`.expatreader`** (v0.12, `parse`/`parseString`)
+and `defusedxml.common` (the `DefusedXmlException` catch alias). Coverage tracks measured
+real-world usage; `xmlrpc` is the remaining candidate. `pulldom` isn't covered yet (open an
+issue), and the deprecated `lxml` shim is out of scope (it needs the third-party `lxml`, which
+would break zero-dependency). Assumes CPython's `pyexpat` (the standard runtime).
 
 ## Requirements
 

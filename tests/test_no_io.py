@@ -19,7 +19,10 @@ import purexml
 #:   __future__  — `annotations` (PEP 563 lazy annotations)
 #: Adding anything here must be a conscious decision (a pure parser's import surface
 #: is part of its security guarantee — each entry is justified inline).
-ALLOWED_TOPLEVEL = {"xml", "collections", "types", "typing", "__future__"}
+#: ``io`` (v0.12): `purexml.sax.parseString` wraps its **bytes** input in an in-memory
+#: ``io.BytesIO`` for the SAX `InputSource` — exactly as `defusedxml.sax` does. `BytesIO` reaches
+#: no OS resource (no socket/file/fd); the actual no-fetch guarantee is the behavioral trip-wire.
+ALLOWED_TOPLEVEL = {"xml", "collections", "types", "typing", "__future__", "io"}
 
 #: The CLI entry point (`__main__.py`, v0.7) is the package's ONE explicit I/O
 #: boundary — it prints the posture report, so it may import the CLI-output stdlib on

@@ -144,13 +144,13 @@ directly. As of **v0.3 the consumer surface is the full `defusedxml.ElementTree`
 family** — `fromstring`, `parse`, `iterparse`, `fromstringlist`, `XML`,
 `XMLParser`, `tostring`, the `forbid_*` knobs — under a canonical
 `purexml.ElementTree` namespace, so migration is a literal `s/defusedxml/purexml/`.
-**As of v0.10 the surface is broadening beyond ElementTree** — `purexml.minidom` (the #2
-real consumer surface) ships, with `purexml.common` for catch-site compat. The anchor
-consumer is **file-observer** (it uses only `fromstring`), but the **1.0 identity reframed
-2026-06-19**: not the ElementTree slice one adopter needs, but *the maintained, zero-dep
+**The surface has broadened well beyond ElementTree** — `purexml.minidom` (v0.10, the #2
+consumer surface) + `purexml.sax` (v0.12, #3) ship, with `purexml.common` for catch-site compat.
+The anchor consumer is **file-observer** (it uses only `fromstring`), but the **1.0 identity
+reframed 2026-06-19**: not the ElementTree slice one adopter needs, but *the maintained, zero-dep
 successor that replaces defusedxml across the surface the ecosystem actually imports*
-(measured: ElementTree ✅, minidom ✅, **sax next**, xmlrpc TBD, lxml excluded on zero-dep
-identity — see Known/Excluded decisions + `docs/ROADMAP-to-1.0.md`). This is a
+(measured: ElementTree ✅, minidom ✅, **sax ✅**, expatreader ✅; xmlrpc TBD, pulldom deferred,
+lxml excluded on zero-dep identity — see Known/Excluded decisions + `docs/ROADMAP-to-1.0.md`). This is a
 *security control*, not a format reader — owning it means owning the audit burden,
 which is why the adversarial review leg carries extra weight here. Capability
 north star: [`docs/FO_REQUIRED_COMPATIBILITY.md`](docs/FO_REQUIRED_COMPATIBILITY.md); the
@@ -346,6 +346,17 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.12.0** *(shipped 2026-06-26, PR #31)* — **`purexml.sax` + `purexml.expatreader` drop-in**:
+  the next breadth module (sax = 375 sites; expatreader promoted *deferred→done* as its engine).
+  Event-driven — `make_parser`/`parse`/`parseString` drive a caller's `ContentHandler`; hardening
+  installed in `reset()` on the stdlib `xml.sax.expatreader.ExpatParser`, raising purexml's
+  exceptions (arg-mapped as in `_parser.py`/`minidom.py`). `parseString` is **bytes-only** (mirrors
+  defusedxml exactly; `str`→`TypeError` on both — no over-accept, the minidom/pathlib lesson).
+  Malformed → stdlib `SAXParseException` (not a `PureXMLError`). New parse surface → LOGIC extended;
+  SCHEMA n/a; zero-dep intact. Full four-leg; event-stream parity vs oracle; sax+expatreader 100% cov.
+  *(RFC §3.4 refined: the SAX reader is no-leak/gc-collected — a residual pyexpat exception-retention
+  cycle, parity with defusedxml.sax — NOT fully refcount-reclaimable like ElementTree/minidom.)*
+  [RFC](docs/v0.12.0_RFC_Specification.md) · [compliance](docs/COMPLIANCE-v0.12.md).
 - **v0.11.0** *(shipped 2026-06-26, PR #30)* — **map the reachable libexpat 2.8.2 batch**: the
   follow-up to v0.10.1's floor patch (v0.5.1→v0.6 lifecycle). Grounded that **7 of the 2.8.2 CVEs
   reach purexml's ordinary parse paths** (storeAtts/addBinding/getAttributeId/XML_ParseBuffer/
@@ -513,6 +524,15 @@ Small by design (~300 lines of `src/`). The whole engine is one class.
   the block exceptions + `NotSupportedError` and aliases `DefusedXmlException = PureXMLError`, so
   `except DefusedXmlException` survives `s/defusedxml/purexml/` across every module. Compat layer
   only — the top-level `purexml` namespace stays purexml-native.
+- **`src/purexml/expatreader.py`** — `purexml.expatreader` (v0.12), the hardened SAX driver:
+  `_DefusedExpatParser(xml.sax.expatreader.ExpatParser)` installs the same blocking handlers as
+  `_parser.py`/`minidom.py` **in `reset()`** (where the stdlib reader (re)creates `self._parser`);
+  `create_parser()` returns it. `parse()` clears the reader→parser edge on every path (minidom
+  PR#28 hygiene) — but the SAX reader is only *gc-collected*, not refcount-reclaimable (residual
+  pyexpat exception-retention cycle; defusedxml.sax has it too).
+- **`src/purexml/sax.py`** — `purexml.sax` (v0.12), the `defusedxml.sax` drop-in: `make_parser`
+  (`parser_list` accepted+ignored — always its own hardened reader), `parse`, `parseString`
+  (**bytes-only**, mirroring defusedxml's `BytesIO(string)`). Malformed → stdlib `SAXParseException`.
 - **`src/purexml/__init__.py`** — top-level convenience re-exports of the family +
   exceptions + the expat-version API + `__version__`; imports the `ElementTree` submodule.
 - **`src/purexml/__main__.py`** — the `python -m purexml` posture CLI (v0.7): prints
@@ -750,9 +770,10 @@ Russell."
   exclusion, not a demand-based one. Do not "add the popular one" without re-opening: the only
   way in would be an optional non-stdlib extra, which is a different product. See
   `scratch/research/2026-06-19_defusedxml-usage-measurement.md`.
-- **`pulldom` / `expatreader` as consumer-facing modules** — deferred (measured-negligible:
-  48 / 14 sites). `expatbuilder` is used *internally* as the minidom engine but not exposed.
-  Not excluded — add if demand appears.
+- **`pulldom` as a consumer-facing module** — deferred (measured-negligible: 48 sites). Not
+  excluded — add if demand appears. (`expatbuilder` is the internal minidom engine, not exposed.)
+  **`expatreader` was promoted deferred→done in v0.12** (it's the natural home for the sax engine —
+  `create_parser`/`_DefusedExpatParser`), so `purexml.expatreader` now ships.
 
 ## Test fixtures
 

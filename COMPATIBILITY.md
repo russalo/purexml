@@ -1,10 +1,14 @@
 # Compatibility with defusedxml
 
 purexml is a drop-in for **`defusedxml`**: migration is `s/defusedxml/purexml/`. It covers the
-**`defusedxml.ElementTree` family** plus, as of v0.10, **`defusedxml.minidom`** and
-**`defusedxml.common`** — the surface scoped to what the ecosystem actually imports (`sax` next;
-see the scope table). This document is the honest detail behind "drop-in" — what matches exactly,
-the few edges, and the evidence.
+**`defusedxml.ElementTree` family** plus **`defusedxml.minidom`** + **`.common`** (v0.10) and
+**`defusedxml.sax`** + **`.expatreader`** (v0.12) — the surface scoped to what the ecosystem
+actually imports (see the scope table). This document is the honest detail behind "drop-in" — what
+matches exactly, the few edges, and the evidence.
+
+> **sax edge:** `purexml.sax.parseString` is **bytes-only** (it wraps the input in a `BytesIO`,
+> exactly as `defusedxml.sax` does) — a `str` raises `TypeError` on both. Deliberate parity, not
+> a regression: a defusedxml.sax caller already passed bytes.
 
 ## The contract
 
@@ -71,8 +75,9 @@ Coverage is **scoped by measured real-world usage** (GitHub code search; see
 | `defusedxml` top-level (`fromstring`, …) | ✅ | re-exported at `purexml` top level |
 | `defusedxml.common` | ✅ (v0.10) | `purexml.common` — incl. the `DefusedXmlException` catch alias |
 | `defusedxml.minidom` | ✅ (v0.10) | `purexml.minidom` — `parse`/`parseString` → stdlib `Document` |
-| `defusedxml.sax` | ⬜ next | the next breadth module (375 sites) |
-| `defusedxml.pulldom` / `.expatreader` | ⬜ deferred | measured-negligible; open an issue if you need them |
+| `defusedxml.sax` | ✅ (v0.12) | `purexml.sax` — `make_parser`/`parse`/`parseString` (bytes-only, mirrors the oracle) |
+| `defusedxml.expatreader` | ✅ (v0.12) | `purexml.expatreader` — `create_parser` (the sax engine) |
+| `defusedxml.pulldom` | ⬜ deferred | measured-negligible; open an issue if you need it |
 | `defusedxml.xmlrpc` | ⬜ TBD | a distinct *monkeypatch-the-stdlib* shape — its own slice |
 | deprecated `defusedxml.lxml` | ⛔ excluded | wraps third-party `lxml` → breaks purexml's zero-dep, stdlib-only contract |
 
