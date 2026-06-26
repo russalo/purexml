@@ -24,7 +24,7 @@ from . import expatreader as _expatreader
 __all__ = ["make_parser", "parse", "parseString"]
 
 
-def make_parser(parser_list: Any = []) -> _expatreader._DefusedExpatParser:  # noqa: B006
+def make_parser(parser_list: Any = []) -> _expatreader.DefusedExpatParser:  # noqa: B006
     """Return a hardened SAX `XMLReader`. ``parser_list`` is accepted for signature
     compatibility and ignored — like ``defusedxml.sax``, this always returns its own
     hardened reader (a foreign driver would bypass purexml's blocking)."""

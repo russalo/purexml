@@ -138,13 +138,13 @@ def test_sax_reader_no_leak_on_error():
     # NOT fully refcount-reclaimable — a residual cycle lives in pyexpat's exception retention
     # (defusedxml.sax has it too) — but it is collected by cyclic GC (NO LEAK), and the edge IS
     # cleared. This test pins both: the edge is gone, and gc.collect() reclaims the reader.
-    from purexml.expatreader import _DefusedExpatParser
+    from purexml.expatreader import DefusedExpatParser
 
     gc.disable()
     try:
         for payload in (b"<r>",  # malformed
                         b'<?xml version="1.0"?><!DOCTYPE r [ <!ENTITY x "v"> ]><r>&x;</r>'):  # blocked
-            p = _DefusedExpatParser()
+            p = DefusedExpatParser()
             p.setContentHandler(_Rec())
             ref = weakref.ref(p)
             try:

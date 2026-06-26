@@ -14,10 +14,10 @@ from xml.sax.expatreader import ExpatParser as _ExpatParser
 
 from .errors import DTDForbidden, EntitiesForbidden, ExternalReferenceForbidden
 
-__all__ = ["create_parser"]
+__all__ = ["DefusedExpatParser", "create_parser"]
 
 
-class _DefusedExpatParser(_ExpatParser):
+class DefusedExpatParser(_ExpatParser):
     """Stdlib ``ExpatParser`` + purexml's blocking handlers — the mirror of
     ``defusedxml.expatreader.DefusedExpatParser``, raising purexml's exceptions."""
 
@@ -74,6 +74,6 @@ class _DefusedExpatParser(_ExpatParser):
             self._parser = None
 
 
-def create_parser(*args: Any, **kwargs: Any) -> _DefusedExpatParser:
+def create_parser(*args: Any, **kwargs: Any) -> DefusedExpatParser:
     """Return a hardened SAX `XMLReader` (mirror of `defusedxml.expatreader.create_parser`)."""
-    return _DefusedExpatParser(*args, **kwargs)
+    return DefusedExpatParser(*args, **kwargs)
