@@ -12,6 +12,7 @@ and the canonical tree are compared.
 """
 import random
 import xml.etree.ElementTree as ET
+from xml.sax.handler import ContentHandler
 
 import pytest
 
@@ -126,3 +127,107 @@ def test_differential_fuzz(seed):
             assert pk[0] == dk[0], (arg, pk[0], dk[0])
             if pk[0] == "parse":
                 assert pk[1] == dk[1], ("C14N differs", arg)
+
+
+# -- the same differential gate, extended to the breadth surfaces (v0.13.1) ----------
+# The equivalence claim covers every drop-in surface, not just ElementTree: minidom by
+# DOM serialization, sax by the event stream, xmlrpc by block-parity. Same `_doc` fuzzer.
+
+class _SaxRec(ContentHandler):
+    def __init__(self):
+        self.ev = []
+
+    def startElement(self, name, attrs):
+        self.ev.append(("S", name, tuple(sorted(attrs.items()))))
+
+    def endElement(self, name):
+        self.ev.append(("E", name))
+
+    def characters(self, content):
+        self.ev.append(("C", content))
+
+    def startPrefixMapping(self, prefix, uri):
+        self.ev.append(("NS", prefix, uri))
+
+
+def _minidom_kind(mod, s):
+    try:
+        doc = mod.parseString(s)
+    except Exception:  # noqa: BLE001
+        return ("raise", None)
+    return ("parse", doc.toxml())  # both build the same stdlib Document -> identical toxml
+
+
+def _sax_kind(mod, b):
+    h = _SaxRec()
+    try:
+        mod.parseString(b, h)
+    except Exception:  # noqa: BLE001
+        return ("raise", None)
+    return ("parse", tuple(h.ev))
+
+
+@requires_oracle
+@pytest.mark.parametrize("seed", range(SEEDS))
+def test_differential_fuzz_minidom(seed):
+    import defusedxml.minidom as DM
+
+    rng = random.Random(seed * 1000 + 23)
+    for _ in range(PER_SEED):
+        doc = _doc(rng)
+        for arg in (doc, doc.encode("utf-8")):  # minidom accepts str AND bytes
+            pk = _minidom_kind(purexml.minidom, arg)
+            dk = _minidom_kind(DM, arg)
+            assert pk[0] == dk[0], (arg, pk[0], dk[0])
+            if pk[0] == "parse":
+                assert pk[1] == dk[1], ("minidom DOM differs", arg)
+
+
+@requires_oracle
+@pytest.mark.parametrize("seed", range(SEEDS))
+def test_differential_fuzz_sax(seed):
+    import defusedxml.sax as DS
+
+    rng = random.Random(seed * 1000 + 29)
+    for _ in range(PER_SEED):
+        b = _doc(rng).encode("utf-8")  # sax is bytes-only
+        pk = _sax_kind(purexml.sax, b)
+        dk = _sax_kind(DS, b)
+        assert pk[0] == dk[0], (b, pk[0], dk[0])
+        if pk[0] == "parse":
+            assert pk[1] == dk[1], ("sax events differ", b)
+
+
+@requires_oracle
+@pytest.mark.parametrize("seed", range(SEEDS))
+def test_differential_fuzz_xmlrpc_block_parity(seed):
+    # xmlrpc's value (vs minidom/sax) is the *block decision* — its defused parser must refuse
+    # iff defusedxml's does. (The unmarshalled value path is stdlib + identical; arbitrary fuzz
+    # isn't valid xmlrpc, so we compare the security decision, not the result.)
+    import defusedxml.xmlrpc as DX
+    from defusedxml.common import DefusedXmlException
+
+    pcls = purexml.xmlrpc._build_defused_parser_cls()
+    dcls = DX.DefusedExpatParser
+
+    class _T:
+        def __getattr__(self, n):
+            return lambda *a, **k: None
+
+    def blocked(cls, s, block_exc):
+        p = cls(_T())
+        try:
+            p.feed(s)
+            p.close()
+            return False
+        except block_exc:
+            return True
+        except Exception:  # noqa: BLE001 — a non-block error (unmarshaller etc.) is "not blocked"
+            return False
+
+    rng = random.Random(seed * 1000 + 31)
+    for _ in range(PER_SEED):
+        doc = _doc(rng)
+        for arg in (doc, doc.encode("utf-8")):  # xmlrpc payloads are bytes over HTTP; test both
+            assert blocked(pcls, arg, purexml.PureXMLError) == blocked(dcls, arg, DefusedXmlException), \
+                ("xmlrpc block decision differs", arg)
