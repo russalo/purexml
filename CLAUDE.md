@@ -646,6 +646,20 @@ blame`.
   latest-stable (patch); (2) if the class reaches purexml's *parse paths*, add it to the
   map gated on its fix version — a **minor** (mitigation-set change → RFC), as v0.6 did.
   This is the maintained-successor promise in mechanism; don't let the floor go stale.
+  **Demonstrated twice: v0.5.1→v0.6 (2.7.4–2.8.1 train) and v0.10.1→v0.11.0 (2.8.2 batch).**
+  - **Aggregate when fix versions match (v0.11):** when several CVEs share ONE fix version +
+    status + nature (the 2.8.2 batch = 7 integer-overflow CVEs), map them as ONE aggregate
+    class (`integer_overflow_dos_expat_2_8_2`) with the CVEs in a note — not N identical rows.
+    Per-CVE classes are only for *different* fix versions (25210@2.7.4, 41080@2.8.0, 45186@2.8.1).
+  - **Interim gap marker (`_HIGHEST_UNMAPPED_FIX`):** between the floor patch and the mapping
+    minor, re-arm it (= the latest fix version with reachable-but-unmapped classes) so the floor
+    advisory warns honestly; the mapping minor retires it again (every reachable fix tracked).
+  - **Grounded-UNREACHABLE expat classes — do NOT re-map** (recorded so a future session doesn't
+    "complete" them): NULL-deref CVE-2026-24515 (2.7.4, unused encoding handler) / -32776 (2.7.5,
+    blocked external-param-entity); the **reentrant-handler / suspend-resume trio** CVE-2026-50219
+    / -56131 / -56412 (require reentrant parser calls from a handler or suspend/resume — purexml
+    does one-shot parsing only); and **xmlwf-only** CVE-2026-56409 / -56410 / -56411 (the CLI
+    utility, not the library). Ground any *new* class before mapping; ground these before un-excluding.
   **Standing check (the proactive gate):** run
   `python tools/check_expat_currency.py` (tracked — runnable from any clone) — it compares the latest
   upstream libexpat release (`gh` API, no new deps) against `RECOMMENDED_EXPAT_VERSION`
