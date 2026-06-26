@@ -175,11 +175,12 @@ def test_differential_fuzz_minidom(seed):
     rng = random.Random(seed * 1000 + 23)
     for _ in range(PER_SEED):
         doc = _doc(rng)
-        pk = _minidom_kind(purexml.minidom, doc)
-        dk = _minidom_kind(DM, doc)
-        assert pk[0] == dk[0], (doc, pk[0], dk[0])
-        if pk[0] == "parse":
-            assert pk[1] == dk[1], ("minidom DOM differs", doc)
+        for arg in (doc, doc.encode("utf-8")):  # minidom accepts str AND bytes
+            pk = _minidom_kind(purexml.minidom, arg)
+            dk = _minidom_kind(DM, arg)
+            assert pk[0] == dk[0], (arg, pk[0], dk[0])
+            if pk[0] == "parse":
+                assert pk[1] == dk[1], ("minidom DOM differs", arg)
 
 
 @requires_oracle
@@ -227,5 +228,6 @@ def test_differential_fuzz_xmlrpc_block_parity(seed):
     rng = random.Random(seed * 1000 + 31)
     for _ in range(PER_SEED):
         doc = _doc(rng)
-        assert blocked(pcls, doc, purexml.PureXMLError) == blocked(dcls, doc, DefusedXmlException), \
-            ("xmlrpc block decision differs", doc)
+        for arg in (doc, doc.encode("utf-8")):  # xmlrpc payloads are bytes over HTTP; test both
+            assert blocked(pcls, arg, purexml.PureXMLError) == blocked(dcls, arg, DefusedXmlException), \
+                ("xmlrpc block decision differs", arg)
