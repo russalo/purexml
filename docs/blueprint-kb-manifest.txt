@@ -1,0 +1,22 @@
+# purexml — Blueprint KB manifest
+#
+# The durable, current-state docs Blueprint's repo_kb_sync should track for purexml
+# (source=gh, SHA-gated). One path per line; globs OK. This is the project's own
+# declaration of "what represents purexml's state to the ecosystem" — it exists so the
+# KB set stays self-syncing + pruned, instead of drifting on manual re-ingest (which is
+# how LIMITATIONS/STACK slipped out of sync, 2026-06-26).
+#
+# DELIBERATELY EXCLUDED (historical detail, kept in-repo, NOT cross-project reference):
+#   docs/v*_RFC_Specification.md, docs/COMPLIANCE-v*.md, docs/EQUIVALENCE.md, scratch/**
+
+README.md
+CLAUDE.md
+HISTORY.md
+COMPATIBILITY.md
+PUBLIC_CONTRACT.md
+SECURITY.md
+STACK.md
+LIMITATIONS.md
+CONVENTIONS.md
+docs/ROADMAP-to-1.0.md
+docs/FO_REQUIRED_COMPATIBILITY.md
