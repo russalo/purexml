@@ -27,9 +27,10 @@ reason to exist beyond file-observer).
 
 - **In scope — ElementTree family (done, v0.1–v0.3):** `fromstring`, `parse`, `iterparse`,
   `fromstringlist`, `XMLParser`, `XML`/`tostring`, `ParseError`.
-- **In scope — breadth (promoted from "deferred" 2026-06-19, by measured demand):**
-  **`minidom` ✅ (v0.10, 457 sites)** + `purexml.common` compat shim; **`sax` ✅ (v0.12, 375
-  sites)** + `purexml.expatreader` (promoted, its engine).
+- **In scope — breadth (promoted from "deferred" 2026-06-19, by measured demand) — COMPLETE:**
+  **`minidom` ✅ (v0.10, 457 sites)** + `purexml.common` shim; **`sax` ✅ (v0.12, 375 sites)** +
+  `purexml.expatreader`; **`xmlrpc` ✅ (v0.13, 343 sites)** — a lazy-monkeypatch shim + gzip-bomb
+  defense. The measured breadth surface is now done; the remaining road to 1.0 is the freeze.
 - **TBD as its own slice:** `xmlrpc` (343 sites, but a distinct *monkeypatch-the-stdlib* shape,
   not a parser wrapper) — decide after sax.
 - **Deferred (measured-negligible):** `pulldom` (48), `expatreader` (14); `expatbuilder` is the

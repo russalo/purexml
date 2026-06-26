@@ -78,7 +78,7 @@ Coverage is **scoped by measured real-world usage** (GitHub code search; see
 | `defusedxml.sax` | ✅ (v0.12) | `purexml.sax` — `make_parser`/`parse`/`parseString` (bytes-only, mirrors the oracle) |
 | `defusedxml.expatreader` | ✅ (v0.12) | `purexml.expatreader` — `create_parser` (the sax engine) |
 | `defusedxml.pulldom` | ⬜ deferred | measured-negligible; open an issue if you need it |
-| `defusedxml.xmlrpc` | ⬜ TBD | a distinct *monkeypatch-the-stdlib* shape — its own slice |
+| `defusedxml.xmlrpc` | ✅ (v0.13) | `purexml.xmlrpc.monkey_patch()` — defused parser + bounded gzip (anti-bomb); **lazy** (network-capable import only on `monkey_patch()`) |
 | deprecated `defusedxml.lxml` | ⛔ excluded | wraps third-party `lxml` → breaks purexml's zero-dep, stdlib-only contract |
 
 purexml is a hardened **reader**, not a writer or a validator, and assumes CPython's

@@ -3,17 +3,17 @@
 purexml does one thing — safely parse untrusted XML, behaviorally equivalent to
 `defusedxml.ElementTree`. This document states plainly what it does **not** do.
 
-## It is the `ElementTree` family + `minidom` + `sax` — not yet all of defusedxml, not a writer
+## It is the measured-breadth defusedxml surface — not a writer, not pulldom/lxml
 
 purexml mirrors `defusedxml.ElementTree`'s full surface (`fromstring`, `parse`, `iterparse`,
 `fromstringlist`, `XML`, `XMLParser`, `tostring`, the `forbid_*` knobs) and, by measured demand
 (`docs/ROADMAP-to-1.0.md`), **`defusedxml.minidom`** (v0.10), **`defusedxml.sax`** +
-**`.expatreader`** (v0.12), and `defusedxml.common` (the `DefusedXmlException` catch alias). It
-does **not** (yet) provide:
-- the **remaining defusedxml submodules** — `xmlrpc` (a distinct monkeypatch-the-stdlib shape,
-  TBD), `pulldom` (deferred, measured-negligible). The deprecated **`lxml`** shim is **excluded**
-  — it wraps the third-party `lxml` library, which would break purexml's zero-dependency,
-  stdlib-only contract;
+**`.expatreader`** (v0.12), **`defusedxml.xmlrpc`** (v0.13, a lazy-monkeypatch shim), and
+`defusedxml.common` (the `DefusedXmlException` catch alias). The measured breadth surface is
+complete. It does **not** provide:
+- `defusedxml.pulldom` (deferred, measured-negligible). The deprecated **`lxml`** shim is
+  **excluded** — it wraps the third-party `lxml` library, which would break purexml's
+  zero-dependency, stdlib-only contract;
 - any XML **writing** / serialization beyond re-exporting stdlib `tostring` — it
   is a hardened *reader*;
 - a non-pyexpat code path — see *Threat model* (IronPython/Jython out of scope).

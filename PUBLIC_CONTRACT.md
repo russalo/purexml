@@ -1,14 +1,15 @@
 # purexml Public Contract
 
-> **⚠️ NOT YET BINDING — purexml is pre-1.0 (currently v0.12.0).** No public
+> **⚠️ NOT YET BINDING — purexml is pre-1.0 (currently v0.13.0).** No public
 > contract is frozen. The de-facto surface today is the full
 > `defusedxml.ElementTree` family (`fromstring`, `parse`, `iterparse`,
 > `fromstringlist`, `XML`, `XMLParser`, `tostring`, `ParseError`, the `forbid_*`
 > knobs) under the `purexml.ElementTree` namespace, behaviorally equivalent to
 > `defusedxml` at its defaults — **plus `purexml.minidom`** (v0.10, `parse`/`parseString`
 > → stdlib `Document`), **`purexml.sax`** (v0.12, `make_parser`/`parse`/`parseString`) +
-> `purexml.expatreader`, and `purexml.common` (the `DefusedXmlException` catch-site alias);
-> `xmlrpc` is the remaining candidate (see `docs/ROADMAP-to-1.0.md`) — plus **opt-in,
+> `purexml.expatreader`, **`purexml.xmlrpc`** (v0.13, `monkey_patch`/`unmonkey_patch` — lazy),
+> and `purexml.common` (the `DefusedXmlException` catch-site alias). The measured breadth surface
+> is complete (see `docs/ROADMAP-to-1.0.md`) — plus **opt-in,
 > default-off** additions (`Limits`
 > structural caps, the `security_report()` posture API) and a read-only posture CLI
 > (`python -m purexml`). Until v1.0 any of it may

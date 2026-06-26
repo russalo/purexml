@@ -149,8 +149,9 @@ consumer surface) + `purexml.sax` (v0.12, #3) ship, with `purexml.common` for ca
 The anchor consumer is **file-observer** (it uses only `fromstring`), but the **1.0 identity
 reframed 2026-06-19**: not the ElementTree slice one adopter needs, but *the maintained, zero-dep
 successor that replaces defusedxml across the surface the ecosystem actually imports*
-(measured: ElementTree ✅, minidom ✅, **sax ✅**, expatreader ✅; xmlrpc TBD, pulldom deferred,
-lxml excluded on zero-dep identity — see Known/Excluded decisions + `docs/ROADMAP-to-1.0.md`). This is a
+(measured: ElementTree ✅, minidom ✅, **sax ✅**, expatreader ✅, **xmlrpc ✅ (v0.13)**, common ✅;
+pulldom deferred, lxml excluded on zero-dep identity — see Known/Excluded decisions +
+`docs/ROADMAP-to-1.0.md`). **The measured breadth surface is COMPLETE; next is the 1.0 freeze.** This is a
 *security control*, not a format reader — owning it means owning the audit burden,
 which is why the adversarial review leg carries extra weight here. Capability
 north star: [`docs/FO_REQUIRED_COMPATIBILITY.md`](docs/FO_REQUIRED_COMPATIBILITY.md); the
@@ -346,6 +347,17 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.13.0** *(shipped 2026-06-26, PR #34)* — **`purexml.xmlrpc` (lazy-monkeypatch shim)**: the
+  last non-negligible measured module (343 sites) and a *different shape* — a monkeypatch of the
+  stdlib `xmlrpc`, not a parse fn. `monkey_patch()`/`unmonkey_patch()` install/restore a defused
+  expat parser (`FastParser`) + a **bounded gzip** decode (`MAX_DATA`=30 MB, anti-decompression-bomb
+  — purexml's first non-XML defense) on `xmlrpc.client`/`server`. **Option C (Russell's call):** all
+  `xmlrpc`/`gzip` imports are LAZY (inside `monkey_patch()` + gzip helpers), so `import purexml`
+  never pulls the network-capable transport — proven in a subprocess; `socket`/`http` stay FORBIDDEN
+  even here (a static `XMLRPC_EXTRA` carve-out covers only the lazy `xmlrpc`/`gzip`). New surface →
+  LOGIC extended; SCHEMA n/a; zero-dep + no-I/O-at-import intact. Full four-leg; 4 PR-bot findings
+  (incl. a gzip-bomb `read(-1)` memory hole) all real + fixed. **This completes the measured breadth
+  surface — next is the 1.0 freeze.** [RFC](docs/v0.13.0_RFC_Specification.md) · [compliance](docs/COMPLIANCE-v0.13.md).
 - **v0.12.0** *(shipped 2026-06-26, PR #31)* — **`purexml.sax` + `purexml.expatreader` drop-in**:
   the next breadth module (sax = 375 sites; expatreader promoted *deferred→done* as its engine).
   Event-driven — `make_parser`/`parse`/`parseString` drive a caller's `ContentHandler`; hardening
@@ -533,6 +545,15 @@ Small by design (~300 lines of `src/`). The whole engine is one class.
 - **`src/purexml/sax.py`** — `purexml.sax` (v0.12), the `defusedxml.sax` drop-in: `make_parser`
   (`parser_list` accepted+ignored — always its own hardened reader), `parse`, `parseString`
   (**bytes-only**, mirroring defusedxml's `BytesIO(string)`). Malformed → stdlib `SAXParseException`.
+- **`src/purexml/xmlrpc.py`** — `purexml.xmlrpc` (v0.13), the `defusedxml.xmlrpc` drop-in. NOT a
+  parse fn — a **lazy monkeypatch shim** (option C): `monkey_patch()`/`unmonkey_patch()` swap a
+  defused `xmlrpc.client.ExpatParser` subclass (`FastParser`) + bounded gzip (`MAX_DATA`,
+  anti-bomb) onto `xmlrpc.client`/`server`, restoring captured originals on undo. **All
+  `xmlrpc`/`gzip`/`io` imports are LAZY** (inside the functions / lazy class factories — a
+  module-level class would import the transport at import time), so `import purexml` stays
+  network-free until a consumer calls `monkey_patch()`. `setattr` for the stdlib patch
+  assignments (mypy-clean). The no-I/O guard carves out only `xmlrpc`/`gzip` for this file;
+  `socket`/`http` stay forbidden (purexml never imports the transport).
 - **`src/purexml/__init__.py`** — top-level convenience re-exports of the family +
   exceptions + the expat-version API + `__version__`; imports the `ElementTree` submodule.
 - **`src/purexml/__main__.py`** — the `python -m purexml` posture CLI (v0.7): prints
