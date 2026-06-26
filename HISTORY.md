@@ -24,6 +24,7 @@ below.
 
 | Version | Schema | Date | Notable | Spec | Compliance |
 |---|---|---|---|---|---|
+| 0.12.0 | n/a | 2026-06-26 (PR #31) | **`purexml.sax` + `purexml.expatreader` drop-in** — the next breadth module (sax = 375 sites; expatreader promoted *deferred→done* as its engine). Event-driven: `make_parser`/`parse`/`parseString` drive a caller's `ContentHandler`; hardening installed in `reset()` on the stdlib `xml.sax.expatreader.ExpatParser`, raising purexml's exceptions. `parseString` is **bytes-only** (mirrors defusedxml exactly; `str`→`TypeError` on both — no over-accept). Malformed → stdlib `SAXParseException` (not a `PureXMLError`). New parse surface → **LOGIC extended** (sax event path); SCHEMA n/a; zero-dep intact. Event-stream parity vs the oracle (8 ALLOW equal + external-DTD both-block); no-fetch proven across SAX vectors. Full four-leg (security-load-bearing); sax+expatreader 100% cov. (RFC §3.4 refined: SAX reader is no-leak/gc-collected — a residual pyexpat exception-retention cycle, parity with defusedxml.sax — not fully refcount-reclaimable.) | [v0.12.0_RFC_Specification.md](docs/v0.12.0_RFC_Specification.md) _(approved 2026-06-26)_ | [COMPLIANCE-v0.12.md](docs/COMPLIANCE-v0.12.md) |
 | 0.11.0 | n/a | 2026-06-26 (PR #30) | **Map the reachable libexpat 2.8.2 batch** — the follow-up to v0.10.1's floor patch (the v0.5.1→v0.6 lifecycle). Grounding confirmed **7 of the 2.8.2 CVEs reach purexml's ordinary parse paths** (storeAtts 56403 / addBinding 56404 / getAttributeId 56405 / XML_ParseBuffer 56406 / textLen 56407 / copyString 56408 / doProlog 56132); the reentrant-handler/suspend-resume trio (50219/56131/56412) and the xmlwf trio (56409–56411) do **not**. Adds one **aggregate** class `integer_overflow_dos_expat_2_8_2` to `security_report().mitigations` (EXPAT_MITIGATED ≥2.8.2 else LIVE; the 7 CVEs share fix version + status + nature) and **retires the v0.10.1 interim `_HIGHEST_UNMAPPED_FIX`** (every reachable fix tracked again; below-floor advisory names the LIVE class). Report-only — no parse-behavior change; LOGIC unchanged (reported, not blocked), SCHEMA n/a. | [v0.11.0_RFC_Specification.md](docs/v0.11.0_RFC_Specification.md) _(approved 2026-06-26)_ | [COMPLIANCE-v0.11.md](docs/COMPLIANCE-v0.11.md) |
 | 0.10.1 | n/a | 2026-06-26 | **Patch** — libexpat-floor currency (no parse-behavior change). The release-time currency gate caught **libexpat 2.8.2** (2026-06-25), a large integer-overflow / memory-corruption release with classes reachable via ordinary attribute/namespace/text/DOCTYPE parsing (storeAtts, addBinding, getAttributeId, textLen, copyString, doProlog, XML_ParseBuffer). Bumps **`RECOMMENDED_EXPAT_VERSION` 2.8.1 → 2.8.2** (report data) and **re-arms the generic floor advisory** (`_HIGHEST_UNMAPPED_FIX = 2.8.2`) so a runtime below 2.8.2 is told it may be missing the not-yet-individually-mapped 2.8.2 batch (no silent under-report). Per-class mapping of those CVEs is the v0.11.0 minor (the v0.5.1→v0.6 lifecycle). LOGIC unchanged (reported, not blocked), SCHEMA n/a. _(HISTORY only, no RFC — part of v0.10.)_ | _(no RFC — patch)_ | _(part of v0.10)_ |
 | 0.10.0 | n/a | 2026-06-19 (PR #28) | **`purexml.minidom` drop-in + `purexml.common` shim** — first breadth beyond ElementTree, scoped by measured defusedxml usage (minidom = 457 sites, the #2 consumer surface). `parse`/`parseString` return a stdlib `xml.dom.minidom.Document` with defusedxml's `forbid_*` signature + defaults; hardening mirrors defusedxml (subclass stdlib `xml.dom.expatbuilder`, install blocking handlers raising purexml's exceptions). A caller-supplied `parser` → `NotSupportedError` (a foreign parser would bypass hardening — stricter than defusedxml). `purexml.common` aliases `DefusedXmlException = PureXMLError` so `except DefusedXmlException` survives `s/defusedxml/purexml/` across every module. New parse surface → **LOGIC extended** (minidom path); SCHEMA n/a (stdlib `Document`); zero runtime dep intact. Oracle-gated parity (9 ALLOW `toxml`-equal, 6 attacks block on both); no-fetch proven on the DOM external-DTD edge. Full four-leg (security-load-bearing); minidom+common 100% cov. | [v0.10.0_RFC_Specification.md](docs/v0.10.0_RFC_Specification.md) _(approved 2026-06-19)_ | [COMPLIANCE-v0.10.md](docs/COMPLIANCE-v0.10.md) |
@@ -52,20 +53,22 @@ List any RFCs currently in draft (`docs/v{X.Y.Z}_RFC_DRAFT.md`). When none are
 open, state so explicitly rather than deleting the section — the empty-but-named
 state is the signal:
 
-> No drafts in flight. **v0.11.0 shipped** 2026-06-26 (PR #30) — current; mapped the reachable
-> libexpat 2.8.2 integer-overflow batch into `security_report()` (one aggregate class), completing
-> the 2.8.2 currency response (v0.10.1 floor patch → v0.11.0 map). **Next: `sax` as v0.12.0** (spec
-> approved + preserved at `scratch/v0.12.0_sax_RFC_approved.md`; the next breadth module, 375
-> sites). Earlier breadth: first module
+> No drafts in flight. **v0.12.0 shipped** 2026-06-26 (PR #31) — current; `purexml.sax` +
+> `purexml.expatreader` (the second breadth module after minidom). Measured-scope status:
+> ElementTree ✅, minidom ✅, **sax ✅ (v0.12)**, expatreader ✅ (promoted, v0.12); remaining =
+> **xmlrpc** (TBD — distinct monkeypatch-the-stdlib shape, its own slice), pulldom (deferred),
+> lxml (excluded). **Next candidate: xmlrpc decision, or converge toward the 1.0 freeze** (the
+> ElementTree+minidom+sax surface now covers the bulk of measured defusedxml usage). Earlier
+> breadth: first module
 > beyond ElementTree shipped in v0.10 (`purexml.minidom` + `purexml.common`). **Scope reframed
 > 2026-06-19 (Russell):** the earned 1.0 = **the maintained, zero-dep successor that replaces
 > defusedxml across the surface the ecosystem actually imports**, grounded by a usage
 > measurement (`scratch/research/2026-06-19_defusedxml-usage-measurement.md`): ElementTree ✅,
-> **minidom ✅ (v0.10)**, **sax → v0.12.0**, xmlrpc TBD (distinct monkeypatch shape),
-> pulldom deferred, expatreader **promoted → done with sax (v0.12)**, **lxml excluded**
-> (third-party dep → breaks zero-dep). Other gates: G1 file-observer adoption + bestiary soak
-> (✅ green, standing); G5 packaging/license/name (Russell's call); G6 freeze. **Next: `sax`
-> (v0.12.0) — the next breadth module.**
+> **minidom ✅ (v0.10)**, **sax ✅ (v0.12)**, expatreader ✅ (promoted, v0.12), xmlrpc TBD
+> (distinct monkeypatch shape), pulldom deferred, **lxml excluded** (third-party dep → breaks
+> zero-dep). Other gates: G1 file-observer adoption + bestiary soak (✅ green, standing); G5
+> packaging/license/name (Russell's call); G6 freeze. **Next: the xmlrpc decision, or converge
+> toward the 1.0 freeze** (ElementTree + minidom + sax now cover the bulk of measured usage).
 >
 > (Shipped: v0.1.0 fromstring (PR #1); v0.1.1 floor→3.10 (PR #2); v0.1.2 durability +
 > expat awareness (PR #3); v0.2.0 non-streaming ElementTree surface + forbid_* knobs
@@ -73,7 +76,8 @@ state is the signal:
 > caps (PR #7); v0.5.0 trust surface (PR #8); v0.5.1 soak + expat-floor currency (PR #10);
 > v0.6.0 posture-map completion (PR #11); v0.7.0 posture CLI (PR #15); v0.8.0 typed +
 > py.typed (PR #21); v0.8.1 mypy --strict (PR #22); v0.9.0 map CVE-2026-41080 (PR #27);
-> v0.10.0 minidom + common (PR #28); v0.10.1 libexpat floor → 2.8.2; v0.11.0 map 2.8.2 batch (PR #30).
+> v0.10.0 minidom + common (PR #28); v0.10.1 libexpat floor → 2.8.2; v0.11.0 map 2.8.2 batch (PR #30);
+> v0.12.0 sax + expatreader (PR #31).
 > Plus tooling/quality: lint+coverage gates (PR #19); typed surface in flight (v0.8).)
 
 ---
