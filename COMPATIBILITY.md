@@ -19,8 +19,9 @@ For the ElementTree family, purexml matches `defusedxml` on:
 - **Defaults** — `forbid_dtd=False`, `forbid_entities=True`, `forbid_external=True`,
   and the same `forbid_*` parameters (names, order, defaults).
 - **Parse results** — **C14N-equivalent, or both raise**, verified per release against
-  the `defusedxml` oracle over a real-document corpus *and* a seeded differential fuzzer:
-  **0 disagreements** (see [`docs/EQUIVALENCE.md`](docs/EQUIVALENCE.md)). "C14N-equivalent"
+  the `defusedxml` oracle over a real-document corpus *and* a seeded differential fuzzer
+  **across every surface** (ElementTree C14N, minidom DOM, sax events, xmlrpc block-parity;
+  v0.13.1): **0 disagreements** (see [`docs/EQUIVALENCE.md`](docs/EQUIVALENCE.md)). "C14N-equivalent"
   means the canonical XML is identical — the precise, tested claim (not a looser
   "byte-identical" hand-wave).
 

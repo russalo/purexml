@@ -91,9 +91,9 @@ incumbent froze.** Concretely, that means:
   within days, and the gate caught **libexpat 2.8.2** (2026-06-25) at its next release — the
   floor moved to 2.8.2 in v0.10.1, with the reachable 2.8.2 classes mapped in the v0.11.0 minor.)
 - **Proven per release.** Every release is differentially tested against the `defusedxml`
-  oracle (C14N-equivalent-or-both-raise) over a real corpus + a fuzzer; the result is a
-  committed [`docs/EQUIVALENCE.md`](docs/EQUIVALENCE.md). New XML-attack research becomes
-  new corpus + tests.
+  oracle (C14N-equivalent-or-both-raise) over a real corpus + a seeded fuzzer — **across every
+  drop-in surface** (ElementTree, minidom, sax, xmlrpc; v0.13.1); the result is a committed
+  [`docs/EQUIVALENCE.md`](docs/EQUIVALENCE.md). New XML-attack research becomes new corpus + tests.
 - **Independent adversarial soak per cycle.** A standing external attack battery
   (out-of-tree, run by a separate reviewer) soaks each release — XML bombs, XXE, external
   entities/DTD, XInclude — judging on raw evidence (timed-out / mem-exceeded / escaped).

@@ -5,8 +5,8 @@
 > (v0.5 RFC §3B). Drop-in equivalence is a *published fact per release*,
 > proven by oracle-gating against `defusedxml`, not asserted.
 
-- **purexml version:** 0.5.0
-- **Generated:** 2026-06-17
+- **purexml version:** 0.13.1
+- **Generated:** 2026-06-26
 - **Runtime:** Python 3.12.3, libexpat 2.6.1
 - **Result:** ✅ EQUIVALENT — **0 disagreements**
 
@@ -30,13 +30,17 @@ committed**; the set is pinned by the committed manifest's hash below.
 ## 2. Seeded differential fuzz (always-run, CI gate)
 
 Deterministic generator over allow-path + attack constructs
-(`tests/test_fuzz_equivalence.py`), str **and** bytes per document. The
+(`tests/test_fuzz_equivalence.py`), run across **every drop-in surface** (v0.13.1). The
 0-disagreements result here is **gate-guaranteed**: a single disagreement
-fails the build (the test asserts C14N-equal-or-both-raise), so a report can
-only be published when this gate is green — it is not re-measured by this
-generator the way §1's corpus counts are.
+fails the build, so a report can only be published when this gate is green — it
+is not re-measured by this generator the way §1's corpus counts are.
 
-- seeds × per-seed: 12 × 80 = **960 documents** (× 2 for str+bytes = 1920 comparisons), 0 disagreements.
+- seeds × per-seed: 12 × 80 = **960 documents** per surface.
+- **surfaces (each fuzzed by the same `_doc` generator, 0 disagreements):**
+  - `ElementTree.fromstring` — C14N tree equality (str **and** bytes).
+  - `minidom.parseString` — DOM serialization (`toxml`) equality.
+  - `sax` — `ContentHandler` event-stream equality.
+  - `xmlrpc` defused parser — block-parity (refuses iff defusedxml refuses).
 - Coverage-guided counterpart (Atheris, on-demand): `fuzz/fuzz_equivalence.py`.
 
 ## 3. Curated case battery
