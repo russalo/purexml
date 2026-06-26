@@ -53,8 +53,8 @@ then-published support window).
 
 | Version | Supported |
 |---|---|
-| 0.12.x | Yes (current) |
-| < 0.12 | No (pre-1.0 moves fast; upgrade) |
+| 0.13.x | Yes (current) |
+| < 0.13 | No (pre-1.0 moves fast; upgrade) |
 
 ## Security advisories & CVE handling
 
