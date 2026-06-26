@@ -14,9 +14,9 @@ def test_expat_version_exposed():
 
 def test_floors_are_documented_constants():
     assert purexml.SAFE_EXPAT_VERSION == (2, 6, 0)
-    # RECOMMENDED tracks latest-stable libexpat (bumped to 2.8.1 after the 2026
-    # release train); it is >= the functional floor.
-    assert purexml.RECOMMENDED_EXPAT_VERSION == (2, 8, 1)
+    # RECOMMENDED tracks latest-stable libexpat (bumped to 2.8.2 in v0.10.1 after the
+    # 2026-06-25 integer-overflow/memory-safety release); it is >= the functional floor.
+    assert purexml.RECOMMENDED_EXPAT_VERSION == (2, 8, 2)
     assert purexml.RECOMMENDED_EXPAT_VERSION >= purexml.SAFE_EXPAT_VERSION
 
 
@@ -55,4 +55,9 @@ def test_version_argument_accepts_string():
 def test_assert_expat_secure_string_message_well_formed():
     with pytest.raises(RuntimeError) as exc:
         purexml.assert_expat_secure("99.0.0")
-    assert "99.0.0" in str(exc.value)  # not malformed char-split "9...9...0"
+    msg = str(exc.value)
+    assert "99.0.0" in msg  # not malformed char-split "9...9...0"
+    # PR#29 Codex: the message must NOT enumerate a fixed class list (it goes stale on every
+    # floor bump and misnames the gap). It points at security_report() for the accurate posture.
+    assert "security_report()" in msg
+    assert "billion laughs" not in msg and "disproportionate" not in msg

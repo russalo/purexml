@@ -117,7 +117,8 @@ _L = purexml.LIVE
     ((2, 7, 2), _M, _M, _L, _P, _L, True,  False),  # memory fixed
     ((2, 7, 4), _M, _M, _M, _P, _L, True,  False),  # content fixed (v0.6)
     ((2, 8, 0), _M, _M, _M, _P, _L, True,  False),  # expat has 16-byte API; wrapper unverifiable -> still PARTIAL
-    ((2, 8, 1), _M, _M, _M, _P, _M, True,  True),   # attr fixed = recommended-latest
+    ((2, 8, 1), _M, _M, _M, _P, _M, True,  False),  # attr fixed, but now below recommended (2.8.2)
+    ((2, 8, 2), _M, _M, _M, _P, _M, True,  True),   # recommended-latest (2.8.2)
     ((2, 9, 0), _M, _M, _M, _P, _M, True,  True),   # above
 ])
 def test_version_gating(monkeypatch, ver, large, memory, content, hashf, attr, safe, rec):
@@ -155,27 +156,29 @@ def test_below_recommended_emits_advisory_note(monkeypatch):
 
 
 def test_at_recommended_no_floor_advisory(monkeypatch):
-    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 8, 1))  # the recommended-latest floor
+    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 8, 2))  # the recommended-latest floor (v0.10.1)
     notes = purexml.security_report().notes
     assert not any("recommended" in n and "floor" in n for n in notes)
     # the structural opt-in advisory is always present (it's never auto-covered)
     assert any("opt-in" in n for n in notes)
 
 
-def test_floor_advisory_no_longer_claims_untracked_gap(monkeypatch):
-    # v0.9: every expat fix REACHABLE through purexml's paths is now individually tracked
-    # (CVE-2026-41080 became the mapped hash_flooding PARTIAL class), so the generic floor
-    # advisory must NOT claim an "untracked"/"not individually tracked" gap — that would be
-    # false. It still fires below recommended-latest and names the LIVE tracked classes.
-    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 7, 4))
+def test_floor_advisory_claims_2_8_2_gap_below_fix(monkeypatch):
+    # v0.10.1 (INTERIM): libexpat 2.8.2 added a reachable integer-overflow batch not yet
+    # individually mapped, so the generic "untracked-gap" clause is RE-ARMED below 2.8.2 — a
+    # runtime there must be told it may be missing fixes not yet tracked (no silent
+    # under-report). The v0.11.0 minor will map them and remove this clause again.
+    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 8, 1))  # below the 2.8.2 fix
     r = purexml.security_report()
     assert r.expat_meets_recommended is False
     joined = " ".join(r.notes)
     assert "recommended-latest floor" in joined
-    assert "not individually tracked" not in joined
-    assert "untracked" not in joined
-    # the still-live tracked class is named so a runtime below the floor never under-reports
-    assert "attribute_collision_dos_cve_2026_45186" in joined
+    assert "not yet individually tracked" in joined and "2.8.2" in joined
+
+    # At/above the 2.8.2 fix the gap clause must be gone (nothing reachable left untracked).
+    monkeypatch.setattr(S, "EXPAT_VERSION", (2, 8, 2))
+    assert not any("not yet individually tracked" in n
+                   for n in purexml.security_report().notes)
 
 
 def test_hash_flooding_always_partial_two_layer(monkeypatch):

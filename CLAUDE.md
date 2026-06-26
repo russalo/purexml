@@ -346,6 +346,14 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.10.1** *(shipped 2026-06-26)* — **patch: libexpat-floor currency**. The release-time
+  currency gate caught **libexpat 2.8.2** (2026-06-25) — a large integer-overflow/memory-
+  corruption release with classes reachable via ordinary attribute/namespace/text/DOCTYPE
+  parsing. Bumps `RECOMMENDED_EXPAT_VERSION` 2.8.1 → 2.8.2 (report data) and **re-arms the
+  generic floor advisory** (`_HIGHEST_UNMAPPED_FIX = 2.8.2`) so a runtime below 2.8.2 is told it
+  may be missing the not-yet-individually-mapped 2.8.2 batch. Per-class mapping is the v0.11.0
+  minor (the v0.5.1→v0.6 lifecycle). No parse-behavior change; SCHEMA n/a; LOGIC unchanged.
+  _HISTORY only, no RFC._
 - **v0.10.0** *(shipped 2026-06-19, PR #28)* — **`purexml.minidom` drop-in + `purexml.common`
   shim**: first breadth beyond ElementTree, scoped by measured defusedxml usage (minidom = 457
   sites, #2 surface). `parse`/`parseString` → stdlib `xml.dom.minidom.Document`, defusedxml's
