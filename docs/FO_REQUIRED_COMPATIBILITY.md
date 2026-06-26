@@ -29,6 +29,36 @@ The capability here is to deliver those same protections on the stdlib, directly
 The anchor consumer is **file-observer** (it parses OOXML `docProps/*.xml`, spreadsheet
 XML, and arbitrary `.xml` files through a hardened parse).
 
+## 1a. FO's explicit adoption requirements (relayed 2026-06-26) — the stable-swap contract
+
+FO uses **exactly one symbol** — `from purexml.ElementTree import fromstring` — then walks the
+result with `.iter(tag)` / `.text` / `.get(attr)` / namespace-qualified tags. Its inputs for keeping
+the swap safe + trivial (folded in here as durable scoping; **all true today**):
+
+1. **Name + module-path stability.** `purexml.ElementTree.fromstring` (import name AND path) must stay
+   stable once FO pins — a later rename/restructure breaks FO's installs *and* its
+   `ScanContext.dependencies` determinism fingerprint. **→ Any package/module rename must land
+   BEFORE FO pins** (a G5 packaging / G6 freeze input — the name/package decision is still deferred;
+   lock it before adoption, not after). Cross-ref the pre-freeze A1 (import path) item.
+2. **Narrow symbol contract.** Keep `fromstring`'s signature + the returned object's shape stable.
+   FO never touches minidom/sax/iterparse/parse — `fromstring` is the only surface that reaches it.
+3. **Element-walk output-equivalence (the load-bearing one).** `fromstring` must keep returning a
+   tree **byte-identical to stdlib `xml.etree.ElementTree`** on the shape FO reads — `.iter(tag)`
+   order, `.text`, attributes, namespace-qualified tags — not only C14N-string-equal. A silent
+   divergence would shift FO's manifest VALUES. **→ the oracle must keep covering element-WALK
+   equivalence specifically** (added as a test guard, not only C14N).
+4. **Mirror defaults.** `fromstring()` with no args must keep defusedxml's defaults
+   (`forbid_entities=True`, `forbid_external=True`, `forbid_dtd=False`) — FO never sets the knobs.
+5. **Plain-string `__version__`.** Top-level `purexml.__version__` must stay a stable plain `str`
+   (FO reads it into `ScanContext` + a manifest checksum; a non-string/odd-repr broke determinism
+   before). **→ guarded by a test.**
+6. **Stays pure-stdlib, zero-IO, ≤3.10.** Zero runtime deps, the no-network/no-filesystem-on-parse
+   guarantee (`test_no_io.py`), and Python floor ≤3.10 — the three reasons FO swaps at all.
+
+These are the floor for the G1 adoption; #3 and #5 are now backed by dedicated test guards
+(element-walk equivalence + `__version__`-is-str). #1 is an explicit input to the freeze/packaging
+decision: **decide the published name before FO pins.**
+
 ## 2. Capabilities required (WHAT, not HOW)
 
 - **C1 — Safe parse.** Given an XML document (untrusted), parse it using only the standard

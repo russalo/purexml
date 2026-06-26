@@ -36,6 +36,31 @@ def test_version_surface_sync():
     assert purexml.__version__ == manifest_version
 
 
+def test_version_is_plain_string():
+    """FO consumer floor (2026-06-26): __version__ must be a stable plain `str` — FO reads it
+    into ScanContext + a manifest checksum, and a non-string/odd-repr breaks its determinism."""
+    assert type(purexml.__version__) is str
+
+
+def test_fromstring_element_walk_equivalent_to_stdlib():
+    """FO consumer floor (2026-06-26): on an allowed parse, `fromstring` must return a tree
+    byte-identical to stdlib `xml.etree.ElementTree` on the shape FO reads — `.iter(tag)` ORDER,
+    `.text`, attributes, and namespace-qualified tags — not only C14N-string-equal. A silent
+    element-walk divergence would shift FO's manifest VALUES."""
+    doc = ('<root xmlns:n="urn:x" xmlns="urn:d">'
+           '<n:c a="1" b="2">hi</n:c><d><e>x</e>tail</d><c k="v"/></root>')
+    px = purexml.fromstring(doc)
+    std = ET.fromstring(doc)
+
+    def walk(el):
+        return [(e.tag, e.text, e.tail, tuple(sorted(e.attrib.items()))) for e in el.iter()]
+
+    assert walk(px) == walk(std)
+    # the specific accessors FO uses, on a namespaced element
+    assert px.find("{urn:x}c").get("a") == std.find("{urn:x}c").get("a") == "1"
+    assert [e.text for e in px.iter("{urn:d}e")] == [e.text for e in std.iter("{urn:d}e")]
+
+
 def test_no_runtime_dependency_on_defusedxml():
     """src/ must never IMPORT defusedxml (it is a dev/test oracle only).
 
