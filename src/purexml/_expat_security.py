@@ -113,12 +113,15 @@ def assert_expat_secure(minimum: str | Sequence[int] = RECOMMENDED_EXPAT_VERSION
     if EXPAT_VERSION < floor:
         cur = ".".join(map(str, EXPAT_VERSION))
         need = ".".join(map(str, floor))
+        # Keep the message floor-agnostic: do NOT enumerate a fixed class list (it goes
+        # stale on every floor bump and would misname the gap — e.g. at 2.8.1 the old list
+        # was all-mitigated while the real gap was the 2.8.2 batch; PR#29 Codex). Point at
+        # security_report() for the accurate per-runtime, per-class posture instead.
         raise RuntimeError(
-            "libexpat %s is below purexml's safe floor %s — the runtime may be "
-            "vulnerable to XML DoS classes mitigated only at the expat layer "
-            "(billion laughs, quadratic blowup, large tokens / CVE-2023-52425, "
-            "disproportionate dynamic memory). Upgrade Python or the system expat."
-            % (cur, need)
+            "libexpat %s is below the required floor %s — the runtime may be missing "
+            "libexpat-layer security fixes (XML DoS / memory-safety) up to that floor. "
+            "Call purexml.security_report() for the per-class posture on this runtime, "
+            "then upgrade Python or the system expat." % (cur, need)
         )
 
 
@@ -333,8 +336,12 @@ def security_report() -> SecurityReport:
                     "storeAtts / addBinding / getAttributeId / textLen / copyString / "
                     "doProlog / XML_ParseBuffer)")
         if live:
-            msg += ("; the tracked class(es) %s are also live on this runtime"
-                    % ", ".join(live))
+            # "also" only reads correctly when the untracked-gap clause preceded it; drop it
+            # when there is no gap clause (e.g. a future floor bump above _HIGHEST_UNMAPPED_FIX
+            # before the mapping minor lands). PR#29 Gemini.
+            msg += ("; the tracked class(es) %s are %slive on this runtime"
+                    % (", ".join(live),
+                       "also " if EXPAT_VERSION < _HIGHEST_UNMAPPED_FIX else ""))
         notes.append(msg + " — upgrade Python or the system expat.")
     # hash_flooding is reported PARTIAL on EVERY runtime (never LIVE, never a version-only
     # MITIGATED): the 16-byte-salt hardening needs both expat>=2.8.0 AND CPython's pyexpat
