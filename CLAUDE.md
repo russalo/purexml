@@ -346,6 +346,15 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.11.0** *(shipped 2026-06-26, PR #30)* — **map the reachable libexpat 2.8.2 batch**: the
+  follow-up to v0.10.1's floor patch (v0.5.1→v0.6 lifecycle). Grounded that **7 of the 2.8.2 CVEs
+  reach purexml's ordinary parse paths** (storeAtts/addBinding/getAttributeId/XML_ParseBuffer/
+  textLen/copyString/doProlog); the reentrant-handler/suspend-resume trio (50219/56131/56412) +
+  xmlwf trio (56409–56411) do **not**. Adds one **aggregate** class
+  `integer_overflow_dos_expat_2_8_2` (EXPAT_MITIGATED ≥2.8.2 else LIVE; the 7 share fix version +
+  status + nature) and **retires the v0.10.1 interim `_HIGHEST_UNMAPPED_FIX`** (every reachable fix
+  tracked again). Report-only; no parse-behavior change; SCHEMA n/a; LOGIC unchanged.
+  [RFC](docs/v0.11.0_RFC_Specification.md) · [compliance](docs/COMPLIANCE-v0.11.md).
 - **v0.10.1** *(shipped 2026-06-26)* — **patch: libexpat-floor currency**. The release-time
   currency gate caught **libexpat 2.8.2** (2026-06-25) — a large integer-overflow/memory-
   corruption release with classes reachable via ordinary attribute/namespace/text/DOCTYPE
@@ -520,12 +529,14 @@ Small by design (~300 lines of `src/`). The whole engine is one class.
   `RECOMMENDED_EXPAT_VERSION`, **latest-stable**, bumped as libexpat ships fixes) **+
   the `security_report()` posture API** (v0.5): a read-only, immutable `SecurityReport`
   whose `mitigations` map gates each attack class on its OWN expat fix version
-  (`_DISPROPORTIONATE_MEMORY_FIXED`/`_CONTENT_TOKEN_OVERFLOW_FIXED`/`_HASH_FLOODING_FIXED`/`_ATTRIBUTE_COLLISION_FIXED`),
+  (`_DISPROPORTIONATE_MEMORY_FIXED`/`_CONTENT_TOKEN_OVERFLOW_FIXED`/`_HASH_FLOODING_FIXED`/`_ATTRIBUTE_COLLISION_FIXED`/`_INTEGER_OVERFLOW_BATCH_FIXED`),
   decoupled from the moving recommended-latest floor. Status vocabulary is `BLOCKED`/
   `EXPAT_MITIGATED`/`EXPAT_PARTIAL`/`OPT_IN`/`LIVE` — `EXPAT_PARTIAL` (v0.9) is for a
   *hardening-not-hole* class (CVE-2026-41080: defense present, the fix strengthens it), so it
-  is **never `LIVE`**. As of v0.9 every *reachable* expat fix is individually mapped, so there
-  is no generic untracked-gap advisory (`_HIGHEST_UNMAPPED_FIX` retired).
+  is **never `LIVE`**. The 2.8.2 integer-overflow batch is mapped as ONE aggregate class
+  `integer_overflow_dos_expat_2_8_2` (v0.11; 7 CVEs sharing the 2.8.2 fix version). As of v0.11
+  every *reachable* expat fix is individually mapped again, so there is no generic untracked-gap
+  advisory (the v0.10.1 interim `_HIGHEST_UNMAPPED_FIX` retired).
 - **`tests/`** — the falsify-first battery: `test_equivalence` / `test_v02_surface`
   / `test_v03_iterparse` (C14N same-parse + event-stream + knob-matrix equivalence
   vs the oracle), `test_attacks` + `test_fuzz_equivalence` + `test_hardening_soak` +
