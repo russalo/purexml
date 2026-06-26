@@ -31,6 +31,16 @@ ALLOWED_TOPLEVEL = {"xml", "collections", "types", "typing", "__future__", "io"}
 CLI_EXTRA = {"argparse", "json", "sys"}
 CLI_FILE = "__main__.py"
 
+#: ``xmlrpc.py`` (v0.13) is a monkeypatch shim for the stdlib ``xmlrpc``. It references
+#: ``xmlrpc`` / ``gzip`` — but ONLY via **lazy** imports inside ``monkey_patch()`` and the gzip
+#: helpers, so ``import purexml`` never pulls them (proven behaviorally by
+#: ``test_v13_xmlrpc.test_import_is_lazy_no_network``). The static walker sees them anyway, so
+#: they are carved out here. ``socket`` / ``http`` / ``urllib`` stay **FORBIDDEN** even for this
+#: file — purexml never imports the transport itself; the network reach is ``xmlrpc.client``'s,
+#: only after an explicit ``monkey_patch()``.
+XMLRPC_EXTRA = {"xmlrpc", "gzip"}
+XMLRPC_FILE = "xmlrpc.py"
+
 #: Explicitly forbidden — network, process-exec, OS, and low-level memory modules,
 #: plus common third-party HTTP clients. None belong in a stdlib-only safe parser.
 FORBIDDEN = {
@@ -60,7 +70,11 @@ def test_src_imports_only_stdlib_xml():
     """Strong form: the entire runtime import surface is the stdlib `xml` package —
     except the CLI entry point, which may add CLI-output stdlib (see CLI_EXTRA)."""
     for py in _SRC.rglob("*.py"):
-        allowed = ALLOWED_TOPLEVEL | CLI_EXTRA if py.name == CLI_FILE else ALLOWED_TOPLEVEL
+        allowed = ALLOWED_TOPLEVEL
+        if py.name == CLI_FILE:
+            allowed = ALLOWED_TOPLEVEL | CLI_EXTRA
+        elif py.name == XMLRPC_FILE:
+            allowed = ALLOWED_TOPLEVEL | XMLRPC_EXTRA
         extra = _toplevel_imports(py) - allowed
         assert not extra, (
             "%s imports outside the allowed surface %s: %s "
