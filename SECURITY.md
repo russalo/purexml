@@ -86,8 +86,9 @@ incumbent froze.** Concretely, that means:
 - **Tracks libexpat.** A standing gate (`tools/check_expat_currency.py`) checks the latest
   libexpat against the recommended floor before every release and when the security code
   changes; new reachable attack classes are added to `security_report()`, gated on their
-  fix version. (Done twice already: the 2026 expat 2.7.4–2.8.1 DoS train was folded in
-  within days.)
+  fix version. (Demonstrated repeatedly: the 2026 expat 2.7.4–2.8.1 DoS train was folded in
+  within days, and the gate caught **libexpat 2.8.2** (2026-06-25) at its next release — the
+  floor moved to 2.8.2 in v0.10.1, with the reachable 2.8.2 classes mapped in the v0.11.0 minor.)
 - **Proven per release.** Every release is differentially tested against the `defusedxml`
   oracle (C14N-equivalent-or-both-raise) over a real corpus + a fuzzer; the result is a
   committed [`docs/EQUIVALENCE.md`](docs/EQUIVALENCE.md). New XML-attack research becomes

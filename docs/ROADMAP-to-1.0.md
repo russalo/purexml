@@ -43,10 +43,10 @@ forbid_entities=True, forbid_external=True`), and accept defusedxml's
 On top, add bounded opt-in defense-in-depth defusedxml never had (all **shipped**,
 default-off):
 - **Runtime libexpat-version assertion** (`pyexpat.EXPAT_VERSION`) — protection is
-  entirely libexpat-version-dependent (the recommended-latest floor is **2.8.1** as
-  of 2026-05, after the 2.7.4–2.8.1 DoS release train; older expat is still
-  vulnerable to several classes); unique to purexml. (v0.1.2; surfaced for adopters by
-  `security_report()` in v0.5; floor refreshed to 2.8.1 in v0.5.1.)
+  entirely libexpat-version-dependent (the recommended-latest floor is **2.8.2** as
+  of 2026-06, after the 2.7.4–2.8.2 DoS / memory-safety release train; older expat is
+  still vulnerable to several classes); unique to purexml. (v0.1.2; surfaced for adopters by
+  `security_report()` in v0.5; floor refreshed to 2.8.1 in v0.5.1, to 2.8.2 in v0.10.1.)
 - **Reparse-deferral awareness** (CVE-2023-52425 "large tokens"; Expat 2.6.0;
   CPython 3.13 `Get/SetReparseDeferralEnabled`, reachable via our expat parser).
 - **Amplification-limit awareness** (libexpat 2.4.0 billion-laughs cap).

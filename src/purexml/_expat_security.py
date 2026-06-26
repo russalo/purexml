@@ -48,18 +48,19 @@ EXPAT_VERSION = _expat.version_info
 SAFE_EXPAT_VERSION = (2, 6, 0)
 
 #: Conservative "recommended" floor = the **latest stable libexpat** with all known
-#: XML-parsing security fixes. Bumped to 2.8.1 (2026-05-10) after a 2026 release train
-#: shipped DoS fixes above the old 2.7.2 line, several reachable through purexml's
-#: normal parse paths: 2.7.4 (CVE-2026-25210, doContent integer overflow),
-#: 2.8.0 (CVE-2026-41080, the fix CPython tracked for its bundled expat),
-#: 2.8.1 (CVE-2026-45186, quadratic attribute-name collision check). (2.7.4
-#: CVE-2026-24515 and 2.7.5 CVE-2026-32776 are NULL-deref classes purexml does not
-#: reach — unused encoding handler / blocked external param entities — but the floor
-#: stays at latest-stable: fail-safe, and a consumer's expat is shared.) **The default**
-#: for the secure checks below — under-reporting security is worse than over-reporting.
-#: Provisional; the precise floor + enforce-vs-warn policy is a 1.0-freeze decision.
-#: Per-class fix versions (not this coarse floor) drive the mitigation map.
-RECOMMENDED_EXPAT_VERSION = (2, 8, 1)
+#: XML-parsing security fixes. Bumped to 2.8.2 (2026-06-25) after a large 2026 release
+#: train shipped DoS / memory-safety fixes, several reachable through purexml's normal
+#: parse paths: 2.7.4 (CVE-2026-25210, doContent integer overflow), 2.8.0
+#: (CVE-2026-41080, hash-salt entropy), 2.8.1 (CVE-2026-45186, quadratic attribute-name
+#: collision check), and **2.8.2 (a batch of integer-overflow / memory-corruption fixes
+#: in storeAtts / addBinding / getAttributeId / textLen / copyString / doProlog /
+#: XML_ParseBuffer — reachable via ordinary attribute / namespace / text / DOCTYPE
+#: parsing).** (NULL-deref / xmlwf-only / suspend-resume classes purexml does not reach
+#: are not mapped, but the floor stays at latest-stable: fail-safe, and a consumer's
+#: expat is shared.) **The default** for the secure checks below — under-reporting
+#: security is worse than over-reporting. Provisional; the precise floor + enforce-vs-warn
+#: policy is a 1.0-freeze decision. Per-class fix versions drive the mitigation map.
+RECOMMENDED_EXPAT_VERSION = (2, 8, 2)
 
 #: Per-class fix versions — each attack class in the mitigation map gates on the
 #: expat release that fixed IT, NOT the moving recommended-latest floor, so the map
@@ -69,13 +70,17 @@ _CONTENT_TOKEN_OVERFLOW_FIXED = (2, 7, 4)   # CVE-2026-25210 (doContent integer 
 _HASH_FLOODING_FIXED = (2, 8, 0)            # CVE-2026-41080 (SipHash salt entropy; hardening)
 _ATTRIBUTE_COLLISION_FIXED = (2, 8, 1)      # CVE-2026-45186 (quadratic attr-name checks)
 
-# As of v0.9.0 every expat fix REACHABLE through purexml's parse paths is individually
-# tracked in the mitigation map below, so there is no generic "untracked-gap" advisory
-# (the old `_HIGHEST_UNMAPPED_FIX` was retired when CVE-2026-41080 was grounded + mapped).
-# The only unmapped expat fixes are the two NULL-deref classes purexml does NOT reach
-# (CVE-2026-24515 @ 2.7.4, unused unknown-encoding handler; CVE-2026-32776 @ 2.7.5,
-# blocked external-param-entity path). If a future *reachable* expat fix lands, add a
-# per-class constant here and a map entry below (the v0.6 / v0.9 pattern).
+# INTERIM (v0.10.1): libexpat 2.8.2 (2026-06-25) shipped a batch of integer-overflow /
+# memory-corruption fixes REACHABLE through purexml's ordinary parse paths (storeAtts,
+# addBinding, getAttributeId, textLen, copyString, doProlog, XML_ParseBuffer). This patch
+# bumps RECOMMENDED to 2.8.2 (report data) but does NOT yet individually map those classes
+# — that is the v0.11.0 minor (mitigation-set change → RFC, the v0.5.1→v0.6 lifecycle). Until
+# then, `_HIGHEST_UNMAPPED_FIX` re-arms the generic floor advisory so a runtime below 2.8.2 is
+# told it may be missing fixes not yet individually tracked (no silent under-report). The
+# v0.11.0 minor maps the reachable classes and retires this marker again.
+# (Unmapped-and-unreachable: NULL-deref CVE-2026-24515 @ 2.7.4 / -32776 @ 2.7.5; xmlwf-only and
+# suspend-resume classes purexml does not reach.)
+_HIGHEST_UNMAPPED_FIX = (2, 8, 2)
 
 
 def _as_version_tuple(v: str | Sequence[int]) -> tuple[int, ...]:
@@ -315,15 +320,20 @@ def security_report() -> SecurityReport:
         cur = ".".join(map(str, EXPAT_VERSION))
         rec = ".".join(map(str, RECOMMENDED_EXPAT_VERSION))
         live = sorted(k for k, v in mitigations.items() if v == LIVE)
-        # Below the recommended-latest floor. As of v0.9 every expat fix REACHABLE
-        # through purexml's paths is individually tracked in the map, so there is no
-        # generic "untracked-gap" clause — it would be false (CVE-2026-41080 is now the
-        # mapped `hash_flooding_*` PARTIAL class; the only unmapped fixes are the two
-        # NULL-deref classes purexml does not reach). The mapped LIVE classes are always
-        # named so a runtime below the floor never under-reports (PR#10 Codex P2).
+        # Below the recommended-latest floor. INTERIM (v0.10.1): libexpat 2.8.2 added a
+        # reachable integer-overflow batch not yet individually mapped, so the generic
+        # "untracked-gap" clause is re-armed (gated on `_HIGHEST_UNMAPPED_FIX`) — a runtime
+        # below 2.8.2 is told it may be missing fixes not yet tracked here, no silent
+        # under-report. The v0.11.0 minor maps those classes and removes this clause again.
+        # The mapped LIVE classes are always named regardless (PR#10 Codex P2).
         msg = "libexpat %s is below the recommended-latest floor %s" % (cur, rec)
+        if EXPAT_VERSION < _HIGHEST_UNMAPPED_FIX:
+            msg += (": it may be missing expat fixes not yet individually tracked here "
+                    "(notably the 2.8.2 integer-overflow / memory-corruption batch — "
+                    "storeAtts / addBinding / getAttributeId / textLen / copyString / "
+                    "doProlog / XML_ParseBuffer)")
         if live:
-            msg += ("; the tracked class(es) %s are live on this runtime"
+            msg += ("; the tracked class(es) %s are also live on this runtime"
                     % ", ".join(live))
         notes.append(msg + " — upgrade Python or the system expat.")
     # hash_flooding is reported PARTIAL on EVERY runtime (never LIVE, never a version-only

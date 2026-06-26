@@ -69,15 +69,17 @@ print(purexml.security_report())          # or:  python -m purexml
 ```
 ```
 purexml security posture            (example on a current runtime)
-  libexpat version: 2.8.1
+  libexpat version: 2.8.2
     meets safe floor (2.6.0): yes
-    meets recommended (2.8.1): yes
+    meets recommended (2.8.2): yes
   mitigations (where each attack class is handled on this runtime):
     attribute_collision_dos_cve_2026_45186 : mitigated-by-libexpat
     billion_laughs                         : blocked-by-purexml
     content_token_overflow_cve_2026_25210  : mitigated-by-libexpat
+    disproportionate_memory                : mitigated-by-libexpat
     external_dtd_retrieval                 : blocked-by-purexml
     external_entity_xxe                    : blocked-by-purexml
+    hash_flooding_cve_2026_41080           : partial-by-libexpat (defense present; upgrade hardens it)
     large_tokens_cve_2023_52425            : mitigated-by-libexpat
     quadratic_blowup                       : blocked-by-purexml
     structural_dos_depth_attrs_size        : opt-in (pass Limits)
