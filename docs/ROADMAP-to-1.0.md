@@ -55,12 +55,13 @@ default-off):
 - **Opt-in structural-DoS caps** (`Limits` — `max_depth`/`max_attributes`/`max_bytes`;
   v0.4) — bound the pathological-but-legal inputs neither defusedxml nor the expat cap cover.
 - **Trust surface** (`security_report()`; v0.5, posture map completed v0.6, **all reachable
-  classes mapped v0.9**) — a read-only report mapping each attack class to where it's handled
-  on the runtime, with per-class libexpat fix-version gating (incl. the 2026 DoS classes). The
-  maintained-successor promise made legible: the living library tells you your posture, and
+  classes mapped through v0.11**) — a read-only report mapping each attack class to where it's
+  handled on the runtime, with per-class libexpat fix-version gating (incl. the 2026 DoS classes).
+  The maintained-successor promise made legible: the living library tells you your posture, and
   **demonstrably tracks the moving target** (v0.5.1 + v0.6 folded the 2026 libexpat 2.7.4–2.8.1
-  train in within days; v0.9 grounded + mapped the last reachable class, CVE-2026-41080, with a
-  non-overstating `EXPAT_PARTIAL` status); the frozen incumbent couldn't.
+  train in within days; v0.9 mapped CVE-2026-41080 with a non-overstating `EXPAT_PARTIAL` status;
+  the currency gate caught **libexpat 2.8.2 the day after release** → v0.10.1 floor bump + v0.11.0
+  mapped its reachable integer-overflow batch); the frozen incumbent couldn't.
 
 > **Reframe (2026-06-17) — the gate is the ecosystem debut, not one consumer.**
 > Stress-tested by removing file-observer entirely: purexml's reason to exist

@@ -110,18 +110,19 @@ _L = purexml.LIVE
 # present on all supported expat) and never a version-only MITIGATED (full 16-byte-salt
 # hardening also needs CPython's pyexpat fix for CVE-2026-7210, which purexml can't verify
 # at runtime — so it is reported conservatively as PARTIAL; v0.9 + PR#27 Codex).
-@pytest.mark.parametrize("ver,large,memory,content,hashf,attr,safe,rec", [
-    ((2, 5, 0), _L, _L, _L, _P, _L, False, False),  # pre-2.6
-    ((2, 6, 0), _M, _L, _L, _P, _L, True,  False),  # safe floor (large fixed)
-    ((2, 6, 1), _M, _L, _L, _P, _L, True,  False),  # between
-    ((2, 7, 2), _M, _M, _L, _P, _L, True,  False),  # memory fixed
-    ((2, 7, 4), _M, _M, _M, _P, _L, True,  False),  # content fixed (v0.6)
-    ((2, 8, 0), _M, _M, _M, _P, _L, True,  False),  # expat has 16-byte API; wrapper unverifiable -> still PARTIAL
-    ((2, 8, 1), _M, _M, _M, _P, _M, True,  False),  # attr fixed, but now below recommended (2.8.2)
-    ((2, 8, 2), _M, _M, _M, _P, _M, True,  True),   # recommended-latest (2.8.2)
-    ((2, 9, 0), _M, _M, _M, _P, _M, True,  True),   # above
+# intov = the v0.11 aggregate integer-overflow batch: LIVE below expat 2.8.2, MITIGATED at/above.
+@pytest.mark.parametrize("ver,large,memory,content,hashf,attr,intov,safe,rec", [
+    ((2, 5, 0), _L, _L, _L, _P, _L, _L, False, False),  # pre-2.6
+    ((2, 6, 0), _M, _L, _L, _P, _L, _L, True,  False),  # safe floor (large fixed)
+    ((2, 6, 1), _M, _L, _L, _P, _L, _L, True,  False),  # between
+    ((2, 7, 2), _M, _M, _L, _P, _L, _L, True,  False),  # memory fixed
+    ((2, 7, 4), _M, _M, _M, _P, _L, _L, True,  False),  # content fixed (v0.6)
+    ((2, 8, 0), _M, _M, _M, _P, _L, _L, True,  False),  # expat has 16-byte API; wrapper unverifiable -> still PARTIAL
+    ((2, 8, 1), _M, _M, _M, _P, _M, _L, True,  False),  # attr fixed, but below recommended; 2.8.2 batch still live
+    ((2, 8, 2), _M, _M, _M, _P, _M, _M, True,  True),   # recommended-latest (2.8.2): batch fixed
+    ((2, 9, 0), _M, _M, _M, _P, _M, _M, True,  True),   # above
 ])
-def test_version_gating(monkeypatch, ver, large, memory, content, hashf, attr, safe, rec):
+def test_version_gating(monkeypatch, ver, large, memory, content, hashf, attr, intov, safe, rec):
     monkeypatch.setattr(S, "EXPAT_VERSION", ver)
     r = purexml.security_report()
     assert r.expat_version == ver
@@ -132,6 +133,7 @@ def test_version_gating(monkeypatch, ver, large, memory, content, hashf, attr, s
     assert r.mitigations["content_token_overflow_cve_2026_25210"] == content
     assert r.mitigations["hash_flooding_cve_2026_41080"] == hashf
     assert r.mitigations["attribute_collision_dos_cve_2026_45186"] == attr
+    assert r.mitigations["integer_overflow_dos_expat_2_8_2"] == intov
     # hash_flooding is a HARDENING class — present on every supported expat, so it must
     # NEVER report LIVE (that would overstate; v0.9 design): PARTIAL below 2.8.0, else MITIGATED.
     assert r.mitigations["hash_flooding_cve_2026_41080"] != purexml.LIVE
@@ -163,22 +165,25 @@ def test_at_recommended_no_floor_advisory(monkeypatch):
     assert any("opt-in" in n for n in notes)
 
 
-def test_floor_advisory_claims_2_8_2_gap_below_fix(monkeypatch):
-    # v0.10.1 (INTERIM): libexpat 2.8.2 added a reachable integer-overflow batch not yet
-    # individually mapped, so the generic "untracked-gap" clause is RE-ARMED below 2.8.2 — a
-    # runtime there must be told it may be missing fixes not yet tracked (no silent
-    # under-report). The v0.11.0 minor will map them and remove this clause again.
+def test_floor_advisory_names_mapped_batch_no_generic_gap(monkeypatch):
+    # v0.11.0: the 2.8.2 integer-overflow batch is now the mapped `integer_overflow_dos_expat_2_8_2`
+    # class, so the v0.10.1 interim generic "untracked-gap" clause is RETIRED again (mirrors v0.9).
+    # Below 2.8.2 the advisory NAMES the LIVE class (no under-report) and makes no generic gap claim.
     monkeypatch.setattr(S, "EXPAT_VERSION", (2, 8, 1))  # below the 2.8.2 fix
     r = purexml.security_report()
     assert r.expat_meets_recommended is False
     joined = " ".join(r.notes)
     assert "recommended-latest floor" in joined
-    assert "not yet individually tracked" in joined and "2.8.2" in joined
+    assert "not yet individually tracked" not in joined and "untracked" not in joined
+    assert "integer_overflow_dos_expat_2_8_2" in joined  # the LIVE class is named
+    # a dedicated note enumerates the batch's CVEs when live
+    assert "CVE-2026-56403" in joined and "storeAtts" in joined
 
-    # At/above the 2.8.2 fix the gap clause must be gone (nothing reachable left untracked).
+    # At/above 2.8.2 the class is mitigated and its live-note is gone.
     monkeypatch.setattr(S, "EXPAT_VERSION", (2, 8, 2))
-    assert not any("not yet individually tracked" in n
-                   for n in purexml.security_report().notes)
+    r2 = purexml.security_report()
+    assert r2.mitigations["integer_overflow_dos_expat_2_8_2"] == purexml.EXPAT_MITIGATED
+    assert not any("CVE-2026-56403" in n for n in r2.notes)
 
 
 def test_hash_flooding_always_partial_two_layer(monkeypatch):
