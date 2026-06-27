@@ -96,8 +96,10 @@ incumbent froze.** Concretely, that means:
   [`docs/EQUIVALENCE.md`](docs/EQUIVALENCE.md). New XML-attack research becomes new corpus + tests.
 - **Independent adversarial soak per cycle.** A standing external attack battery
   (out-of-tree, run by a separate reviewer) soaks each release — XML bombs, XXE, external
-  entities/DTD, XInclude — judging on raw evidence (timed-out / mem-exceeded / escaped).
-  Green at every release to date; any non-survival is a real finding.
+  entities/DTD, XInclude, and (for xmlrpc) gzip decompression-bombs — judging on raw evidence
+  (timed-out / mem-exceeded / escaped), **across every drop-in surface** (ElementTree, minidom,
+  sax, xmlrpc). Multi-surface GREEN at every release to date (latest vs v0.13.1, 2026-06-27);
+  any non-survival is a real finding.
 - **Reviewed.** Every change runs the four-leg decorrelated review; findings are grounded
   against the real code before action.
 
