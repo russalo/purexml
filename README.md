@@ -14,20 +14,21 @@ external-entity resolution (XXE), and external DTD retrieval — exactly as
 correctness is validated oracle-gated against `defusedxml`.
 
 Beyond the strict mirror, purexml adds **opt-in, default-off** defense-in-depth
-`defusedxml` never had — structural-DoS caps (`Limits`, v0.4) and a read-only
+`defusedxml` never had — structural-DoS caps (`Limits`, v0.4; on ElementTree +
+minidom + sax as of v0.14) and a read-only
 security-posture report (`security_report()`, v0.5) that tells you what your
 *runtime* is actually protected against. Both are off by default, so the drop-in
 promise is never violated; you get a clean mirror until you ask for more.
 
 ## Status
 
-**Working — current v0.13.0 (2026-06-26); complete `defusedxml.ElementTree`
+**Working — current v0.14.0 (2026-06-27); complete `defusedxml.ElementTree`
 drop-in** (the family completed at v0.3.0) **plus `defusedxml.minidom` + `.common`
 (v0.10), `defusedxml.sax` + `.expatreader` (v0.12), and `defusedxml.xmlrpc` (v0.13)** —
 the **measured breadth surface is now complete** (only measured-negligible `pulldom`
 deferred + third-party `lxml` excluded); next is the 1.0 freeze. Opt-in
 mirror-plus along the way: v0.4 structural-DoS caps (`Limits`,
-default-off) and the **trust surface** (`security_report()` + shipped audit evidence, v0.5;
+default-off; extended to minidom + sax in v0.14) and the **trust surface** (`security_report()` + shipped audit evidence, v0.5;
 posture map extended with the newer expat DoS classes in v0.6 and CVE-2026-41080 in v0.9;
 the `python -m purexml` posture CLI in v0.7; a typed public surface + `py.typed` in v0.8).
 All ElementTree parse entry points
@@ -39,7 +40,7 @@ CPython ≥3.10. No public contract is frozen yet (binds at v1.0), and it is **n
 published**: the vendor-vs-first-party adoption model (and with it
 PyPI/name/license) is deferred to v1.0 — see *License*. Path to 1.0:
 [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md). Latest spec:
-[`docs/v0.8.0_RFC_Specification.md`](docs/v0.8.0_RFC_Specification.md); north star:
+[`docs/v0.14.0_RFC_Specification.md`](docs/v0.14.0_RFC_Specification.md); north star:
 [`docs/v1.0_TARGET.md`](docs/v1.0_TARGET.md) and the FO floor at
 [`docs/FO_REQUIRED_COMPATIBILITY.md`](docs/FO_REQUIRED_COMPATIBILITY.md).
 

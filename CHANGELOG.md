@@ -13,6 +13,42 @@ per-release record (RFCs, compliance, internal axes) lives in
 ## [Unreleased]
 - Publish-prep: public README, this changelog, packaging metadata.
 
+## [0.14.0] — 2026-06-27
+### Added
+- Opt-in `Limits` structural-DoS caps (`max_depth`/`max_attributes`/`max_bytes`) now
+  apply to **`purexml.minidom`** and **`purexml.sax`** too, via a keyword-only
+  `limits=` argument. Default-off — with `limits=None` these surfaces stay byte-identical
+  to defusedxml. (xmlrpc is bounded by its own anti-decompression-bomb cap instead.)
+
+## [0.13.0] — 2026-06-26
+### Added
+- **`purexml.xmlrpc`** — a drop-in for `defusedxml.xmlrpc`: `monkey_patch()` /
+  `unmonkey_patch()` install/restore a defused parser plus a bounded (anti-bomb) gzip
+  decode on the stdlib `xmlrpc`. Network-capable imports stay lazy — `import purexml`
+  never pulls the transport.
+
+## [0.12.0] — 2026-06-26
+### Added
+- **`purexml.sax`** + **`purexml.expatreader`** — drop-ins for `defusedxml.sax` /
+  `.expatreader`: `make_parser` / `parse` / `parseString` driving a caller's
+  `ContentHandler`.
+
+## [0.11.0] — 2026-06-26
+### Changed
+- `security_report()` maps the reachable libexpat 2.8.2 integer-overflow batch
+  (`integer_overflow_dos_expat_2_8_2`), gated on expat ≥ 2.8.2.
+
+## [0.10.0] — 2026-06-19
+### Added
+- **`purexml.minidom`** — a drop-in for `defusedxml.minidom` (`parse` / `parseString`
+  returning a stdlib `Document`), plus **`purexml.common`** (aliases
+  `DefusedXmlException = PureXMLError`, so `except DefusedXmlException` survives
+  `s/defusedxml/purexml/`).
+
+## [0.9.0] — 2026-06-19
+### Changed
+- `security_report()` maps the SipHash hash-flooding class (`hash_flooding_cve_2026_41080`).
+
 ## [0.8.0] — 2026-06-18
 ### Added
 - **Type annotations + `py.typed`** (PEP 561): the public API is annotated and the

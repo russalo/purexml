@@ -13,6 +13,7 @@ from typing import Any
 from xml.sax.expatreader import ExpatParser as _ExpatParser
 
 from .errors import DTDForbidden, EntitiesForbidden, ExternalReferenceForbidden
+from .limits import Limits, _counter_for
 
 __all__ = ["DefusedExpatParser", "create_parser"]
 
@@ -23,13 +24,18 @@ class DefusedExpatParser(_ExpatParser):
 
     def __init__(self, namespaceHandling: int = 0, bufsize: int = 2 ** 16 - 20,
                  forbid_dtd: bool = False, forbid_entities: bool = True,
-                 forbid_external: bool = True) -> None:
-        # namespaceHandling stays `int` to match defusedxml's signature (typeshed narrows the
-        # base param to Literal[0,1]|bool; 0/1 are the real values).
-        super().__init__(namespaceHandling, bufsize)  # type: ignore[arg-type]
+                 forbid_external: bool = True, limits: Limits | None = None) -> None:
         self.forbid_dtd = forbid_dtd
         self.forbid_entities = forbid_entities
         self.forbid_external = forbid_external
+        # opt-in structural-DoS accounting (v0.14); None == no depth/attr cap. Set BEFORE
+        # super().__init__ so a lifecycle method invoked from the base ctor can never read an
+        # unset attr. (Grounded: stdlib `ExpatParser.__init__` does NOT call reset() today — so
+        # this is latent-robustness + parity with minidom's required ordering, not a live fix.)
+        self._counter = _counter_for(limits)
+        # namespaceHandling stays `int` to match defusedxml's signature (typeshed narrows the
+        # base param to Literal[0,1]|bool; 0/1 are the real values).
+        super().__init__(namespaceHandling, bufsize)  # type: ignore[arg-type]
 
     # Blocking handlers — arg mapping matches `_parser.py` (purexml's exception signatures).
     def _forbid_dtd(self, name: str, sysid: str | None, pubid: str | None,
@@ -60,6 +66,31 @@ class DefusedExpatParser(_ExpatParser):
             parser.UnparsedEntityDeclHandler = self._forbid_unparsed_entity_decl
         if self.forbid_external:
             parser.ExternalEntityRefHandler = self._forbid_external_ref
+        if self._counter is not None:
+            self._counter.reset()
+
+    # Depth/attr accounting (v0.14) — override the reader's element handlers (both NS-off and
+    # NS-on paths), count, then delegate to `super()`. sax passes attrs as a DICT, so the
+    # attribute count is len(attrs).
+    def start_element(self, name: str, attrs: Any) -> None:
+        if self._counter is not None:
+            self._counter.enter(name, len(attrs))
+        super().start_element(name, attrs)
+
+    def end_element(self, name: str) -> None:
+        if self._counter is not None:
+            self._counter.leave()
+        super().end_element(name)
+
+    def start_element_ns(self, name: Any, attrs: Any) -> None:
+        if self._counter is not None:
+            self._counter.enter(str(name), len(attrs))
+        super().start_element_ns(name, attrs)
+
+    def end_element_ns(self, name: Any) -> None:
+        if self._counter is not None:
+            self._counter.leave()
+        super().end_element_ns(name)
 
     def parse(self, source: Any) -> None:
         # The stdlib ExpatParser clears self._parser only on the SUCCESS path (close()); on a

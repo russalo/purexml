@@ -20,23 +20,27 @@ from xml.sax import InputSource as _InputSource
 from xml.sax.handler import ContentHandler
 
 from . import expatreader as _expatreader
+from .limits import Limits, _check_max_bytes
 
 __all__ = ["make_parser", "parse", "parseString"]
 
 
-def make_parser(parser_list: Any = []) -> _expatreader.DefusedExpatParser:  # noqa: B006
+def make_parser(parser_list: Any = [], *,  # noqa: B006
+                limits: Limits | None = None) -> _expatreader.DefusedExpatParser:
     """Return a hardened SAX `XMLReader`. ``parser_list`` is accepted for signature
     compatibility and ignored — like ``defusedxml.sax``, this always returns its own
-    hardened reader (a foreign driver would bypass purexml's blocking)."""
-    return _expatreader.create_parser()
+    hardened reader (a foreign driver would bypass purexml's blocking). The keyword-only
+    ``limits`` (purexml's opt-in structural-DoS caps) wires depth/attr accounting into it."""
+    return _expatreader.create_parser(limits=limits)
 
 
 def parse(source: Any, handler: ContentHandler, errorHandler: Any = _ErrorHandler(),
           forbid_dtd: bool = False, forbid_entities: bool = True,
-          forbid_external: bool = True) -> None:
+          forbid_external: bool = True, *, limits: Limits | None = None) -> None:
     """Parse *source* (filename / URL / open stream / `InputSource`) with the hardened reader,
-    driving *handler*. Same signature/defaults as ``defusedxml.sax.parse``."""
-    parser = make_parser()
+    driving *handler*. Same signature/defaults as ``defusedxml.sax.parse``. ``limits`` (opt-in)
+    enforces ``max_depth`` / ``max_attributes`` here; ``max_bytes`` is `parseString`-only."""
+    parser = make_parser(limits=limits)
     parser.setContentHandler(handler)
     parser.setErrorHandler(errorHandler)
     parser.forbid_dtd = forbid_dtd
@@ -47,12 +51,14 @@ def parse(source: Any, handler: ContentHandler, errorHandler: Any = _ErrorHandle
 
 def parseString(string: bytes, handler: ContentHandler, errorHandler: Any = _ErrorHandler(),
                 forbid_dtd: bool = False, forbid_entities: bool = True,
-                forbid_external: bool = True) -> None:
+                forbid_external: bool = True, *, limits: Limits | None = None) -> None:
     """Parse a **bytes** document with the hardened reader, driving *handler*. Same
-    signature/defaults as ``defusedxml.sax.parseString`` (bytes-only — see module docstring)."""
+    signature/defaults as ``defusedxml.sax.parseString`` (bytes-only — see module docstring).
+    ``limits`` (opt-in) enforces all three caps; default ``None`` is a no-op (mirror unchanged)."""
     if errorHandler is None:
         errorHandler = _ErrorHandler()
-    parser = make_parser()
+    _check_max_bytes(string, limits)
+    parser = make_parser(limits=limits)
     parser.setContentHandler(handler)
     parser.setErrorHandler(errorHandler)
     parser.forbid_dtd = forbid_dtd

@@ -347,6 +347,18 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.14.0** *(shipped 2026-06-27, PR #37)* — **extend opt-in `Limits` to minidom + sax**: the v0.4
+  structural-DoS caps (`max_depth`/`max_attributes`/`max_bytes`) now reach the breadth surfaces via a
+  keyword-only `*, limits=None` — opt-in, default-off (with `limits=None` minidom/sax stay
+  byte-identical; differential fuzz + sweep 372/0 confirm). A shared `_LimitCounter` in `limits.py`
+  keeps accounting identical to the ElementTree path (same `DepthExceeded`/`AttributesExceeded`/
+  `SizeExceeded`). `max_bytes` enforced on `parseString` only (stream length unknown without `os`);
+  depth/attrs also on `parse(file/stream)`. **xmlrpc deferred** (no `limits=` call site; gzip-bomb
+  `MAX_DATA` is its cap). Closes the last of three post-breadth gaps (A=fuzz-all-surfaces v0.13.1,
+  B=multi-surface re-soak #36, C=Limits breadth). New caps on new surfaces → **LOGIC extended**;
+  SCHEMA n/a. Full four-leg (security-load-bearing); 1 PR-bot finding (Gemini init-ordering on
+  expatreader) grounded as not-a-live-bug + applied anyway as parity/robustness; limits/minidom/sax/
+  expatreader 100% cov. [RFC](docs/v0.14.0_RFC_Specification.md) · [compliance](docs/COMPLIANCE-v0.14.md).
 - **v0.13.0** *(shipped 2026-06-26, PR #34)* — **`purexml.xmlrpc` (lazy-monkeypatch shim)**: the
   last non-negligible measured module (343 sites) and a *different shape* — a monkeypatch of the
   stdlib `xmlrpc`, not a parse fn. `monkey_patch()`/`unmonkey_patch()` install/restore a defused
@@ -532,6 +544,10 @@ Small by design (~300 lines of `src/`). The whole engine is one class.
   blocking handlers as `_parser.py` (arg-mapped to purexml's exception signatures). A
   caller-supplied `parser=` raises `NotSupportedError` (a foreign parser would bypass hardening —
   stricter than defusedxml's parser-patching); `bufsize=` accepted for compat, result identical.
+  Keyword-only `limits=` (v0.14): depth/attr accounting overrides the element handlers on
+  `_DefusedExpatBuilderNS` (Namespaces owns them in the MRO; `_counter` set BEFORE `super().__init__`
+  since `ExpatBuilder.__init__` calls `reset()`); attrs are an ordered list → count = `len//2`.
+  `max_bytes` on `parseString` only.
 - **`src/purexml/common.py`** — `purexml.common`, the exception-compat shim (v0.10): re-exports
   the block exceptions + `NotSupportedError` and aliases `DefusedXmlException = PureXMLError`, so
   `except DefusedXmlException` survives `s/defusedxml/purexml/` across every module. Compat layer
@@ -541,10 +557,15 @@ Small by design (~300 lines of `src/`). The whole engine is one class.
   `_parser.py`/`minidom.py` **in `reset()`** (where the stdlib reader (re)creates `self._parser`);
   `create_parser()` returns it. `parse()` clears the reader→parser edge on every path (minidom
   PR#28 hygiene) — but the SAX reader is only *gc-collected*, not refcount-reclaimable (residual
-  pyexpat exception-retention cycle; defusedxml.sax has it too).
+  pyexpat exception-retention cycle; defusedxml.sax has it too). Keyword-only `limits=` (v0.14):
+  overrides `start_element`/`end_element` + the NS-on `start_element_ns(name, attrs)`/`end_element_ns(name)`
+  (grounded signatures); attrs are a dict → count = `len`. `_counter` set before `super().__init__`
+  for parity (grounded: `ExpatParser.__init__` doesn't call reset(), so latent-robustness not a live fix).
 - **`src/purexml/sax.py`** — `purexml.sax` (v0.12), the `defusedxml.sax` drop-in: `make_parser`
   (`parser_list` accepted+ignored — always its own hardened reader), `parse`, `parseString`
   (**bytes-only**, mirroring defusedxml's `BytesIO(string)`). Malformed → stdlib `SAXParseException`.
+  Keyword-only `limits=` (v0.14) threads through `make_parser` → `create_parser`; `parseString`
+  also checks `max_bytes`.
 - **`src/purexml/xmlrpc.py`** — `purexml.xmlrpc` (v0.13), the `defusedxml.xmlrpc` drop-in. NOT a
   parse fn — a **lazy monkeypatch shim** (option C): `monkey_patch()`/`unmonkey_patch()` swap a
   defused `xmlrpc.client.ExpatParser` subclass (`FastParser`) + bounded gzip (`MAX_DATA`,
@@ -564,7 +585,10 @@ Small by design (~300 lines of `src/`). The whole engine is one class.
   `EntitiesForbidden`, `ExternalReferenceForbidden`, `LimitExceeded`(←`Depth`/
   `Attributes`/`SizeExceeded`). Malformed → stdlib `ParseError`.
 - **`src/purexml/limits.py`** — opt-in structural-DoS caps (v0.4): `Limits`
-  (`max_depth`/`max_attributes`/`max_bytes`, default `None`) + `RECOMMENDED_LIMITS`.
+  (`max_depth`/`max_attributes`/`max_bytes`, default `None`) + `RECOMMENDED_LIMITS`. v0.14
+  adds the shared `_LimitCounter` (enter/leave/reset depth+attr accounting), `_counter_for(limits)`
+  (None when no depth/attr cap), and `_check_max_bytes(data, limits)` — reused by minidom + sax so
+  the breadth surfaces enforce caps identically to the ElementTree path.
 - **`src/purexml/_expat_security.py`** — opt-in libexpat version-awareness
   (`EXPAT_VERSION`, `expat_is_secure`/`assert_expat_secure`; default floor =
   `RECOMMENDED_EXPAT_VERSION`, **latest-stable**, bumped as libexpat ships fixes) **+
@@ -666,7 +690,8 @@ blame`.
   defusedxml lacks, **opt-in**: runtime `pyexpat.EXPAT_VERSION` assertion (v0.1.2),
   the `forbid_dtd=True` OWASP strict mode (v0.2), and **opt-in structural-DoS caps**
   (`max_depth`/`max_attributes`/`max_bytes`, v0.4 — defusedxml + the expat cap don't
-  bound structural DoS). **Rule: any defense-in-depth is OPT-IN, default-OFF — never
+  bound structural DoS; **extended to minidom + sax in v0.14** via a shared `_LimitCounter`,
+  same caps/exceptions, default-off so the breadth mirror stays byte-identical). **Rule: any defense-in-depth is OPT-IN, default-OFF — never
   diverge from defusedxml by default.** At 1.0 freeze the mirror surface is STABLE;
   the novel defense-in-depth is PROVISIONAL (it may evolve). See `docs/v0.4.0_RFC_Specification.md`.
 - **Adoption model: DIRECTION decided = publish first-party; SPECIFICS deferred to

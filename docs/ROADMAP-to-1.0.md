@@ -55,7 +55,8 @@ default-off):
 - **Optional `forbid_dtd=True` strict mode** (OWASP's strongest: one control for
   XXE *and* billion-laughs). (v0.2.)
 - **Opt-in structural-DoS caps** (`Limits` — `max_depth`/`max_attributes`/`max_bytes`;
-  v0.4) — bound the pathological-but-legal inputs neither defusedxml nor the expat cap cover.
+  v0.4, extended to `minidom` + `sax` in v0.14) — bound the pathological-but-legal inputs
+  neither defusedxml nor the expat cap cover.
 - **Trust surface** (`security_report()`; v0.5, posture map completed v0.6, **all reachable
   classes mapped through v0.11**) — a read-only report mapping each attack class to where it's
   handled on the runtime, with per-class libexpat fix-version gating (incl. the 2026 DoS classes).

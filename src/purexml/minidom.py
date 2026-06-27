@@ -26,6 +26,7 @@ from .errors import (
     ExternalReferenceForbidden,
     NotSupportedError,
 )
+from .limits import Limits, _check_max_bytes, _counter_for
 
 __all__ = ["parse", "parseString"]
 
@@ -41,7 +42,11 @@ class _DefusedExpatBuilder(_ExpatBuilder):
     ``defusedxml.expatbuilder.DefusedExpatBuilder``, raising purexml's exceptions."""
 
     def __init__(self, options: Any = None, forbid_dtd: bool = False,
-                 forbid_entities: bool = True, forbid_external: bool = True) -> None:
+                 forbid_entities: bool = True, forbid_external: bool = True,
+                 limits: Limits | None = None) -> None:
+        # opt-in structural-DoS accounting (v0.14); None == no depth/attr cap. MUST precede
+        # super().__init__ — ExpatBuilder.__init__ calls self.reset(), which reads self._counter.
+        self._counter = _counter_for(limits)
         super().__init__(options)
         self.forbid_dtd = forbid_dtd
         self.forbid_entities = forbid_entities
@@ -108,29 +113,47 @@ class _DefusedExpatBuilderNS(_Namespaces, _DefusedExpatBuilder):
     def reset(self) -> None:
         _DefusedExpatBuilder.reset(self)
         self._initNamespaces()  # type: ignore[attr-defined]
+        if self._counter is not None:
+            self._counter.reset()
+
+    # Depth/attr accounting (v0.14). These override `Namespaces`' element handlers (which win
+    # in this class's MRO) and delegate to `super()`; minidom passes attributes as an ordered
+    # LIST [name1, val1, ...], so the attribute count is len()//2. The root + all nested go
+    # through `start_element_handler` (first_element_handler delegates to it), so this counts
+    # every element.
+    def start_element_handler(self, name: str, attributes: Any) -> None:
+        if self._counter is not None:
+            self._counter.enter(name, len(attributes) // 2)
+        super().start_element_handler(name, attributes)
+
+    def end_element_handler(self, name: str) -> None:
+        if self._counter is not None:
+            self._counter.leave()
+        super().end_element_handler(name)
 
 
-def _builder(forbid_dtd: bool, forbid_entities: bool,
-             forbid_external: bool) -> _DefusedExpatBuilder:
+def _builder(forbid_dtd: bool, forbid_entities: bool, forbid_external: bool,
+             limits: Limits | None = None) -> _DefusedExpatBuilder:
     # Namespace-aware by default, matching stdlib/defusedxml minidom.
     return _DefusedExpatBuilderNS(
         forbid_dtd=forbid_dtd, forbid_entities=forbid_entities,
-        forbid_external=forbid_external)
+        forbid_external=forbid_external, limits=limits)
 
 
 def parse(file: str | IO[Any], parser: Any = None, bufsize: int | None = None,
           forbid_dtd: bool = False, forbid_entities: bool = True,
-          forbid_external: bool = True) -> Document:
+          forbid_external: bool = True, *, limits: Limits | None = None) -> Document:
     """Parse a file (filename or open binary file object) into a hardened DOM ``Document``.
 
-    Same signature/defaults as ``defusedxml.minidom.parse``. A caller-supplied ``parser``
-    raises `NotSupportedError` (it would bypass hardening). ``bufsize`` is accepted for
-    signature compatibility but does not change the hardened whole-document parse (the
-    resulting ``Document`` is identical).
+    Same signature/defaults as ``defusedxml.minidom.parse`` (a caller-supplied ``parser``
+    raises `NotSupportedError`; ``bufsize`` is accepted for compat but doesn't change the
+    result). The keyword-only ``limits`` (purexml's opt-in structural-DoS caps) enforces
+    ``max_depth`` / ``max_attributes`` here; ``max_bytes`` is enforced on `parseString` only
+    (a stream's length isn't known up front) — default ``None`` is a no-op (mirror unchanged).
     """
     if parser is not None:
         raise NotSupportedError(_CUSTOM_PARSER_MSG)
-    builder = _builder(forbid_dtd, forbid_entities, forbid_external)
+    builder = _builder(forbid_dtd, forbid_entities, forbid_external, limits)
     if isinstance(file, str):
         with open(file, "rb") as fp:
             return builder.parseFile(fp)
@@ -138,14 +161,16 @@ def parse(file: str | IO[Any], parser: Any = None, bufsize: int | None = None,
 
 
 def parseString(string: str | bytes, parser: Any = None, forbid_dtd: bool = False,
-                forbid_entities: bool = True,
-                forbid_external: bool = True) -> Document:
+                forbid_entities: bool = True, forbid_external: bool = True,
+                *, limits: Limits | None = None) -> Document:
     """Parse a string/bytes into a hardened DOM ``Document``.
 
-    Same signature/defaults as ``defusedxml.minidom.parseString``. A caller-supplied
-    ``parser`` raises `NotSupportedError`.
+    Same signature/defaults as ``defusedxml.minidom.parseString`` (a caller-supplied ``parser``
+    raises `NotSupportedError`). The keyword-only ``limits`` enforces all three opt-in caps
+    (``max_depth`` / ``max_attributes`` / ``max_bytes``); default ``None`` is a no-op (mirror).
     """
     if parser is not None:
         raise NotSupportedError(_CUSTOM_PARSER_MSG)
-    builder = _builder(forbid_dtd, forbid_entities, forbid_external)
+    _check_max_bytes(string, limits)
+    builder = _builder(forbid_dtd, forbid_entities, forbid_external, limits)
     return builder.parseString(string)

@@ -8,9 +8,10 @@
 > required-compat contract, and purexml's own 1.0 aspiration is a strict superset.)
 
 > **Where the wider 1.0 lives.** purexml has grown well past this floor — it is now the
-> complete `defusedxml.ElementTree` drop-in plus opt-in defense-in-depth (shipped through
-> v0.6: `Limits` caps in v0.4, the `security_report()` posture API in v0.5, its map
-> completed with the 2026 expat DoS classes in v0.6). FO's floor
+> complete `defusedxml.ElementTree` drop-in **plus the measured breadth surface**
+> (`minidom`/`common` v0.10, `sax`/`expatreader` v0.12, `xmlrpc` v0.13) and opt-in
+> defense-in-depth (`Limits` caps v0.4, extended to minidom + sax in v0.14; the
+> `security_report()` posture API v0.5, its map current through v0.11). FO's floor
 > below remains the non-negotiable compatibility guarantee; purexml's
 > own steward vision for a healthy 1.0 is in [`v1.0_TARGET.md`](v1.0_TARGET.md), and the
 > execution plan is [`ROADMAP-to-1.0.md`](ROADMAP-to-1.0.md). This doc is the originating
