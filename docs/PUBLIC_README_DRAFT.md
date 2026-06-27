@@ -40,9 +40,10 @@
      [[STRATEGIC: package name, license, and which publish-time badges ship are Russell's calls.]] -->
 
 <!-- Hero diagram. SVG renders on both GitHub and the PyPI project page (mermaid does NOT
-     render on PyPI). Path is repo-root-relative so it resolves once this file swaps in as
-     README.md at publish. -->
-![How purexml defends untrusted XML in two layers: purexml's own Python-layer handlers block entity bombs, XXE and external-DTD resolution version-independently, while the libexpat parser layer mitigates parser-level DoS depending on your runtime; the result is a standard, trusted xml.etree tree.](assets/defense-layers.svg)
+     render on PyPI). URL is ABSOLUTE (raw.githubusercontent) on purpose: PyPI does not resolve
+     relative image paths in the long-description, so a relative path would render on GitHub but
+     break on the PyPI page. Resolves once the repo is public on `main`. -->
+![How purexml defends untrusted XML in two layers: purexml's own Python-layer handlers block entity bombs, XXE and external-DTD resolution version-independently, while the libexpat parser layer mitigates parser-level DoS depending on your runtime; the result is a standard, trusted xml.etree tree.](https://raw.githubusercontent.com/russalo/purexml/main/assets/defense-layers.svg)
 
 purexml hardens Python's standard-library XML parser against the known untrusted-XML
 attack classes — entity-expansion bombs, XXE, external-DTD/entity resolution — and
