@@ -13,6 +13,8 @@
 > standard-library-only implementation of the `defusedxml` security model, with
 > runtime posture visibility and optional modern hardening.
 
+<!-- Badges shown now: static shields, every one true TODAY (structural facts + CI-gated
+     quality). Honesty discipline — nothing here implies a published or licensed state. -->
 ![Python 3.10–3.13](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)
 ![runtime deps: zero](https://img.shields.io/badge/runtime%20deps-zero-brightgreen)
 ![pure standard library](https://img.shields.io/badge/pure-stdlib-blue)
@@ -20,24 +22,27 @@
 ![lint: ruff](https://img.shields.io/badge/lint-ruff-30173D)
 ![types: mypy](https://img.shields.io/badge/types-mypy-blue)
 ![differentially fuzzed](https://img.shields.io/badge/differentially-fuzzed-blueviolet)
-<!-- BADGE ROADMAP — three tiers (honesty discipline: only show what's true today).
-   HAVE NOW (shown above; static, render anywhere, all true today): Python matrix
-     (CI-grounded) · runtime-deps-zero + pure-stdlib (structurally-guarded contracts) ·
-     coverage ≥90% (CI --cov-fail-under=90; ~94%) · lint ruff + types mypy (CI) ·
-     differentially-fuzzed (CI gate + opt-in Atheris harness).
-   FLIPS ON AT PUBLISH (true already, ~zero effort — just need the public repo / the
-     name+license decisions; uncomment then):
-       tests (GitHub Actions): https://img.shields.io/github/actions/workflow/status/russalo/purexml/tests.yml?label=tests
-       PyPI version · PyPI downloads · license  (once published / license set)
-   EASY TO WORK TOWARDS (earnable; pick up as publish-prep proceeds):
-       coverage  — wire pytest-cov in CI (in-lane, easy) + Codecov badge at publish
-       typed     — add a py.typed marker + a clean mypy run -> "typed" badge
-       linted    — wire ruff in CI -> style badge (cheap)
-       OpenSSF Best Practices / Scorecard — security-cred badges; higher effort,
-         strong signal for a security library (needs public repo + the questionnaire/action)
-   NOT YET (don't fake): anything implying published/licensed state before those land.
-   Full publish-prep tracker: scratch/publish_prep_checklist.md.
-   [[STRATEGIC: final tagline + the publish-time badges are Russell's call.]] -->
+
+<!-- ── AT PUBLISH: uncomment these DYNAMIC badges (they self-update — they can't silently go
+     stale the way a hardcoded shield can) and RETIRE the matching static one above. Each is
+     true today; gated only on the public repo + the name/license decision, not on more work. ──
+
+![CI](https://img.shields.io/github/actions/workflow/status/russalo/purexml/tests.yml?branch=main&label=tests)  (live green/red; needs public repo — replaces nothing)
+![PyPI](https://img.shields.io/pypi/v/purexml)                          (needs publish)
+![Python versions](https://img.shields.io/pypi/pyversions/purexml)      (dynamic; RETIRE the static Python matrix above)
+![Coverage](https://codecov.io/gh/russalo/purexml/branch/main/graph/badge.svg)  (real %; needs Codecov — RETIRE the static coverage badge above)
+![License](https://img.shields.io/pypi/l/purexml)                       (needs the license decision)
+![OpenSSF Best Practices](https://www.bestpractices.dev/projects/PROJECT_ID/badge)  (enroll at bestpractices.dev → fill PROJECT_ID — the headline credential for a security library)
+![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/russalo/purexml/badge)  (optional; supply-chain posture, needs the Scorecard action)
+
+     NOT YET (don't fake): downloads (no traffic yet — low value early); anything implying a
+     published/licensed state before those land. Tracker: scratch/publish_prep_checklist.md.
+     [[STRATEGIC: package name, license, and which publish-time badges ship are Russell's calls.]] -->
+
+<!-- Hero diagram. SVG renders on both GitHub and the PyPI project page (mermaid does NOT
+     render on PyPI). Path is repo-root-relative so it resolves once this file swaps in as
+     README.md at publish. -->
+![How purexml defends untrusted XML in two layers: purexml's own Python-layer handlers block entity bombs, XXE and external-DTD resolution version-independently, while the libexpat parser layer mitigates parser-level DoS depending on your runtime; the result is a standard, trusted xml.etree tree.](assets/defense-layers.svg)
 
 purexml hardens Python's standard-library XML parser against the known untrusted-XML
 attack classes — entity-expansion bombs, XXE, external-DTD/entity resolution — and

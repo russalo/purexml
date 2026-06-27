@@ -1,0 +1,37 @@
+name: Bug report
+description: A correct XML parses differently from defusedxml, a non-attack input is wrongly blocked, or purexml errors unexpectedly.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Not a vulnerability report.** A parse that should have been *blocked*, an unexpected
+        fetch/read, or any way an attack gets through is a security report — please follow
+        [SECURITY.md](https://github.com/russalo/purexml/blob/main/SECURITY.md) instead, not this form.
+  - type: textarea
+    id: xml
+    attributes:
+      label: Minimal XML input
+      description: The smallest document that reproduces it. This is the single most useful thing you can provide.
+      render: xml
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: The exact call and what happened vs. what you expected — ideally the defusedxml result alongside purexml's.
+      placeholder: |
+        from purexml.ElementTree import fromstring
+        fromstring(open("repro.xml","rb").read())   # got: ... ; expected (defusedxml): ...
+      render: python
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: purexml version, Python version, and libexpat version (`python -m purexml` prints the last).
+      placeholder: "purexml 0.14.0 · CPython 3.12.3 · libexpat 2.8.2"
+    validations:
+      required: true
