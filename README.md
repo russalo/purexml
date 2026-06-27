@@ -1,4 +1,9 @@
-<p align="center"><img src="assets/logo.svg" alt="purexml logo" width="120" height="120"></p>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+    <img src="assets/logo-light.svg" alt="purexml logo" width="120" height="120">
+  </picture>
+</p>
 
 # purexml
 

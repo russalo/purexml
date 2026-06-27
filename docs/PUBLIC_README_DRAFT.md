@@ -7,9 +7,15 @@
      defusedxml's status). [[STRATEGIC]] markers = Russell's positioning/naming/
      license/publish-timing calls, left open. -->
 
-<!-- Logo: absolute raw URL so it renders on the PyPI project page (PyPI does not resolve
-     relative paths); resolves once the repo is public on `main`. -->
-<p align="center"><img src="https://raw.githubusercontent.com/russalo/purexml/main/assets/logo.svg" alt="purexml logo" width="120" height="120"></p>
+<!-- Logo: absolute raw URLs so it renders on the PyPI project page (PyPI does not resolve
+     relative paths); resolves once the repo is public on `main`. GitHub honors <picture> for
+     light/dark; PyPI's sanitizer drops <source> and falls back to the light <img>. -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/russalo/purexml/main/assets/logo-dark.svg">
+    <img src="https://raw.githubusercontent.com/russalo/purexml/main/assets/logo-light.svg" alt="purexml logo" width="120" height="120">
+  </picture>
+</p>
 
 # purexml
 
