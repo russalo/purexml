@@ -1,6 +1,6 @@
 # purexml Public Contract
 
-> **⚠️ NOT YET BINDING — purexml is pre-1.0 (currently v0.13.0).** No public
+> **⚠️ NOT YET BINDING — purexml is pre-1.0 (currently v0.14.0).** No public
 > contract is frozen. The de-facto surface today is the full
 > `defusedxml.ElementTree` family (`fromstring`, `parse`, `iterparse`,
 > `fromstringlist`, `XML`, `XMLParser`, `tostring`, `ParseError`, the `forbid_*`
@@ -11,7 +11,7 @@
 > and `purexml.common` (the `DefusedXmlException` catch-site alias). The measured breadth surface
 > is complete (see `docs/ROADMAP-to-1.0.md`) — plus **opt-in,
 > default-off** additions (`Limits`
-> structural caps, the `security_report()` posture API) and a read-only posture CLI
+> structural caps — on ElementTree + minidom + sax as of v0.14, the `security_report()` posture API) and a read-only posture CLI
 > (`python -m purexml`). Until v1.0 any of it may
 > still change. The tables below are the **skeleton to fill at the v1.0 freeze**;
 > they are intentionally not populated yet (pinning a contract pre-1.0 would be a

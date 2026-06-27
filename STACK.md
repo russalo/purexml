@@ -40,7 +40,8 @@ scaffolding side-by-side; the Go half was deleted when purexml chose Python.)
   `ElementTree.py` (the canonical `purexml.ElementTree` namespace mirroring
   defusedxml), `_parser.py` (the expat-based engine — `XMLParser` + `fromstring`/
   `parse`/`iterparse`/`fromstringlist`), `errors.py` (exception hierarchy),
-  `limits.py` (opt-in structural-DoS caps — `Limits`/`RECOMMENDED_LIMITS`, v0.4),
+  `limits.py` (opt-in structural-DoS caps — `Limits`/`RECOMMENDED_LIMITS`, v0.4; the
+  shared `_LimitCounter` accounting is reused by minidom + sax as of v0.14),
   `_expat_security.py` (opt-in libexpat version awareness + `security_report()`
   posture API, v0.5), `__main__.py` (the `python -m purexml` posture CLI, v0.7 —
   the package's one I/O boundary), `py.typed` (PEP 561 marker, v0.8 — the package ships

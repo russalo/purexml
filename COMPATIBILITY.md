@@ -62,8 +62,10 @@ behavior — purexml does not over-block:
 
 The **one sanctioned divergence** is opt-in and default-off: passing `Limits` makes
 purexml reject pathological-but-legal structural input (deep nesting / attribute floods /
-giant documents) that defusedxml would accept. With the default `limits=None`, purexml
-stays byte-for-byte the defusedxml mirror. See [`LIMITATIONS.md`](LIMITATIONS.md).
+giant documents) that defusedxml would accept. It applies on the ElementTree family,
+`purexml.minidom`, and `purexml.sax` (a keyword-only `limits=`; v0.14). With the default
+`limits=None`, purexml stays byte-for-byte the defusedxml mirror. See
+[`LIMITATIONS.md`](LIMITATIONS.md).
 
 ## Scope — what's covered
 

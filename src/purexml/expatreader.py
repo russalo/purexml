@@ -25,14 +25,17 @@ class DefusedExpatParser(_ExpatParser):
     def __init__(self, namespaceHandling: int = 0, bufsize: int = 2 ** 16 - 20,
                  forbid_dtd: bool = False, forbid_entities: bool = True,
                  forbid_external: bool = True, limits: Limits | None = None) -> None:
-        # namespaceHandling stays `int` to match defusedxml's signature (typeshed narrows the
-        # base param to Literal[0,1]|bool; 0/1 are the real values).
-        super().__init__(namespaceHandling, bufsize)  # type: ignore[arg-type]
         self.forbid_dtd = forbid_dtd
         self.forbid_entities = forbid_entities
         self.forbid_external = forbid_external
-        # opt-in structural-DoS accounting (v0.14); None == no depth/attr cap.
+        # opt-in structural-DoS accounting (v0.14); None == no depth/attr cap. Set BEFORE
+        # super().__init__ so a lifecycle method invoked from the base ctor can never read an
+        # unset attr. (Grounded: stdlib `ExpatParser.__init__` does NOT call reset() today — so
+        # this is latent-robustness + parity with minidom's required ordering, not a live fix.)
         self._counter = _counter_for(limits)
+        # namespaceHandling stays `int` to match defusedxml's signature (typeshed narrows the
+        # base param to Literal[0,1]|bool; 0/1 are the real values).
+        super().__init__(namespaceHandling, bufsize)  # type: ignore[arg-type]
 
     # Blocking handlers — arg mapping matches `_parser.py` (purexml's exception signatures).
     def _forbid_dtd(self, name: str, sysid: str | None, pubid: str | None,

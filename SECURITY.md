@@ -25,7 +25,8 @@ Beyond the mirror, `security_report()` (v0.5) is **read-only introspection** —
 reports this runtime's posture (libexpat version + per-class mitigation layer +
 the opt-in `Limits` preset) and **does not change parse behavior or hard-fail**;
 the enforce-vs-warn policy is a 1.0 decision. The structural-DoS caps (`Limits`,
-v0.4) are **opt-in, default-off**, so they never alter the strict-mirror default.
+v0.4 — on the ElementTree family, `minidom`, and `sax` as of v0.14) are **opt-in,
+default-off**, so they never alter the strict-mirror default.
 
 It is stdlib-only (`xml.parsers.expat` + `xml.etree`) with **zero runtime
 dependencies**, so the host process inherits no third-party parser attack surface.

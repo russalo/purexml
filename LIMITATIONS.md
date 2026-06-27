@@ -22,8 +22,8 @@ complete. It does **not** provide:
 defaults match defusedxml; `forbid_dtd=True` is OWASP's stricter DTD-disable mode.)
 
 Beyond the mirror it adds two **opt-in, default-off** capabilities `defusedxml`
-lacks: structural-DoS caps (`Limits`, v0.4) and a read-only posture report
-(`security_report()`, v0.5). Neither changes default parse behavior — see the next
+lacks: structural-DoS caps (`Limits`, v0.4 — on ElementTree + minidom + sax as of
+v0.14) and a read-only posture report (`security_report()`, v0.5). Neither changes default parse behavior — see the next
 section. The posture report is **informational only**: it does not parse, fetch, or
 hard-fail, and the enforce-vs-warn policy for the libexpat-version floor is deferred
 to 1.0 (it currently *informs*, never enforces).
@@ -41,11 +41,14 @@ matching its block behavior.** Specifically, purexml deliberately **allows**:
 Do not "harden" purexml past the oracle — over-blocking breaks the equivalence
 contract and the consumer's parses.
 
-The **one sanctioned divergence** is opt-in: passing `Limits` (v0.4) makes purexml
-reject pathological-but-legal structural input (`LimitExceeded`) that `defusedxml`
+The **one sanctioned divergence** is opt-in: passing `Limits` (v0.4; on the
+ElementTree family, `minidom`, and `sax` as of v0.14) makes purexml reject
+pathological-but-legal structural input (`LimitExceeded`) that `defusedxml`
 would accept. This is *by design* and only when the caller asks — with the default
 `limits=None`, purexml stays byte-equivalent to the oracle. The equivalence sweep
 runs at the default (no limits), so it measures the mirror, not the opt-in mode.
+(`max_bytes` is enforced on the `parseString` entry points only — a stream's length
+isn't known up front; `max_depth`/`max_attributes` are enforced on the `parse` paths too.)
 
 ## Threat model
 
