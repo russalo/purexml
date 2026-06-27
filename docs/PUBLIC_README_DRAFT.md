@@ -7,6 +7,10 @@
      defusedxml's status). [[STRATEGIC]] markers = Russell's positioning/naming/
      license/publish-timing calls, left open. -->
 
+<!-- Logo: absolute raw URL so it renders on the PyPI project page (PyPI does not resolve
+     relative paths); resolves once the repo is public on `main`. -->
+<p align="center"><img src="https://raw.githubusercontent.com/russalo/purexml/main/assets/logo.svg" alt="purexml logo" width="120" height="120"></p>
+
 # purexml
 
 > Safely parse untrusted XML with **zero third-party dependencies** — a maintained,

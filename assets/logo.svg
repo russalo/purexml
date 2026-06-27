@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="purexml logo: a violet security shield enclosing angle-bracket code marks (secure XML)">
+  <title>purexml</title>
+  <defs>
+    <linearGradient id="shieldGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+  </defs>
+  <path d="M100 15 L175 35 V90 C175 145 140 180 100 190 C60 180 25 145 25 90 V35 Z"
+        fill="url(#shieldGrad)"/>
+  <path d="M70 85 L50 105 L70 125 M108 75 L92 135 M130 85 L150 105 L130 125"
+        fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/logo.svg" alt="purexml logo" width="120" height="120"></p>
+
 # purexml
 
 > Safely parse untrusted XML using only the Python standard library.
