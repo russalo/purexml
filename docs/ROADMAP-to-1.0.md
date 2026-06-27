@@ -93,14 +93,16 @@ default-off):
   a stranger's issue, download/awareness). FO's two scanner-side validation items
   (adversarial soak + 2nd consumer) feed this but don't bound it. *Equivalence already
   proven; the gap is presentation + reach, not capability.*
-  - **Adversarial soak — ✅ GREEN, confirmed vs current 0.8.1 (bestiary M2 + re-soak,
-    2026-06-19).** bestiary Claude's XML attack battery (FO's defusedxml→purexml adoption
-    gate, M2): all 7 specimens clear — billion-laughs / param-entity-bomb /
-    quadratic-blowup BOUNDED (rejected cleanly, no OOM/hang); xxe / external-param-entity /
-    external-dtd / xinclude-system NO-ESCAPE (`escaped=False`). First run vs 0.7.0,
-    **re-soak vs 0.8.1 GREEN** (identical), **independently grounded here** (own repro
-    matches exactly). **bestiary is now purexml's STANDING per-release adversarial battery**
-    — re-run each cycle; any non-survival is a real new finding.
+  - **Adversarial soak — ✅ MULTI-SURFACE GREEN vs v0.13.1 (bestiary, 2026-06-27);
+    INDUSTRIALIZED.** bestiary Claude's XML attack battery (the 7 specimens — billion-laughs /
+    param-entity-bomb / quadratic-blowup BOUNDED; xxe / external-param-entity / external-dtd /
+    xinclude-system NO-ESCAPE) now runs against **every drop-in surface** — ElementTree,
+    minidom, sax, xmlrpc — all GREEN, plus a new non-XML specimen (the **xmlrpc gzip
+    decompression-bomb**, bounded). purexml is a **registered multi-surface soak consumer**
+    (future re-soak = `bestiary soak purexml-*`). Independently corroborated here by the
+    all-surface differential-fuzz gate (0-divergence) + the blocking/gzip-bomb/no-io unit tests.
+    History: first run vs 0.7.0, re-soak vs 0.8.1 (ElementTree only), this multi-surface run vs
+    v0.13.1. Any non-survival on a default-on class is a real finding.
 - **G3 — build the ElementTree family — ✅ COMPLETE (2026-06-16).**
   - **v0.2** ✅ (PR #4) — `parse` + `fromstringlist` + `XML`/`tostring` + `XMLParser`
     + the `forbid_*` knobs.
