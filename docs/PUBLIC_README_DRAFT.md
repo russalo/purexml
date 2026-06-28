@@ -7,15 +7,10 @@
      defusedxml's status). [[STRATEGIC]] markers = Russell's positioning/naming/
      license/publish-timing calls, left open. -->
 
-<!-- Logo: absolute raw URLs so it renders on the PyPI project page (PyPI does not resolve
-     relative paths); resolves once the repo is public on `main`. GitHub honors <picture> for
-     light/dark; PyPI's sanitizer drops <source> and falls back to the light <img>. -->
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/russalo/purexml/main/assets/logo-dark.svg">
-    <img src="https://raw.githubusercontent.com/russalo/purexml/main/assets/logo-light.svg" alt="purexml logo" width="120" height="120">
-  </picture>
-</p>
+<!-- Plain markdown image with an ABSOLUTE raw URL: PyPI doesn't resolve relative paths,
+     and neither PyPI nor the GitHub mobile apps render <picture>. Markdown ![] renders on
+     all three (GitHub web, GitHub mobile, PyPI); size comes from the SVG width attr. -->
+![purexml logo](https://raw.githubusercontent.com/russalo/purexml/main/assets/logo-light.svg)
 
 # purexml
 
