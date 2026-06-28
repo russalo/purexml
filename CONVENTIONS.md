@@ -26,7 +26,7 @@ axes that apply to this project; common ones:
 metadata.
 **When it bumps:** Any release.
 **Format:** `MAJOR.MINOR.PATCH`
-**Current:** TODO
+**Current:** 0.14.1
 
 ### 1.2 LOGIC_VERSION *(optional — for projects with routing / decision logic)*
 **What it is:** Version of the *decision logic* — code that decides how an
@@ -282,8 +282,8 @@ Freeze postures: `docs/ROADMAP-to-1.0.md`.
 - RELEASE: `pyproject.toml` `version` + `purexml.__version__` (test-synced).
 - LOGIC (mitigation set): narrated per release in `HISTORY.md`. SCHEMA: n/a (returns stdlib `Element`).
 
-Remaining TODO subsections (delete what doesn't apply): error codes, configuration
-profiles, closed tables — none accumulated yet beyond the surface above.
+Not yet accumulated (added if/when they appear): error codes, configuration profiles,
+closed tables — none beyond the surface above.
 
 ---
 

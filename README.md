@@ -29,7 +29,7 @@ promise is never violated; you get a clean mirror until you ask for more.
 
 ## Status
 
-**Working — current v0.14.0 (2026-06-27); complete `defusedxml.ElementTree`
+**Working — current v0.14.1 (2026-06-28); complete `defusedxml.ElementTree`
 drop-in** (the family completed at v0.3.0) **plus `defusedxml.minidom` + `.common`
 (v0.10), `defusedxml.sax` + `.expatreader` (v0.12), and `defusedxml.xmlrpc` (v0.13)** —
 the **measured breadth surface is now complete** (only measured-negligible `pulldom`
@@ -44,8 +44,8 @@ same-parse + event-stream equivalence over a real corpus, an adversarial attack
 battery, seeded differential fuzz, and a 3.10–3.13 CI matrix — see
 [`docs/EQUIVALENCE.md`](docs/EQUIVALENCE.md), regenerated per release). Runs on
 CPython ≥3.10. No public contract is frozen yet (binds at v1.0), and it is **not
-published**: the vendor-vs-first-party adoption model (and with it
-PyPI/name/license) is deferred to v1.0 — see *License*. Path to 1.0:
+published**: PyPI publishing and claiming the `purexml` name stay deferred to a
+deliberate strategic call. The **license is decided — MIT** (see *License*). Path to 1.0:
 [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md). Latest spec:
 [`docs/v0.14.0_RFC_Specification.md`](docs/v0.14.0_RFC_Specification.md); north star:
 [`docs/v1.0_TARGET.md`](docs/v1.0_TARGET.md) and the FO floor at
@@ -100,7 +100,7 @@ root = fromstring(untrusted_xml, limits=RECOMMENDED_LIMITS)   # raises LimitExce
 - [`CLAUDE.md`](CLAUDE.md) — agent instructions for working in this repo
 - [`HISTORY.md`](HISTORY.md) — running index of all versions, specs, and compliance reports
 - [`CONVENTIONS.md`](CONVENTIONS.md) — naming, version-bump rules, document promotion paths
-- [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md) — consumer-facing stability commitments *(delete if no stable public surface)*
+- [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md) — consumer-facing stability commitments (binds at v1.0)
 - [`COMPATIBILITY.md`](COMPATIBILITY.md) — drop-in compatibility with `defusedxml` (contract, exception edge, scope)
 - [`CHANGELOG.md`](CHANGELOG.md) — public-facing changelog
 - [`LIMITATIONS.md`](LIMITATIONS.md) — what this project deliberately does **not** do

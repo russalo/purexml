@@ -1,6 +1,6 @@
 # purexml Public Contract
 
-> **⚠️ NOT YET BINDING — purexml is pre-1.0 (currently v0.14.0).** No public
+> **⚠️ NOT YET BINDING — purexml is pre-1.0 (currently v0.14.1).** No public
 > contract is frozen. The de-facto surface today is the full
 > `defusedxml.ElementTree` family (`fromstring`, `parse`, `iterparse`,
 > `fromstringlist`, `XML`, `XMLParser`, `tostring`, `ParseError`, the `forbid_*`
@@ -36,7 +36,10 @@ downstream systems.
 
 ### 1.1 Schema / API Version
 
-TODO: Describe the version axis(es) consumers depend on. Typical shape:
+_Filled at the v1.0 freeze._ The version axis(es) consumers depend on — for purexml:
+RELEASE_VERSION (the package version); SCHEMA is **n/a** (purexml returns stdlib
+`xml.etree` / `minidom` / SAX objects, not a versioned wire shape); LOGIC_VERSION is
+diagnostic only, not a stability commitment. The shape this will take:
 
 > Every {output / response} includes a top-level `schema_version` field in
 > the format `MAJOR.MINOR`.
@@ -52,28 +55,30 @@ TODO: Describe the version axis(es) consumers depend on. Typical shape:
 
 ### 1.2 Stable Top-Level Surface
 
-TODO: Tabulate the stable top-level keys / endpoints / functions and their
-types.
+_Filled at the v1.0 freeze._ The stable top-level functions and their types (purexml's
+de-facto surface today is the `defusedxml`-mirroring API enumerated at the top of this doc;
+the freeze pins names + signatures).
 
 | Key / Endpoint / Function | Type | Stability |
 |---|---|---|
-| TODO | TODO | **Stable** — always present |
+| _enumerated at the v1.0 freeze_ | — | **Stable** — always present |
 
 ### 1.3 Stable Per-Record / Per-Field Structure
 
-TODO: If the project emits records (manifest entries, response objects,
-etc.), document the stable field list here. Mark each field's stability
-explicitly (**Stable** / **Provisional** / **Candidate**).
+_Filled at the v1.0 freeze._ purexml returns standard `xml.etree.ElementTree.Element` /
+`xml.dom.minidom.Document` / SAX events — the field structure is the **stdlib's**, not
+purexml's, so there is no purexml-specific record schema to pin. (The opt-in
+`security_report()` value object is **Provisional** — see §2.2.)
 
 | Field | Type | Stability |
 |---|---|---|
-| TODO | TODO | **Stable** |
+| _(stdlib types — no purexml record schema)_ | — | **Stable** |
 
 ### 1.4 Namespaces / Tool Names / Registries
 
-TODO: If the project uses namespacing (specialist namespaces, MIME types,
-tool registries), document which namespace keys are stable and what they
-contain.
+_Filled at the v1.0 freeze._ Which namespace keys (specialist namespaces, MIME types, tool
+registries) are stable and what they contain. _(purexml exposes no such registry today —
+its surface is the `defusedxml`-mirroring module namespaces, e.g. `purexml.ElementTree`.)_
 
 ---
 
@@ -100,7 +105,7 @@ A change is **additive** (and ships in a MINOR) if:
 
 ### 2.1 Deprecation Policy
 
-TODO: Document the deprecation policy. Typical russalo shape:
+_Filled at the v1.0 freeze._ The deprecation policy — the intended russalo shape:
 
 > A field destined for removal in v{N+1}.0 must be marked deprecated in at
 > least one full v{N}.MINOR release before removal, with a deprecation
@@ -127,7 +132,7 @@ See [`CONVENTIONS.md`](CONVENTIONS.md) §3.1 for the registry.
 
 ## 3. What Consumers Should NOT Count On
 
-TODO: Be explicit about what is **not** under the contract. Typical entries:
+Explicitly **not** under the contract (this holds pre-1.0 and after the freeze):
 
 - **Internal version axes** (e.g. LOGIC_VERSION) — visible in output for
   diagnosis, but not a stability commitment. We bump them freely.
@@ -144,7 +149,7 @@ TODO: Be explicit about what is **not** under the contract. Typical entries:
 
 ## 4. Backward Compatibility Policy
 
-TODO: Spell out the project's compatibility guarantee. Typical shape:
+_Filled at the v1.0 freeze._ The backward-compatibility guarantee — the intended shape:
 
 > Within a MAJOR version, code that works on v{X}.Y will continue to work
 > on v{X}.Z where Z > Y. Tests that pinned to v{X}.Y output will pass on
@@ -155,7 +160,7 @@ TODO: Spell out the project's compatibility guarantee. Typical shape:
 
 ## 5. Version of This Contract
 
-TODO: When did this contract become binding? Link the release that froze it.
+_Set at the v1.0 freeze_ — the date and release that froze this contract (not yet binding):
 
 > This contract became binding at v{X.0} (YYYY-MM-DD). See
 > [`HISTORY.md`](HISTORY.md) for the freeze entry.

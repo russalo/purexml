@@ -100,15 +100,15 @@ design notes, alternate drafts) lives here once promoted out of `scratch/`.
 
 | File | Era | Purpose |
 |---|---|---|
-| TODO | Pre-vX.Y | TODO: short description of what this is |
+| _(none promoted yet)_ | — | Pre-RFC design notes still live in `scratch/`; promoted here when they earn a durable home. |
 
 ---
 
 ## Compliance Report Gaps
 
-TODO: Note any versions that did **not** get a compliance report and why
-(usually patch releases — they're covered by HISTORY narrative + the
-parent minor's compliance report). Default rule:
+The patch releases — 0.1.1, 0.1.2, 0.3.1, 0.5.1, 0.8.1, 0.10.1, 0.13.1, 0.14.1 —
+have **no separate compliance report** by design; each is covered by its row above and
+its parent minor's report. Default rule:
 
 > Patches inherit their parent minor's compliance report; their narrative
 > lives in this index, not in a separate report.
