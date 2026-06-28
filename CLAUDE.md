@@ -347,6 +347,16 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v0.14.1** *(shipped 2026-06-28)* — **patch: license = MIT**. Adds `LICENSE` (MIT, © 2026
+  Russell Pfister), `license = {text = "MIT"}` + the OSI MIT classifier in `pyproject.toml`
+  (table form, not the bare SPDX string — keeps the classifier without the PEP 639 warning on
+  the setuptools≥65 floor), and swaps the "license deferred" placeholders in README/STACK for
+  MIT. Rationale (Russell): give-it-away zero-dep infrastructure → pure OSS, max reuse, no
+  commercial-upside concern (deliberate opposite of file-observer's AGPL-3.0 + dual-commercial);
+  MIT is one-way AGPL-compatible, so purexml stays clean as a future FO dependency. **Sets the
+  pure\* family default** (purecfb/puresniff) unless a lib flags a reason to differ. Publish +
+  name-claim stay deferred (license settled; publish trigger separate). No code/parse change;
+  LOGIC unchanged, SCHEMA n/a. _HISTORY only._
 - **v0.14.0** *(shipped 2026-06-27, PR #37)* — **extend opt-in `Limits` to minidom + sax**: the v0.4
   structural-DoS caps (`max_depth`/`max_attributes`/`max_bytes`) now reach the breadth surfaces via a
   keyword-only `*, limits=None` — opt-in, default-off (with `limits=None` minidom/sax stay
@@ -694,15 +704,22 @@ blame`.
   same caps/exceptions, default-off so the breadth mirror stays byte-identical). **Rule: any defense-in-depth is OPT-IN, default-OFF — never
   diverge from defusedxml by default.** At 1.0 freeze the mirror surface is STABLE;
   the novel defense-in-depth is PROVISIONAL (it may evolve). See `docs/v0.4.0_RFC_Specification.md`.
-- **Adoption model: DIRECTION decided = publish first-party; SPECIFICS deferred to
-  v1.0** (direction ratified 2026-06-16). purexml is an **ecosystem-adoptable,
-  first-party library** (not vendor-only) — that's the mandate (`docs/v1.0_TARGET.md`).
-  But the *specifics* — PyPI timing, claiming the `purexml` name (confirmed free
-  2026-06-15), the license, the optional vendorable single-file form — stay deferred
-  to the 1.0 freeze. **Until 1.0, still: do NOT publish, claim the name, or set a
-  license** — package-only in the private repo, consumed via git/path. The direction
-  just means: when 1.0's specifics are decided, they aim at *published*, not vendored.
-  See `scratch/packaging_and_naming_notes.md`.
+- **Adoption model: DIRECTION decided = publish first-party; LICENSE decided = MIT;
+  PUBLISH SPECIFICS deferred** (direction ratified 2026-06-16; license ratified
+  2026-06-28). purexml is an **ecosystem-adoptable, first-party library** (not vendor-only)
+  — that's the mandate (`docs/v1.0_TARGET.md`). **License is now SET: MIT** (applied
+  v0.14.1; `LICENSE` + pyproject; rationale below). The *remaining* specifics — PyPI
+  publish timing, claiming the `purexml` name (confirmed free 2026-06-15, re-confirmed
+  2026-06-27), the optional vendorable single-file form — stay deferred to a deliberate
+  strategic call. **Until then: do NOT publish or claim the name** — repo-only, consumed via
+  git/path. (The "do NOT set a license" half of this is now SUPERSEDED — license is MIT.)
+  - **License = MIT** (Russell, 2026-06-28): give-it-away, zero-dep infrastructure → pure
+    OSS, maximum reuse, no commercial-upside concern — the deliberate **opposite** of
+    file-observer's AGPL-3.0 + dual-commercial (FO is a leverage product; purexml is not).
+    MIT is one-way compatible with AGPL, so purexml is clean as a future FO dependency.
+    **This is the pure\* family default** (purecfb, puresniff) unless a given lib has a
+    specific reason to differ — flag it if so. Licensing is still a *maturity* step (don't
+    rush it for a new pure\* lib just because the bearing is fixed). See `scratch/packaging_and_naming_notes.md`.
 - **Posture map tracks current libexpat — the operating pattern** (set v0.5.1/v0.6).
   `RECOMMENDED_EXPAT_VERSION` = **latest-stable libexpat** and is bumped *as a patch* when
   a new DoS-fix release ships (it changes report DATA, not parse-or-block → not a LOGIC
@@ -806,9 +823,11 @@ Russell."
   drop-in for `defusedxml.ElementTree`," which *requires* matching defusedxml's
   parameterized signature. The knobs are now **in scope** — see Known decisions.
   Tombstone kept so the reversal is a recorded decision, not a silent regression.
-- **Publishing to PyPI / claiming the `purexml` name** — explicitly held until
-  the adoption model (vendor vs first-party dep) is decided. Free-name status is
-  recorded, not acted on. (Cross-reference: Known decisions, last bullet.)
+- **Publishing to PyPI / claiming the `purexml` name** — explicitly held for a deliberate
+  strategic call (timing/first-impression). Free-name status is recorded (re-confirmed
+  2026-06-27), not acted on. **Note: this no longer covers the license** — license is now
+  DECIDED + APPLIED (MIT, v0.14.1); only the publish + name-claim remain held. (Cross-reference:
+  Known decisions, adoption-model bullet.)
 - **`defusedxml.lxml` coverage** — **excluded on zero-dep identity** (ratified 2026-06-19).
   `defusedxml.lxml` wraps the third-party `lxml` library; covering it would require depending on
   `lxml`, breaking purexml's stdlib-only, zero-runtime-dependency contract (and it's deprecated

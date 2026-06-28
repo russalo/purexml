@@ -13,6 +13,12 @@ per-release record (RFCs, compliance, internal axes) lives in
 ## [Unreleased]
 - Publish-prep: public README, this changelog, packaging metadata.
 
+## [0.14.1] — 2026-06-28
+### Added
+- **License: MIT** — purexml is now MIT-licensed (`LICENSE`; `license`/classifier set in
+  packaging metadata). Pure open source, zero strings. (PyPI publishing remains a separate,
+  deliberate step.)
+
 ## [0.14.0] — 2026-06-27
 ### Added
 - Opt-in `Limits` structural-DoS caps (`max_depth`/`max_attributes`/`max_bytes`) now
