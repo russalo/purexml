@@ -80,12 +80,12 @@ action surface.
 
 ## Packaging / distribution
 
-**Deferred to v1.0.** The vendor-vs-first-party adoption model — and with it PyPI
-publishing, claiming the `purexml` name, and the license — is deliberately
-unmade until v1.0 (see `CLAUDE.md` *Known decisions* and
-`scratch/packaging_and_naming_notes.md`). Until then purexml ships as the
-`src/purexml/` package in the private repo only; a vendorable single-file
-amalgamation, if wanted, comes at the 1.0 adoption decision.
+**License: MIT** (decided 2026-06-28, applied v0.14.1 — see `LICENSE`). PyPI publishing
+and claiming the `purexml` name remain deferred to a deliberate strategic call (the license
+is settled; the publish trigger is separate — see `CLAUDE.md` *Known decisions* and
+`scratch/packaging_and_naming_notes.md`). Until then purexml ships as the `src/purexml/`
+package in the repo only; a vendorable single-file amalgamation, if wanted, comes at the
+1.0 adoption decision.
 
 ---
 

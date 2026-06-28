@@ -4,20 +4,24 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "purexml"
-version = "0.14.0"
+version = "0.14.1"
 description = "Safely parse untrusted XML using only the Python standard library — a zero-dependency defusedxml replacement."
 readme = "README.md"
 requires-python = ">=3.10"
-# License UNDECIDED — tied to the open adoption model (vendor vs first-party dep);
-# see README.md "License" and scratch/packaging_and_naming_notes.md. Do not publish
-# before this is set with Russell.
-license = {text = "TODO"}
+# MIT (decided 2026-06-28) — pure open source, maximum reuse; one-way compatible with
+# AGPL so it's clean as a future file-observer dependency. See LICENSE. Table form
+# (`{text="MIT"}`) + classifier is used rather than the bare SPDX `license = "MIT"`
+# string: the string form needs setuptools>=77 and (per PEP 639) deprecates the license
+# classifier — this form keeps the classifier (which PyPI's UI surfaces) with no warning
+# on the current setuptools>=65 floor.
+license = {text = "MIT"}
 authors = [
     {name = "Russell Pfister", email = "russalo@gmail.com"},
 ]
 keywords = ["xml", "security", "defusedxml", "xxe", "billion-laughs", "stdlib", "hardening"]
 classifiers = [
     "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
     "Intended Audience :: Developers",
     "Topic :: Security",
     "Topic :: Text Processing :: Markup :: XML",

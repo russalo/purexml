@@ -109,10 +109,10 @@ root = fromstring(untrusted_xml, limits=RECOMMENDED_LIMITS)   # raises LimitExce
 
 ## License
 
-**Deferred to v1.0.** The license rides on the **adoption model** (vendor into
-file-observer vs. ship as a first-party dependency — see
-`scratch/packaging_and_naming_notes.md`), which is deliberately deferred to v1.0
-(decided 2026-06-16). The russalo default for a distributable library is AGPL-3.0
-+ dual commercial; a vendored unit would inherit the host project's terms
-instead. Until 1.0: package-only in the private repo, no PyPI, no name claim, no
-license set.
+**MIT** — see [`LICENSE`](LICENSE). Decided 2026-06-28: purexml is give-it-away,
+zero-dependency infrastructure, so it's pure open source with maximum reuse and no
+commercial-upside concern (deliberately the opposite of file-observer's AGPL-3.0 +
+dual-commercial posture). MIT is one-way compatible with AGPL, so purexml stays clean as
+a future file-observer dependency. Publishing to PyPI and claiming the `purexml` name
+remain deferred to a deliberate strategic call — the license is set, the publish trigger
+is separate.

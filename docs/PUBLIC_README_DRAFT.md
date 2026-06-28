@@ -202,4 +202,4 @@ channel + CVE-handling / supported-versions policy, set at publish.]]
 
 ## License
 
-[[STRATEGIC: Russell's call, set at publish.]]
+[MIT](LICENSE) — pure open source, zero strings. Drop it into your project and go.
