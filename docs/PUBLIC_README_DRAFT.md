@@ -30,19 +30,19 @@
 
 <!-- ── AT PUBLISH: uncomment these DYNAMIC badges (they self-update — they can't silently go
      stale the way a hardcoded shield can) and RETIRE the matching static one above. Each is
-     true today; gated only on the public repo + the name/license decision, not on more work. ──
+     true today; gated only on the public repo + the publish/name decision, not on more work. ──
 
 ![CI](https://img.shields.io/github/actions/workflow/status/russalo/purexml/tests.yml?branch=main&label=tests)  (live green/red; needs public repo — replaces nothing)
 ![PyPI](https://img.shields.io/pypi/v/purexml)                          (needs publish)
 ![Python versions](https://img.shields.io/pypi/pyversions/purexml)      (dynamic; RETIRE the static Python matrix above)
 ![Coverage](https://codecov.io/gh/russalo/purexml/branch/main/graph/badge.svg)  (real %; needs Codecov — RETIRE the static coverage badge above)
-![License](https://img.shields.io/pypi/l/purexml)                       (needs the license decision)
+![License](https://img.shields.io/pypi/l/purexml)                       (license is MIT — badge reads it from PyPI once published)
 ![OpenSSF Best Practices](https://www.bestpractices.dev/projects/PROJECT_ID/badge)  (enroll at bestpractices.dev → fill PROJECT_ID — the headline credential for a security library)
 ![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/russalo/purexml/badge)  (optional; supply-chain posture, needs the Scorecard action)
 
      NOT YET (don't fake): downloads (no traffic yet — low value early); anything implying a
      published/licensed state before those land. Tracker: scratch/publish_prep_checklist.md.
-     [[STRATEGIC: package name, license, and which publish-time badges ship are Russell's calls.]] -->
+     [[STRATEGIC: package name + which publish-time badges ship are Russell's calls. License = MIT (decided).]] -->
 
 <!-- Hero diagram. SVG renders on both GitHub and the PyPI project page (mermaid does NOT
      render on PyPI). URL is ABSOLUTE (raw.githubusercontent) on purpose: PyPI does not resolve

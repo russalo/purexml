@@ -776,8 +776,9 @@ blame`.
   tracking the moving libexpat threat the incumbent doesn't. So **build for a cold security
   engineer evaluating it on publish day** (the first 60 seconds), not for FO's needs. FO is
   the **anchor consumer + first validation track** (G1, alive), NOT the definition of done.
-  **Publishing (PyPI/name/license) stays deferred for STRATEGIC TIMING + first-impression
-  quality — Russell's call — not for lack of readiness.** Build for the first-impression
+  **Publishing (PyPI publish + name-claim) stays deferred for STRATEGIC TIMING + first-impression
+  quality — Russell's call — not for lack of readiness** (license is DECIDED: MIT, v0.14.1).
+  Build for the first-impression
   layer. **Publish-prep progress (as of 2026-06-18):** done — public README candidate
   (`docs/PUBLIC_README_DRAFT.md`, swaps to README.md at publish), `CHANGELOG.md`,
   `COMPATIBILITY.md`, `SECURITY.md` CVE/maintenance policy, and an honest CI-gated badge row

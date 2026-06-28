@@ -6,9 +6,10 @@ That raises the bar on this policy: a defect here is a security defect.
 ## Scope
 
 purexml mirrors the `defusedxml.ElementTree` surface (`fromstring`, `parse`,
-`iterparse`, `fromstringlist`, `XMLParser`, the `forbid_*` knobs) and, as of v0.10–v0.12,
-`defusedxml.minidom` (`parse`/`parseString`) and `defusedxml.sax` (`make_parser`/`parse`/
-`parseString`) — behaviorally equivalent to `defusedxml` at its defaults. On **fully untrusted**
+`iterparse`, `fromstringlist`, `XMLParser`, the `forbid_*` knobs) and, as of v0.10–v0.13,
+`defusedxml.minidom` (`parse`/`parseString`), `defusedxml.sax` (`make_parser`/`parse`/
+`parseString`), and `defusedxml.xmlrpc` (`monkey_patch()` — defused parser + anti-gzip-bomb)
+— behaviorally equivalent to `defusedxml` at its defaults. On **fully untrusted**
 XML input (the caller is trusted; the XML is the attacker-controlled surface) it — across every
 entry point, including incremental `iterparse` streaming, the minidom DOM builder, and the
 event-driven SAX reader:
