@@ -1,0 +1,27 @@
+name: Feature / surface-coverage request
+description: Request a defusedxml surface purexml doesn't cover yet, or another enhancement.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        purexml's scope is driven by **measured real-world usage** of `defusedxml`. The most
+        impactful requests are "I'm blocked migrating off `defusedxml` because purexml doesn't
+        cover X" — that's exactly the signal that moves something off the deferred list
+        (e.g. `pulldom`). Note: `defusedxml.lxml` is intentionally out of scope (it needs the
+        third-party `lxml`, which would break purexml's zero-dependency contract).
+  - type: textarea
+    id: need
+    attributes:
+      label: What do you need, and what are you migrating from?
+      description: Which defusedxml import/API are you using today, and what does purexml not yet provide?
+      placeholder: "We use defusedxml.pulldom.parse(...) and can't drop defusedxml without it."
+    validations:
+      required: true
+  - type: textarea
+    id: usage
+    attributes:
+      label: Evidence of demand (optional but valuable)
+      description: Links to where this surface is used, rough import counts, or the downstream project that needs it.
+    validations:
+      required: false

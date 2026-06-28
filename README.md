@@ -1,6 +1,15 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+    <img src="assets/logo-light.svg" alt="purexml logo" width="120" height="120">
+  </picture>
+</p>
+
 # purexml
 
 > Safely parse untrusted XML using only the Python standard library.
+
+![How purexml defends untrusted XML in two layers: purexml's own Python-layer handlers block entity bombs, XXE and external-DTD resolution version-independently, while the libexpat parser layer mitigates parser-level DoS depending on your runtime; the result is a standard, trusted xml.etree tree.](assets/defense-layers.svg)
 
 purexml is a pure-Python, zero-runtime-dependency replacement for `defusedxml`:
 it returns the same parse results the stdlib parser would (standard `xml.etree`

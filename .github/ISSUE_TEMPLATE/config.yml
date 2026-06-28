@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability (private)
+    url: https://github.com/russalo/purexml/blob/main/SECURITY.md
+    about: A parse that should have been blocked, an unexpected fetch/read, or any attack getting through — report privately, never as a public issue.
+  - name: Compatibility details
+    url: https://github.com/russalo/purexml/blob/main/COMPATIBILITY.md
+    about: What matches defusedxml exactly, the deliberate edges, and what's in/out of scope — check here before filing a "differs from defusedxml" report.
