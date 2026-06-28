@@ -1,9 +1,7 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
-    <img src="assets/logo-light.svg" alt="purexml logo" width="120" height="120">
-  </picture>
-</p>
+<!-- Plain markdown image (not <picture>/<img>): the GitHub iOS app's renderer doesn't
+     support <picture>, so it showed a broken box. Markdown ![] renders everywhere the
+     diagram does; display size comes from the SVG's width attr (140). -->
+![purexml logo](assets/logo-light.svg)
 
 # purexml
 
