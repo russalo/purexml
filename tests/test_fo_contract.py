@@ -114,9 +114,13 @@ def test_fo_2_billion_laughs_blocked_by_default():
 
 
 def test_fo_2_xxe_blocked_by_default():
-    """An external-entity (XXE) declaration is refused by DEFAULT, before any fetch."""
-    with pytest.raises(ValueError):  # EntitiesForbidden — a PureXMLError/ValueError
+    """An external-entity (XXE) declaration is refused by DEFAULT — at the entity
+    DECLARATION, before external resolution is ever attempted (so it surfaces as
+    ``EntitiesForbidden``, not the untriggered ``ExternalReferenceForbidden`` backstop;
+    see LIMITATIONS.md). Assert the concrete type, as the sibling bomb test does."""
+    with pytest.raises(EntitiesForbidden) as ei:
         fromstring(XXE_NETWORK)
+    assert isinstance(ei.value, ValueError)  # lands in fo's except
 
 
 def test_fo_2_default_path_does_not_crash_on_deep_input():
@@ -270,7 +274,9 @@ def test_fo_5_python_floor_stays_3_10():
     DECLARED floor: a bump must be a conscious decision, and it fails CI here, not at fo.
     (Substring check, not ``tomllib`` — tomllib is 3.11+, and this test must run on 3.10.)"""
     text = (PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert re.search(r'requires-python\s*=\s*">=\s*3\.10"', text), (
+    # ``[^"]*`` on both sides tolerates a future upper bound (e.g. ``">=3.10,<4.0"``)
+    # without weakening the guard — a bump to ``>=3.11`` still has no ``>=3.10`` and fails.
+    assert re.search(r'requires-python\s*=\s*"[^"]*>=\s*3\.10[^"]*"', text), (
         "the 3.10 floor is fo's adoption requirement — re-open with Russell before bumping"
     )
 

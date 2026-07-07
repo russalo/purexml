@@ -64,8 +64,10 @@ decision: **decide the published name before FO pins.**
 ([`tests/test_fo_contract.py`](../tests/test_fo_contract.py), added 2026-07 after FO's steward
 re-affirmed the contract): one `test_fo_<n>_*` per point — bytes/str encoding parity, hostile-input
 default-safety + opt-in `RECOMMENDED_LIMITS` typed caps (with a **bounded-*time*** never-hang
-tripwire), the `purexml.common` exception mirror, determinism, the flat read surface + the pinned
-`>=3.10` floor, and `__version__`-is-`str` — plus a guard on FO's exact `purexml.ElementTree.fromstring`
+tripwire), the `purexml.common` exception mirror, determinism, the flat read surface + the declared
+`requires-python = ">=3.10"` floor (the concrete form of the `≤3.10` constraint in #6 above — purexml
+must run on 3.10, i.e. never bind a floor *higher* than the consumer's), and `__version__`-is-`str` —
+plus a guard on FO's exact `purexml.ElementTree.fromstring`
 import path. Any change that breaks an FO guarantee now fails purexml's CI **as a named FO regression**,
 so the contract cannot silently drift between now and when FO pins. FO's usage is a first-class fixture
 keeping the surface honest to 1.0, not a promise to remember.
