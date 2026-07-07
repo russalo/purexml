@@ -94,14 +94,15 @@ incumbent froze.** Concretely, that means:
   floor moved to 2.8.2 in v0.10.1, with the reachable 2.8.2 classes mapped in the v0.11.0 minor.)
 - **Proven per release.** Every release is differentially tested against the `defusedxml`
   oracle (C14N-equivalent-or-both-raise) over a real corpus + a seeded fuzzer — **across every
-  drop-in surface** (ElementTree, minidom, sax, xmlrpc; v0.13.1); the result is a committed
+  drop-in surface** (ElementTree, minidom, sax, xmlrpc); the result is a committed
   [`docs/EQUIVALENCE.md`](docs/EQUIVALENCE.md). New XML-attack research becomes new corpus + tests.
 - **Independent adversarial soak per cycle.** A standing external attack battery
   (out-of-tree, run by a separate reviewer) soaks each release — XML bombs, XXE, external
   entities/DTD, XInclude, and (for xmlrpc) gzip decompression-bombs — judging on raw evidence
   (timed-out / mem-exceeded / escaped), **across every drop-in surface** (ElementTree, minidom,
-  sax, xmlrpc). Multi-surface GREEN at every release to date (latest vs v0.13.1, 2026-06-27);
-  any non-survival is a real finding.
+  sax, xmlrpc). Multi-surface GREEN at every release to date (latest re-soak vs **v0.14.1**,
+  2026-07-07 — 31 pass / 0 fail across all six surfaces incl. the SAX-NS split); any
+  non-survival is a real finding.
 - **Reviewed.** Every change runs the four-leg decorrelated review; findings are grounded
   against the real code before action.
 

@@ -20,7 +20,7 @@ authors = [
 ]
 keywords = ["xml", "security", "defusedxml", "xxe", "billion-laughs", "stdlib", "hardening"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
     "Intended Audience :: Developers",
     "Topic :: Security",

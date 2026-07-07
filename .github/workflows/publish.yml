@@ -1,0 +1,71 @@
+name: publish
+
+# Publish purexml to PyPI when a GitHub Release is published, via PyPI Trusted
+# Publishing (OIDC) — no long-lived API token.
+#
+# STAGED — not yet live. This workflow only runs when a Release is *published*, and
+# the upload step additionally requires:
+#   1. the `purexml` name claimed on PyPI, and
+#   2. a configured PyPI Trusted Publisher for russalo/purexml (this workflow,
+#      environment `pypi`).
+# Until both exist (a deliberate strategic call — see docs/ROADMAP-to-1.0.md, gate
+# G5), do not create a Release. Committing the workflow is harmless: nothing runs
+# without a Release event.
+#
+# Action refs use version tags (matching tests.yml). Pinning to full commit SHAs is
+# a worthwhile supply-chain hardening, but it's a repo-WIDE decision to land at
+# OpenSSF enrollment (tracked in scratch/publish_prep_checklist.md), not a one-file
+# inconsistency — so both workflows stay on tags until then.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Verify the release tag matches the package version
+        # Refuse to publish if the Release tag (e.g. v0.14.1) and pyproject's version
+        # disagree — a mismatched tag is the classic way to ship the wrong version.
+        # The tag is passed via env, NOT inline ${{ }} in run:, to avoid shell injection
+        # from an attacker-controllable tag name.
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="$(python -c 'import tomllib, pathlib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')"
+          echo "release tag: $TAG   pyproject version: $VERSION"
+          if [ "${TAG#v}" != "$VERSION" ]; then
+            echo "::error::release tag '$TAG' does not match pyproject version '$VERSION'"
+            exit 1
+          fi
+      - name: Build sdist + wheel and validate metadata
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build
+          twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi          # deployment gate + audit record
+    permissions:
+      id-token: write          # mint the OIDC token for Trusted Publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Publish to PyPI (Trusted Publishing / OIDC)
+        uses: pypa/gh-action-pypi-publish@release/v1

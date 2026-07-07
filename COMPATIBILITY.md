@@ -15,7 +15,8 @@ matches exactly, the few edges, and the evidence.
 For the ElementTree family, purexml matches `defusedxml` on:
 
 - **API** — same call names and signatures: `fromstring`, `parse`, `iterparse`,
-  `fromstringlist`, `XML`, `XMLParser`, `tostring`, `ParseError`.
+  `XML`, `XMLParser`, `tostring`, `ParseError` (plus a hardened `fromstringlist`,
+  which the stdlib has and `defusedxml` doesn't wrap — a purexml addition).
 - **Defaults** — `forbid_dtd=False`, `forbid_entities=True`, `forbid_external=True`,
   and the same `forbid_*` parameters (names, order, defaults).
 - **Parse results** — **C14N-equivalent, or both raise**, verified per release against
