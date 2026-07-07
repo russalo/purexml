@@ -112,7 +112,7 @@ Run the relevant checklist AT the moment, not from memory of having read it.
   drift surfaced)? See the libexpat Known decision.
 
 **Before merge (minors):**
-- [ ] Did the PR-bot leg fire (Codex / Gemini Code Assist / Copilot), and are
+- [ ] Did the PR-bot leg fire (**CodeRabbit** — the async leg-4 bot, auto on PR open), and are
   its findings addressed or grounded-and-declined?
 - [ ] Compliance report written? CI green? Review comments addressed/grounded?
 
@@ -291,8 +291,8 @@ shell session; they're not project-installed.
 | `gh` | GitHub CLI — PRs, issues, releases, gh-actions. Auth'd as `russalo`. | Blueprint inventory + `gh --help` |
 | `git` | Source control. The russalo GitHub org is the canonical remote for most projects. | — |
 | `just` | Task runner (russalo standard). Replaces Make; see this project's `justfile`. | `just --list` |
-| `gemini` (CLI) | Gemini CLI for the cross-model review leg. Two surfaces: API-key (flash, durable) and OAuth (pro). | Blueprint `gemini-review-infra` doc |
-| `gem.sh` / `gem-oauth.sh` / `gem-review.sh` | Wrapper scripts at `/srv/projects/review-kit/` that paper over the gemini CLI's gotchas (stale env key, untrusted-folder hang, approval-mode differences). | `/srv/projects/review-kit/README.md` |
+| `agy` (Antigravity CLI) | The Gemini surface for the cross-model review leg, on the **paid AI Pro** subscription (replaced the free-key `gemini` CLI 2026-06-29). Model-selectable (`agy models`); `agy plugin import gemini` adds the maestro/code-review extensions. | Blueprint `gemini-review-infra` doc |
+| review-kit legs at `/srv/projects/review-kit/` | `route.sh` (orchestrator — picks legs by heat/health), `gpt.sh` (OpenAI — the genuinely **independent** cross-family vote vs a Claude author), `gem-pro.sh` (Gemini inline, on `agy`), `gem-review.sh` (agy+maestro whole-codebase red-team, `/tmp`-snapshot-guarded), `static.sh` (non-LLM shellcheck/semgrep), `deps.sh` (osv-scanner CVE). Consume by copy, **change by issue** on `russalo/review-kit`. | `/srv/projects/review-kit/README.md` |
 | `file-observer` | russalo's PyPI'd observation layer (file → manifest). Install via `pip install file-observer[pdf,watch]` if your project needs deterministic file metadata. | https://pypi.org/project/file-observer/ |
 | Language toolchains | Python 3.12+, Go (current stable), Node, etc. — versions tracked in Blueprint. | Blueprint inventory |
 
@@ -870,14 +870,19 @@ the **Review-tier rubric** below; patches subset per scope):
 
 1. **In-house multi-agent swarm** — finder angles × candidates → verify →
    ranked findings. Same model, decorrelated *perspectives*.
-2. **Gemini cross-model** — different model family. Two modes: inline prompt
-   (`gem.sh` / `gem-oauth.sh`, read-only, pre-PR diff review) and native
-   review skills (`gem-review.sh` → `/code-review`,
-   `/maestro:security-audit`, yolo-mode + `/tmp` snapshot guarded, for
-   whole-codebase red-teams).
+2. **Cross-model** — a different model family from the Claude author. Run via
+   `route.sh` (the orchestrator, which picks legs by heat/health) or by hand:
+   **`gpt.sh`** (OpenAI, inline, read-only) is the genuinely **independent** vote —
+   it does NOT collapse with the Gemini legs, so it's the one that buys *confirmation*;
+   **`gem-pro.sh`** (Gemini, inline, on `agy`) adds coverage (~1 vote with any Gemini
+   bot); **`gem-review.sh`** (agy + maestro, `/tmp`-snapshot-guarded) is the
+   whole-codebase red-team. `static.sh` (non-LLM) + `deps.sh` (CVE) decorrelate on
+   axes the LLMs miss. Old `gem.sh`/`gem-oauth.sh` were **removed** 2026-06-29.
 3. **Repo-clone audit + empirical sweep** — clean-room clone; deterministic
    sweep vs a baseline.
-4. **PR bots** — Codex / Gemini Code Assist / Copilot on PR open. External.
+4. **PR bots** — **CodeRabbit** (auto-review on PR open, ~15s, org-wide) is the
+   current async bot. External. (Gemini Code Assist still comments but is sunsetting
+   2026-07; Codex/Copilot are reserves.)
 
 ### Review-tier rubric (how the legs scale by change type)
 
@@ -886,11 +891,11 @@ Codified from v0.1–v0.6 practice — "subset per scope" made precise so scalin
 *(a) does it touch parse-or-block behavior (the mirror)? (b) is it a new public
 capability/surface? (c) is it security-load-bearing?*
 
-| Change type | Leg 1 (in-house) | Leg 2 (Gemini `gem.sh`) | Leg 3 (sweep) | Leg 4 (bots) | RFC / compliance |
+| Change type | Leg 1 (in-house) | Leg 2 (cross-model: `gpt.sh`/`gem-pro.sh` via `route.sh`) | Leg 3 (sweep) | Leg 4 (CodeRabbit) | RFC / compliance |
 |---|---|---|---|---|---|
 | **Feature minor** — new parse surface / capability; touches the mirror (v0.2–v0.4) | full multi-angle swarm | yes | **mandatory** | yes | RFC + compliance |
 | **Report-only / additive-to-provisional minor** — no parse-or-block change (v0.6) | 1 decorrelated finder | yes (1 pass) | yes — as the cheap **"mirror-untouched" proof** (expect 0 divergences) | yes | RFC + compliance |
-| **Patch** — bug fix / hardening / data within an already-approved design (v0.1.1/.2, v0.3.1, v0.5.1) | inline grounded probes or 1 finder | subset — `gem.sh` **if security-relevant**, else skip (recorded) | yes if it *could* touch the mirror | yes (on PR) | HISTORY only |
+| **Patch** — bug fix / hardening / data within an already-approved design (v0.1.1/.2, v0.3.1, v0.5.1) | inline grounded probes or 1 finder | subset — `gpt.sh`/`gem-pro.sh` **if security-relevant**, else skip (recorded) | yes if it *could* touch the mirror | yes (on PR) | HISTORY only |
 | **Docs-only** (PR #9, #12) | — | — | — | — (CI only) | — |
 
 **Floor that never scales (holds at every tier):**
