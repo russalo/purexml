@@ -182,8 +182,9 @@ Default behavior stays a strict mirror of `defusedxml`; you opt into more only b
 ## Scope
 
 The **`defusedxml.ElementTree` family** — the part the large majority of projects use:
-`fromstring`, `parse`, `iterparse`, `fromstringlist`, `XML`, `XMLParser`, `tostring`,
-`ParseError`, the `forbid_*` knobs — **plus `defusedxml.minidom`** (v0.10), **`defusedxml.sax`**
+`fromstring`, `parse`, `iterparse`, `XML`, `XMLParser`, `tostring`, `ParseError`, the
+`forbid_*` knobs (plus a hardened `fromstringlist` the stdlib has and `defusedxml` doesn't
+wrap) — **plus `defusedxml.minidom`** (v0.10), **`defusedxml.sax`**
 + **`.expatreader`** (v0.12), and **`defusedxml.xmlrpc`** (v0.13, `monkey_patch()` — defused
 parser + anti-gzip-bomb), and `defusedxml.common` (the `DefusedXmlException` catch alias). The
 measured breadth surface is complete; only measured-negligible `pulldom` isn't covered (open an

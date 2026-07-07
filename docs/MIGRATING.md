@@ -48,8 +48,8 @@ Defaults are identical to defusedxml: `forbid_dtd=False`, `forbid_entities=True`
 ### `ElementTree`
 
 ```diff
-- from defusedxml.ElementTree import fromstring, parse, iterparse, fromstringlist, XML, XMLParser, tostring
-+ from purexml.ElementTree  import fromstring, parse, iterparse, fromstringlist, XML, XMLParser, tostring
+- from defusedxml.ElementTree import fromstring, parse, iterparse, XML, XMLParser, tostring
++ from purexml.ElementTree  import fromstring, parse, iterparse, XML, XMLParser, tostring
 ```
 
 `fromstring(text)` returns a standard `xml.etree.ElementTree.Element` — your existing
@@ -57,6 +57,12 @@ Defaults are identical to defusedxml: `forbid_dtd=False`, `forbid_entities=True`
 **both `str` and `bytes`** (pass bytes when the document carries an encoding
 declaration, so the parser reads it). `parse`/`iterparse` work on files exactly as the
 stdlib versions do, hardened.
+
+> **`fromstringlist` is a purexml addition, not a rename.** `defusedxml.ElementTree`
+> does *not* wrap `fromstringlist`, but the stdlib has it — so purexml hardens it too.
+> If you parse untrusted chunks with `xml.etree.ElementTree.fromstringlist`, switch
+> those calls to `purexml.ElementTree.fromstringlist` (there is no `defusedxml`
+> equivalent to migrate *from*).
 
 ### `minidom`
 

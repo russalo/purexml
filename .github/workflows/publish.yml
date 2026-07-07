@@ -35,8 +35,11 @@ jobs:
       - name: Verify the release tag matches the package version
         # Refuse to publish if the Release tag (e.g. v0.14.1) and pyproject's version
         # disagree — a mismatched tag is the classic way to ship the wrong version.
+        # The tag is passed via env, NOT inline ${{ }} in run:, to avoid shell injection
+        # from an attacker-controllable tag name.
+        env:
+          TAG: ${{ github.event.release.tag_name }}
         run: |
-          TAG="${{ github.event.release.tag_name }}"
           VERSION="$(python -c 'import tomllib, pathlib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')"
           echo "release tag: $TAG   pyproject version: $VERSION"
           if [ "${TAG#v}" != "$VERSION" ]; then

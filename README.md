@@ -14,8 +14,9 @@ it returns the same parse results the stdlib parser would (standard `xml.etree`
 objects) while blocking the known XML attack classes — entity-expansion bombs,
 external-entity resolution (XXE), and external DTD retrieval — exactly as
 `defusedxml` does. It mirrors **`defusedxml.ElementTree`'s full surface**
-(`fromstring`, `parse`, `iterparse`, `fromstringlist`, `XML`, `XMLParser`,
-`tostring`, the `forbid_*` knobs) and, by measured demand, **`defusedxml.minidom`**
+(`fromstring`, `parse`, `iterparse`, `XML`, `XMLParser`, `tostring`, the `forbid_*`
+knobs — plus a hardened `fromstringlist` the stdlib has and `defusedxml` doesn't wrap)
+and, by measured demand, **`defusedxml.minidom`**
 (v0.10), **`defusedxml.sax`** + **`.expatreader`** (v0.12), **`defusedxml.xmlrpc`** (v0.13), and
 `defusedxml.common`, so migrating off `defusedxml` is a literal `s/defusedxml/purexml/`. It is a security control, not a format reader;
 correctness is validated oracle-gated against `defusedxml`.
