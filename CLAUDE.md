@@ -619,6 +619,10 @@ Small by design (~300 lines of `src/`). The whole engine is one class.
   trip-wire), `test_v04_limits`, `test_v05_security_report` (posture API + version-gating),
   `test_v07_cli` (the `python -m purexml` flag matrix + JSON + --check exit codes),
   `test_no_io` (structural import guard, incl. the `__main__.py` CLI carve-out),
+  `test_fo_contract` (the file-observer six-point consumer contract as a named CI gate —
+  bytes/str parity, default-safe + opt-in-typed hostile input, a bounded-*time* never-hang
+  tripwire, the `.common` exception mirror, determinism, flat surface + `>=3.10` floor,
+  `__version__`-is-`str`; a break fails CI as a labeled FO regression),
   `test_durability` / `test_expat_security` / `test_misc`. Run on CPython ≥3.10.
 - **Out of `src/` (gitignored `scratch/`):** `review/corpus_sweep.py` (empirical
   sweep over the shared pkplab corpus via symlinks — baseline pinned in committed

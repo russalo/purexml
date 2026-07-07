@@ -79,6 +79,21 @@ isn't known up front; `max_depth`/`max_attributes` are enforced on the `parse` p
   resolution is attempted, so this exception is essentially unreachable under the
   fixed config. Kept as defense-in-depth, mirroring defusedxml's handler. Revisit
   if a parse mode is added that can reach external resolution directly.
+- **Deep trees + recursive *consumption* (`RecursionError` escapes `ValueError`).**
+  `fromstring` itself never `RecursionError`s on deep input — CPython's expat parses
+  **iteratively** in C, so even a 100 000-deep document parses (it does not hang or crash),
+  and flat, iterative access (`.iter`/`.get`/`.text`/`.tag`) walks it safely at any depth.
+  The residual is entirely *downstream* of purexml: feeding the resulting deep tree to a
+  **recursive** operation — `ET.tostring`, `copy.deepcopy`, or a hand-rolled recursive
+  walk — past `sys.getrecursionlimit()` (~1000) raises `RecursionError`, which is a
+  `RuntimeError`, **not** a `ValueError`, so it is **not** caught by `except PureXMLError`
+  / `except ValueError`. This is identical to `defusedxml`, which also has no depth cap.
+  To keep the never-crash guarantee end-to-end on untrusted deep input, pass
+  `limits=RECOMMENDED_LIMITS` (or any `max_depth`): purexml then rejects the document at
+  the parse boundary with a typed, catchable `DepthExceeded` (a `ValueError`) **before**
+  such a tree is ever built — turning a would-be downstream `RuntimeError` into an in-band
+  refusal. (`max_depth` is prevention of a dangerous tree, not rescue from a parse-time
+  crash — there is no parse-time crash to rescue.)
 - **Runtime floor is 3.10, though ≥3.8 is technically feasible.** Lower floors
   are untested here (only 3.10–3.13 are CI-grounded). Revisit if a consumer needs
   a lower floor *and* it can be added to the CI matrix.

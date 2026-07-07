@@ -60,6 +60,16 @@ These are the floor for the G1 adoption; #3 and #5 are now backed by dedicated t
 (element-walk equivalence + `__version__`-is-str). #1 is an explicit input to the freeze/packaging
 decision: **decide the published name before FO pins.**
 
+**All six FO-relayed contract points are now a single executable CI gate**
+([`tests/test_fo_contract.py`](../tests/test_fo_contract.py), added 2026-07 after FO's steward
+re-affirmed the contract): one `test_fo_<n>_*` per point — bytes/str encoding parity, hostile-input
+default-safety + opt-in `RECOMMENDED_LIMITS` typed caps (with a **bounded-*time*** never-hang
+tripwire), the `purexml.common` exception mirror, determinism, the flat read surface + the pinned
+`>=3.10` floor, and `__version__`-is-`str` — plus a guard on FO's exact `purexml.ElementTree.fromstring`
+import path. Any change that breaks an FO guarantee now fails purexml's CI **as a named FO regression**,
+so the contract cannot silently drift between now and when FO pins. FO's usage is a first-class fixture
+keeping the surface honest to 1.0, not a promise to remember.
+
 ## 2. Capabilities required (WHAT, not HOW)
 
 - **C1 — Safe parse.** Given an XML document (untrusted), parse it using only the standard
