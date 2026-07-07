@@ -30,7 +30,7 @@ def main() -> None:
     # Same hardening — an entity declaration is refused as a purexml exception.
     try:
         parseString(b'<!DOCTYPE d [ <!ENTITY e "x"> ]><d>&e;</d>', Collector())
-        print("!! entity was not blocked")
+        raise AssertionError("entity was not blocked")  # regression tripwire
     except DefusedXmlException as ex:
         print("blocked entity bomb:", type(ex).__name__)
 

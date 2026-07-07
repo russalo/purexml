@@ -38,7 +38,7 @@ def main() -> None:
     for label, payload in [("billion-laughs", BILLION_LAUGHS), ("XXE", XXE)]:
         try:
             fromstring(payload)
-            print(f"!! {label} was NOT blocked")
+            raise AssertionError(f"{label} was NOT blocked")  # regression tripwire
         except ValueError as e:
             print(f"blocked {label}: {type(e).__name__}")
 

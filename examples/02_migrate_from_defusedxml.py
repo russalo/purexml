@@ -35,7 +35,7 @@ def main() -> None:
     print("benign:")
     print("  text =", load("<greeting>hi</greeting>").text)
     print("hostile:")
-    load(XXE)
+    assert load(XXE) is None, "XXE was NOT blocked"  # regression tripwire
     # Defaults match defusedxml exactly: forbid_entities=True, forbid_external=True,
     # forbid_dtd=False. Nothing about your call sites changes — only the import path.
     print("done — the only edit was the import path.")

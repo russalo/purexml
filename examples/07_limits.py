@@ -23,7 +23,7 @@ def main() -> None:
     # catchable DepthExceeded (a LimitExceeded, which is a ValueError).
     try:
         fromstring(deep, limits=RECOMMENDED_LIMITS)
-        print("!! deep doc was not capped")
+        raise AssertionError("deep doc was not capped")  # regression tripwire
     except DepthExceeded as e:
         print("RECOMMENDED -> blocked:", e)
 
@@ -31,7 +31,7 @@ def main() -> None:
     tight = Limits(max_depth=5, max_attributes=3, max_bytes=1_000_000)
     try:
         fromstring("<e a='1' b='2' c='3' d='4'/>", limits=tight)
-        print("!! attribute flood was not capped")
+        raise AssertionError("attribute flood was not capped")  # regression tripwire
     except AttributesExceeded as e:
         print("custom     -> blocked:", e)
 

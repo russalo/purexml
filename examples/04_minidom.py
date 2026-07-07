@@ -19,7 +19,7 @@ def main() -> None:
     # Same hardening as ElementTree — an entity declaration is refused.
     try:
         parseString('<!DOCTYPE d [ <!ENTITY e "x"> ]><d>&e;</d>')
-        print("!! entity was not blocked")
+        raise AssertionError("entity was not blocked")  # regression tripwire
     except DefusedXmlException as ex:
         print("blocked entity bomb:", type(ex).__name__)
 
