@@ -1,13 +1,16 @@
 # Migrating from `defusedxml` to purexml
 
 purexml is a **behavioral mirror of `defusedxml`** built on the Python standard
-library alone. Migration is a literal find-and-replace of the import path —
-`s/defusedxml/purexml/` — with **no logic change**: the same parses succeed, the
-same attacks are blocked, the same exception types are raised, and you get back the
-same standard stdlib objects (`xml.etree` `Element`, `xml.dom.minidom.Document`, SAX
-events). The reason purexml can promise this: `defusedxml` is not an open-ended
-parser, it is a *closed set of hardening behaviors* layered on the stdlib parser —
-purexml delivers those same behaviors on the stdlib directly.
+library alone. For the **default drop-in path**, migration is a literal find-and-replace
+of the import path — `s/defusedxml/purexml/`: the same parses succeed, the same attacks
+are blocked, the same exception types are raised, and you get back the same standard
+stdlib objects (`xml.etree` `Element`, `xml.dom.minidom.Document`, SAX events). A few
+**deliberate differences** — all noted in the per-module sections below — apply only if
+you rely on them: `minidom(parser=...)` is refused rather than silently patched (stricter),
+and purexml adds opt-in structural-DoS caps that are **off by default**. The reason
+purexml can mirror `defusedxml` at all: it is not an open-ended parser, it is a *closed
+set of hardening behaviors* layered on the stdlib parser — purexml delivers those same
+behaviors on the stdlib directly.
 
 > **Why migrate.** One fewer third-party dependency (purexml has **zero** runtime
 > deps), and a *maintained* implementation of the same security model — `defusedxml`
