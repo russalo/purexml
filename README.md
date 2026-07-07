@@ -80,6 +80,10 @@ There's also a posture CLI — `python -m purexml` prints the runtime's XML-secu
 posture (libexpat version + per-class mitigation map); `--json` for machine-readable
 output, `--check [--min-expat X.Y.Z]` as an opt-in CI gate (exit code), `--version`.
 
+Runnable, copy-paste examples for every surface (ElementTree family, minidom, sax,
+xmlrpc, opt-in `Limits`, the posture report) are in [`examples/`](examples/); the
+module-by-module migration reference is [`docs/MIGRATING.md`](docs/MIGRATING.md).
+
 ### Opt-in defense-in-depth (default-off)
 
 ```python
@@ -97,6 +101,8 @@ root = fromstring(untrusted_xml, limits=RECOMMENDED_LIMITS)   # raises LimitExce
 
 ## Documentation
 
+- [`examples/`](examples/) — runnable, copy-paste examples for every surface
+- [`docs/MIGRATING.md`](docs/MIGRATING.md) — the `s/defusedxml/purexml/` migration guide, module by module
 - [`CLAUDE.md`](CLAUDE.md) — agent instructions for working in this repo
 - [`HISTORY.md`](HISTORY.md) — running index of all versions, specs, and compliance reports
 - [`CONVENTIONS.md`](CONVENTIONS.md) — naming, version-bump rules, document promotion paths

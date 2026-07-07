@@ -23,7 +23,7 @@ jobs:
           python-version: "3.12"
       - run: pip install ruff mypy
       - name: ruff
-        run: ruff check src/ tests/ fuzz/ tools/
+        run: ruff check src/ tests/ fuzz/ tools/ examples/
       - name: mypy
         run: mypy
 

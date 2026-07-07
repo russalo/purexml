@@ -1,0 +1,52 @@
+name: publish
+
+# Publish purexml to PyPI when a GitHub Release is published, via PyPI Trusted
+# Publishing (OIDC) — no long-lived API token.
+#
+# STAGED — not yet live. This workflow only runs when a Release is *published*, and
+# the upload step additionally requires:
+#   1. the `purexml` name claimed on PyPI, and
+#   2. a configured PyPI Trusted Publisher for russalo/purexml (this workflow,
+#      environment `pypi`).
+# Until both exist (a deliberate strategic call — see docs/ROADMAP-to-1.0.md, gate
+# G5), do not create a Release. Committing the workflow is harmless: nothing runs
+# without a Release event.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Build sdist + wheel and validate metadata
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build
+          twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi          # deployment gate + audit record
+    permissions:
+      id-token: write          # mint the OIDC token for Trusted Publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Publish to PyPI (Trusted Publishing / OIDC)
+        uses: pypa/gh-action-pypi-publish@release/v1
