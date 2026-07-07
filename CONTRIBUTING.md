@@ -8,8 +8,9 @@ security library needs. This page is the short version of what that means in pra
 > been blocked, an unexpected fetch/read, or any divergence from `defusedxml`'s blocking is a
 > security report — see [`SECURITY.md`](SECURITY.md).
 
-> **Status: pre-1.0, license pending.** The public API isn't frozen yet and the license is an
-> open decision (see the README). For anything beyond a small fix, **open an issue to discuss
+> **Status: pre-1.0, MIT-licensed.** The public API isn't frozen yet — it binds at 1.0 (the
+> freeze contract is ratified; see [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md)). purexml
+> is not yet published to PyPI. For anything beyond a small fix, **open an issue to discuss
 > first** — it saves you from building against a moving target.
 
 ## The prime directive
@@ -40,8 +41,8 @@ python -m pytest tests/ -q
 ```sh
 python -m pytest tests/ -q                       # all green, CPython 3.10–3.13
 python -m pytest --cov=purexml --cov-fail-under=90
-ruff check src tests                             # clean
-mypy src                                         # --strict, clean
+ruff check src tests fuzz tools examples         # clean (CI lints all of these)
+mypy                                             # --strict, clean
 ```
 
 A change also has to keep:
@@ -50,6 +51,13 @@ A change also has to keep:
   divergences** vs the oracle, across every covered surface (ElementTree, minidom, sax, xmlrpc).
 - **The no-I/O import guard** (`tests/test_no_io.py`) passing — no new network/fs/exec import
   reachable from `src/`.
+- **The consumer-contract gate** (`tests/test_fo_contract.py`) — the anchor consumer's contract
+  as named tests (bytes/str parity, the `.common` exception mirror, determinism, the `>=3.10`
+  floor, `__version__`). A change that breaks a downstream guarantee fails CI as a *labeled
+  regression*, so touch the mirror deliberately.
+- **The examples stay runnable** — `tests/test_examples.py` runs each `examples/*.py` as a
+  smoke test (exit 0); an example that no longer runs, or an attack it stops blocking, fails CI.
+  New/edited examples must run on stdlib + purexml only.
 - **Exception shape:** malformed input → stdlib `xml.etree.ElementTree.ParseError`; a blocked
   attack → a `*Forbidden` / `LimitExceeded` exception, all subclassing `ValueError`.
 
@@ -59,16 +67,18 @@ and PRs are most useful with a minimal reproducing XML document.
 ## How changes are reviewed
 
 Substantive changes go through a four-leg decorrelated review (in-house multi-agent swarm,
-a cross-model pass, an empirical corpus/fuzz sweep, and PR bots) and — for new surfaces or
-parse-behavior changes — an RFC + a compliance report. Every cross-model/bot finding is
-**grounded against the real code** before it's acted on. You don't have to run all of that
-yourself; opening the PR kicks off the parts that run on PR open.
+a cross-model pass, an empirical corpus/fuzz sweep, and a PR bot — CodeRabbit auto-reviews on
+open) and — for new surfaces or parse-behavior changes — an RFC + a compliance report. Every
+cross-model/bot finding is **grounded against the real code** before it's acted on (models
+overstate severity and critique code they were never shown). You don't have to run all of that
+yourself; opening the PR kicks off CI + the CodeRabbit review.
 
 ## Commits & PRs
 
 - Keep PRs focused; describe *what changed and why*, and what you ran.
 - Reference the issue you discussed (for non-trivial changes).
 - Update the docs that drift with your change (README / CHANGELOG / COMPATIBILITY / LIMITATIONS
-  as applicable) in the same PR.
+  / MIGRATING / `examples/` as applicable) in the same PR — sweep the affected docs together,
+  not piecemeal.
 
 Thanks again — careful, well-tested contributions to a security control are genuinely valued.
