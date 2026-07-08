@@ -38,7 +38,7 @@ return types below are **Stable** — frozen to 2.0. Migration off `defusedxml` 
 |---|---|---|
 | `purexml.ElementTree.fromstring` (also `purexml.fromstring`) | `(text: str\|bytes, forbid_dtd=False, forbid_entities=True, forbid_external=True, *, limits=None) -> Element` | **Stable** |
 | `purexml.ElementTree.parse` | `(source, parser=None, forbid_dtd=False, forbid_entities=True, forbid_external=True, *, limits=None) -> ElementTree` | **Stable** |
-| `purexml.ElementTree.iterparse` | `(source, events=None, forbid_dtd=False, forbid_entities=True, forbid_external=True, *, limits=None)` | **Stable** |
+| `purexml.ElementTree.iterparse` | `(source, events=None, parser=None, forbid_dtd=False, forbid_entities=True, forbid_external=True, *, limits=None)` | **Stable** |
 | `purexml.ElementTree.fromstringlist` | `(sequence, parser=None, forbid_dtd=False, forbid_entities=True, forbid_external=True, *, limits=None) -> Element` | **Stable** |
 | `purexml.ElementTree.XMLParser` | `(*, target=None, encoding=None, forbid_dtd=False, forbid_entities=True, forbid_external=True, limits=None)` | **Stable** |
 | `purexml.ElementTree.XML` / `XMLParse` / `XMLTreeBuilder` / `tostring` / `ParseError` | aliases + re-exported stdlib | **Stable** |
@@ -61,7 +61,7 @@ is additive.
 
 Frozen and **complete** — every reachable refusal is present. Consumers may catch any level.
 
-```
+```text
 PureXMLError(ValueError)
 ├── DTDForbidden
 ├── EntitiesForbidden
@@ -74,8 +74,11 @@ PureXMLError(ValueError)
 ```
 
 - Every refusal subclasses `ValueError` (mirrors `defusedxml`'s MRO).
-- **Malformed** input raises the stdlib `xml.etree.ElementTree.ParseError` (or
-  `xml.sax.SAXParseException` for sax) — never a `PureXMLError`.
+- **Malformed** input raises a stdlib parser error — **never** a `PureXMLError` — and the
+  type is the one the underlying stdlib parser raises on each surface:
+  `xml.etree.ElementTree.ParseError` (ElementTree), `xml.parsers.expat.ExpatError`
+  (minidom), `xml.sax.SAXParseException` (sax). All are stdlib types, unchanged from what
+  `defusedxml` surfaces.
 - `purexml.common.DefusedXmlException` is a **Stable** alias for `PureXMLError`, so
   `except DefusedXmlException` migrates verbatim.
 

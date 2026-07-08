@@ -2,7 +2,7 @@
 
 Audit of v1.0.0 against the approved spec
 [`v1.0.0_RFC_Specification.md`](v1.0.0_RFC_Specification.md). Environment: CPython 3.12.3,
-libexpat 2.6.1, defusedxml 0.7.1 (dev/test oracle only). Suite: **372 passed, 1 gated-skip.**
+libexpat 2.6.1, defusedxml 0.7.1 (dev/test oracle only). Suite: **376 passed, 1 gated-skip.**
 
 ## Theme
 1.0 is a **governance/contract freeze on a validated codebase — not a feature release.** The
@@ -31,8 +31,8 @@ ratified; version → 1.0.0 (pyproject, `__init__`, CONVENTIONS); classifier →
 
 | Gate | Result |
 |---|---|
-| Full suite (CPython 3.12; CI matrix 3.10–3.13) | **372 passed, 1 skip** |
-| New contract-freeze guard (`test_public_contract.py`) | **24 passed** |
+| Full suite (CPython 3.12; CI matrix 3.10–3.13) | **376 passed, 1 skip** |
+| New contract-freeze guard (`test_public_contract.py`) | **28 passed** |
 | Coverage (`--cov-fail-under=90`) | pass (~94%) |
 | `mypy --strict` | clean (12 files) |
 | `ruff` (src tests fuzz tools examples) | clean |
@@ -55,7 +55,16 @@ set enumerated in `test_public_contract.py` were grounded against `src/`).
 - **Leg 2 (cross-model)** — n/a-scaled (no parse-or-block change; the contract text + version
   bump carry no adversarial parse risk). Recorded per the report-only/governance tier.
 - **Leg 3 (empirical sweep)** — ✅ mirror-untouched, 0 divergences over 372 real inputs.
-- **Leg 4 (CodeRabbit, on PR open)** — _(finalized before merge — see PR.)_
+- **Leg 4 (CodeRabbit, on PR #48)** — ✅ ran; **findings all grounded + fixed.** Two were
+  genuine **contract-accuracy bugs** the freeze had to get right: (a) `iterparse`'s
+  `parser=None` was omitted from the frozen signature in `PUBLIC_CONTRACT.md`, and (b) the
+  frozen exception contract said malformed → `ParseError`/`SAXParseException` but **minidom**
+  malformed input raises `xml.parsers.expat.ExpatError` — both corrected in the binding docs
+  + the migration guide, and now guarded (`test_public_contract` gained per-surface
+  malformed-exception + `parser=`-param checks). Also: removed a leftover placeholder 1.0.0
+  HISTORY row (duplicate), strengthened the guard (assert `XMLParser` keyword-only, top-level
+  exception re-exports, minidom defaults), and tagged a markdown fence. This is exactly why a
+  freeze gets reviewed — a wrong frozen contract is worse than none.
 
 ## Ratification
 Ratified by Russell (all gating calls) + the file-observer steward (full sign-off, all four

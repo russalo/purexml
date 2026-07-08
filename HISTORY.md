@@ -47,8 +47,6 @@ below.
 | 0.1.2 | n/a | 2026-06-16 | **Patch** — durability hardening: differential fuzz gate vs the defusedxml oracle (seeded, C14N-equal-or-both-raise), the 2 newer expat-layer attack classes (CVE-2023-52425 large-tokens + disproportionate-memory, version-gated), and an opt-in libexpat version-awareness API (`EXPAT_VERSION` / `expat_is_secure` / `assert_expat_secure`). No parse-behavior change; LOGIC unchanged (v0.1), SCHEMA n/a. _(HISTORY only, no RFC — part of v0.1.)_ | _(no RFC — patch)_ | _(part of v0.1)_ |
 | 0.1.1 | n/a | 2026-06-16 | **Patch** — lower runtime floor to Python **3.10** (was 3.12) so purexml never binds a consumer's Python floor (target spec §4); add a CI matrix (3.10–3.13) to test the declared floor rather than only 3.12. No logic/behavior change; SCHEMA n/a, LOGIC unchanged (v0.1). _(HISTORY only, no RFC — part of v0.1.)_ | _(no RFC — patch)_ | _(part of v0.1; see [COMPLIANCE-v0.1.md](docs/COMPLIANCE-v0.1.md))_ |
 | 0.1.0 | n/a | 2026-06-16 | First slice: hardened `fromstring` — C1 safe-parse + C2 safe-failure, behaviorally equivalent to `defusedxml` defaults, stdlib-only. SCHEMA n/a (returns stdlib `Element`); LOGIC introduced (hardening mitigation set v0.1). Merged via PR #1; four-leg review complete. | [v0.1.0_RFC_Specification.md](docs/v0.1.0_RFC_Specification.md) | [COMPLIANCE-v0.1.md](docs/COMPLIANCE-v0.1.md) |
-| 1.0.0 | 1.0 | YYYY-MM-DD | **Schema freeze.** Public contract binding. Backward compatibility policy in effect. No new features — governance declaration on a validated codebase. | [v1.0.0_RFC_Specification.md](docs/v1.0.0_RFC_Specification.md) | [COMPLIANCE-v1.0.md](docs/COMPLIANCE-v1.0.md) |
-| 1.0.1 | 1.0 | YYYY-MM-DD | **Patch release** — example shape. Bug fix in {component}. SCHEMA unchanged. _(part of v1.0; HISTORY only, no RFC.)_ | _(no RFC — patch)_ | _(part of v1.0)_ |
 
 ---
 
@@ -58,7 +56,8 @@ List any RFCs currently in draft (`docs/v{X.Y.Z}_RFC_DRAFT.md`). When none are
 open, state so explicitly rather than deleting the section — the empty-but-named
 state is the signal:
 
-> No drafts in flight. **v0.14.1 shipped** 2026-06-28 — current; patch applying the **MIT
+> No drafts in flight. **v1.0.0 shipped** 2026-07-08 — the public contract freeze
+> (ratified with file-observer); current. (Superseded note: v0.14.1 shipped 2026-06-28 — MIT
 > license** (LICENSE + pyproject + docs). **v0.14.0** (PR #37) brought opt-in `Limits`
 > structural-DoS caps across **ElementTree + minidom + sax** (xmlrpc deferred — gzip-bomb cap
 > is its bound). **The measured breadth surface is COMPLETE:** ElementTree ✅,
