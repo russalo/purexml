@@ -116,7 +116,7 @@ won't move under you without a 2.0 (see [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.m
 - [`COMPATIBILITY.md`](COMPATIBILITY.md) — drop-in compatibility contract + exception edge cases
 - [`LIMITATIONS.md`](LIMITATIONS.md) — what purexml deliberately does **not** do
 - [`SECURITY.md`](SECURITY.md) — security policy and how to report issues
-- [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md) — consumer stability commitments (binds at 1.0)
+- [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md) — consumer stability commitments (binding as of 1.0)
 - [`CHANGELOG.md`](CHANGELOG.md) — release notes · [`HISTORY.md`](HISTORY.md) — full per-release record
 - [`STACK.md`](STACK.md) — language, runtime, dependencies · [`CONVENTIONS.md`](CONVENTIONS.md) — project conventions
 
