@@ -1,10 +1,21 @@
-<!-- Plain markdown image (not <picture>/<img>): the GitHub iOS app's renderer doesn't
-     support <picture>, so it showed a broken box. Markdown ![] renders everywhere. -->
-![purexml logo](assets/logo-light.svg)
+<!-- Plain markdown image with an ABSOLUTE raw URL (not <picture>/<img>): the GitHub iOS
+     app doesn't render <picture>, and PyPI doesn't resolve relative paths — markdown ![]
+     with a raw.githubusercontent URL renders on all three (GitHub web + mobile, PyPI). -->
+![purexml logo](https://raw.githubusercontent.com/russalo/purexml/main/assets/logo-light.svg)
 
 # purexml
 
 > Safely parse untrusted XML using only the Python standard library.
+
+[![tests](https://img.shields.io/github/actions/workflow/status/russalo/purexml/tests.yml?branch=main&label=tests)](https://github.com/russalo/purexml/actions/workflows/tests.yml)
+![Python 3.10–3.13](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)
+![runtime deps: zero](https://img.shields.io/badge/runtime%20deps-zero-brightgreen)
+![pure stdlib](https://img.shields.io/badge/pure-stdlib-blue)
+![coverage ≥90%](https://img.shields.io/badge/coverage-%E2%89%A590%25-brightgreen)
+![lint: ruff](https://img.shields.io/badge/lint-ruff-30173D)
+![types: mypy](https://img.shields.io/badge/types-mypy-blue)
+![differentially fuzzed](https://img.shields.io/badge/differentially-fuzzed-blueviolet)
+![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 
 **purexml is a zero-dependency, drop-in replacement for [`defusedxml`](https://pypi.org/project/defusedxml/).**
 It hardens Python's standard-library XML parsers against the known attack classes —
@@ -12,7 +23,7 @@ entity-expansion bombs, external-entity resolution (XXE), and external-DTD retri
 and hands back the same standard `xml.etree` / `minidom` / SAX objects your code already
 expects. Migrating is a literal find-and-replace: `s/defusedxml/purexml/`.
 
-![How purexml defends untrusted XML in two layers: purexml's own Python-layer handlers block entity bombs, XXE and external-DTD resolution version-independently, while the libexpat parser layer mitigates parser-level DoS depending on your runtime; the result is a standard, trusted xml.etree tree.](assets/defense-layers.svg)
+![How purexml defends untrusted XML in two layers: purexml's own Python-layer handlers block entity bombs, XXE and external-DTD resolution version-independently, while the libexpat parser layer mitigates parser-level DoS depending on your runtime; the result is a standard, trusted xml.etree tree.](https://raw.githubusercontent.com/russalo/purexml/main/assets/defense-layers.svg)
 
 ## Why purexml
 
