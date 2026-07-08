@@ -48,7 +48,7 @@ from .limits import RECOMMENDED_LIMITS, Limits
 
 XML = fromstring
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 __all__ = [
     # the ElementTree family (also at purexml.ElementTree)
