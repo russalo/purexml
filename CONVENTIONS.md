@@ -26,7 +26,7 @@ axes that apply to this project; common ones:
 metadata.
 **When it bumps:** Any release.
 **Format:** `MAJOR.MINOR.PATCH`
-**Current:** 0.14.1
+**Current:** 1.0.0
 
 ### 1.2 LOGIC_VERSION *(optional — for projects with routing / decision logic)*
 **What it is:** Version of the *decision logic* — code that decides how an

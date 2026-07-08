@@ -80,19 +80,20 @@ There's also a posture CLI — `python -m purexml` (`--json` for machine output,
 
 ## Status
 
-**Pre-1.0 — currently v0.14.1.** Working and validated, but the public API is not frozen
-yet (it binds at 1.0).
+**v1.0.0 — the public contract is frozen and binding.** The `defusedxml`-mirror surface
+won't move under you without a 2.0 (see [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md)).
 
 - Runs on **CPython 3.10–3.13**, zero runtime dependencies.
 - Correctness is **oracle-gated against `defusedxml` every release** — C14N + event-stream
   equivalence over a real corpus, an adversarial attack battery, and differential fuzzing
   (see [`docs/EQUIVALENCE.md`](docs/EQUIVALENCE.md)).
-- **Not yet published to PyPI**, and the `purexml` name is not yet claimed — both held for
-  a deliberate strategic call.
+- The contract freeze was ratified with the anchor consumer (file-observer) — see
+  [`docs/v1.0.0_RFC_Specification.md`](docs/v1.0.0_RFC_Specification.md). The opt-in
+  defense-in-depth (`Limits`, `security_report()`) stays **provisional** (it tracks the
+  moving libexpat threat landscape).
+- **Not yet published to PyPI**, and the `purexml` name is not yet claimed — distribution
+  is a separate, deliberate step. Depend on it via git/path until then.
 - **License: MIT.**
-
-The measured drop-in surface is complete; the plan to 1.0 is
-[`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md).
 
 ## Documentation
 

@@ -1,166 +1,152 @@
 # purexml Public Contract
 
-> **⚠️ NOT YET BINDING — purexml is pre-1.0 (currently v0.14.1).** No public
-> contract is frozen. The de-facto surface today is the full
-> `defusedxml.ElementTree` family (`fromstring`, `parse`, `iterparse`,
-> `fromstringlist`, `XML`, `XMLParser`, `tostring`, `ParseError`, the `forbid_*`
-> knobs) under the `purexml.ElementTree` namespace, behaviorally equivalent to
-> `defusedxml` at its defaults — **plus `purexml.minidom`** (v0.10, `parse`/`parseString`
-> → stdlib `Document`), **`purexml.sax`** (v0.12, `make_parser`/`parse`/`parseString`) +
-> `purexml.expatreader`, **`purexml.xmlrpc`** (v0.13, `monkey_patch`/`unmonkey_patch` — lazy),
-> and `purexml.common` (the `DefusedXmlException` catch-site alias). The measured breadth surface
-> is complete (see `docs/ROADMAP-to-1.0.md`) — plus **opt-in,
-> default-off** additions (`Limits`
-> structural caps — on ElementTree + minidom + sax as of v0.14, the `security_report()` posture API) and a read-only posture CLI
-> (`python -m purexml`). Until v1.0 any of it may
-> still change. The tables below are the **skeleton to fill at the v1.0 freeze**;
-> they are intentionally not populated yet (pinning a contract pre-1.0 would be a
-> false promise). The contract binds, and this file is completed, **at v1.0** —
-> which is gated on the still-deferred adoption-model decision (see `CLAUDE.md`
-> *Known decisions*). At the freeze the mirror surface is STABLE; the opt-in
-> defense-in-depth (`Limits`, `security_report`) is PROVISIONAL (see
-> [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md)).
-
-This document defines what **consumers** of purexml's output / API
-can rely on. It is the stability commitment from purexml to
-downstream systems.
-
-> **This contract is binding as of v1.0** (not yet reached). The stability
-> commitments below are obligations, not intentions. Fields / functions marked
-> stable will not be removed, renamed, or change type without a MAJOR version
-> bump. See the backward compatibility and deprecation policies below.
-
----
-
-## 1. What Consumers Can Count On
-
-### 1.1 Schema / API Version
-
-_Filled at the v1.0 freeze._ The version axis(es) consumers depend on — for purexml:
-RELEASE_VERSION (the package version); SCHEMA is **n/a** (purexml returns stdlib
-`xml.etree` / `minidom` / SAX objects, not a versioned wire shape); LOGIC_VERSION is
-diagnostic only, not a stability commitment. The shape this will take:
-
-> Every {output / response} includes a top-level `schema_version` field in
-> the format `MAJOR.MINOR`.
+> **✅ BINDING as of v1.0.0 (2026-07-08; ratified 2026-07-07).** This is the stability commitment from purexml
+> to the systems that depend on it. Everything marked **Stable** below will not be removed,
+> renamed, or change type or semantics without a **MAJOR** (2.0) version bump. Fields marked
+> **Provisional** are explicitly *not* under this contract (§2.2). The frozen surface was
+> ratified by Russell and the file-observer steward — see
+> [`docs/v1.0.0_RFC_Specification.md`](docs/v1.0.0_RFC_Specification.md); it is guarded
+> mechanically by `tests/test_public_contract.py`.
 >
-> **Stability rules (post-v{X.0}):**
-> - **MINOR bumps are additive only.** New fields may appear. Existing
->   fields will not be removed, renamed, or change type.
-> - **MAJOR bumps are reserved for breaking changes** and require an
->   explicit migration path. A MAJOR bump will be preceded by at least one
->   full MINOR version of deprecation warnings on affected fields.
-> - **Consumers should branch on the MAJOR version.** Code written for
->   schema 1.x will continue to work with schema 1.y where y > x.
+> **Not the same as publication.** This contract binds the *codebase* at 1.0.0. Distribution
+> (PyPI publication, claiming the `purexml` name) is a separate step; until then, depend on
+> purexml via a git or path reference.
 
-### 1.2 Stable Top-Level Surface
+---
 
-_Filled at the v1.0 freeze._ The stable top-level functions and their types (purexml's
-de-facto surface today is the `defusedxml`-mirroring API enumerated at the top of this doc;
-the freeze pins names + signatures).
+## 1. What consumers can count on
 
-| Key / Endpoint / Function | Type | Stability |
+### 1.1 Version
+
+- **RELEASE_VERSION** — the package version (`purexml.__version__`, a plain `str`; also
+  `pyproject.toml`). Consumers may pin it and stamp it into dependency provenance. Semantic
+  versioning: **MAJOR** for breaking changes, **MINOR** for additive changes, **PATCH** for
+  fixes.
+- **SCHEMA_VERSION — n/a.** purexml returns standard stdlib objects
+  (`xml.etree.ElementTree.Element`, `xml.dom.minidom.Document`, SAX events), not a versioned
+  wire shape, so there is no purexml record schema to version.
+- **LOGIC_VERSION** — the hardening mitigation set. Visible for diagnosis (`security_report()`),
+  **not** a stability commitment (§3).
+
+### 1.2 Stable top-level surface
+
+The `defusedxml`-mirror surface. Names, signatures, parameter names/order, **defaults**, and
+return types below are **Stable** — frozen to 2.0. Migration off `defusedxml` is
+`s/defusedxml/purexml/`.
+
+| Namespace / symbol | Signature (defaults are part of the contract) | Stability |
 |---|---|---|
-| _enumerated at the v1.0 freeze_ | — | **Stable** — always present |
+| `purexml.ElementTree.fromstring` (also `purexml.fromstring`) | `(text: str\|bytes, forbid_dtd=False, forbid_entities=True, forbid_external=True, *, limits=None) -> Element` | **Stable** |
+| `purexml.ElementTree.parse` | `(source, parser=None, forbid_dtd=False, forbid_entities=True, forbid_external=True, *, limits=None) -> ElementTree` | **Stable** |
+| `purexml.ElementTree.iterparse` | `(source, events=None, forbid_dtd=False, forbid_entities=True, forbid_external=True, *, limits=None)` | **Stable** |
+| `purexml.ElementTree.fromstringlist` | `(sequence, parser=None, forbid_dtd=False, forbid_entities=True, forbid_external=True, *, limits=None) -> Element` | **Stable** |
+| `purexml.ElementTree.XMLParser` | `(*, target=None, encoding=None, forbid_dtd=False, forbid_entities=True, forbid_external=True, limits=None)` | **Stable** |
+| `purexml.ElementTree.XML` / `XMLParse` / `XMLTreeBuilder` / `tostring` / `ParseError` | aliases + re-exported stdlib | **Stable** |
+| `purexml.minidom.parse` / `parseString` | `parseString(string: str\|bytes, parser=None, forbid_*…, *, limits=None) -> Document` | **Stable** |
+| `purexml.sax.make_parser` / `parse` / `parseString` | `parseString(string: bytes, handler, …)` — **bytes-only** | **Stable** |
+| `purexml.expatreader.create_parser` | `() -> hardened SAX reader` | **Stable** |
+| `purexml.xmlrpc.monkey_patch` / `unmonkey_patch` / `defused_gzip_decode` / `MAX_DATA` | monkeypatch shim | **Stable** |
+| `purexml.common.DefusedXmlException` (+ block-exception re-exports) | alias of `PureXMLError` | **Stable** |
+| `purexml.__version__` | plain `str`, always present | **Stable** |
+| `Limits`, `RECOMMENDED_LIMITS`, `security_report`, `SecurityReport`, status constants, the `EXPAT_*` / `assert_expat_secure` surface | opt-in defense-in-depth | **Provisional** (§2.2) |
 
-### 1.3 Stable Per-Record / Per-Field Structure
+**Defaults (Stable):** `forbid_entities=True`, `forbid_external=True`, `forbid_dtd=False`.
+The default parse path is byte-equivalent to `defusedxml`.
 
-_Filled at the v1.0 freeze._ purexml returns standard `xml.etree.ElementTree.Element` /
-`xml.dom.minidom.Document` / SAX events — the field structure is the **stdlib's**, not
-purexml's, so there is no purexml-specific record schema to pin. (The opt-in
-`security_report()` value object is **Provisional** — see §2.2.)
+**Runtime floor (Stable):** `requires-python >= 3.10`. purexml will **not raise** its
+supported Python floor above 3.10 within the 1.x line (a raise is a 2.0). Lowering the floor
+is additive.
 
-| Field | Type | Stability |
-|---|---|---|
-| _(stdlib types — no purexml record schema)_ | — | **Stable** |
+### 1.3 Stable exception hierarchy
 
-### 1.4 Namespaces / Tool Names / Registries
+Frozen and **complete** — every reachable refusal is present. Consumers may catch any level.
 
-_Filled at the v1.0 freeze._ Which namespace keys (specialist namespaces, MIME types, tool
-registries) are stable and what they contain. _(purexml exposes no such registry today —
-its surface is the `defusedxml`-mirroring module namespaces, e.g. `purexml.ElementTree`.)_
+```
+PureXMLError(ValueError)
+├── DTDForbidden
+├── EntitiesForbidden
+├── ExternalReferenceForbidden
+├── NotSupportedError
+└── LimitExceeded            [Provisional — opt-in; raised only when limits= is passed]
+    ├── DepthExceeded
+    ├── AttributesExceeded
+    └── SizeExceeded
+```
 
----
+- Every refusal subclasses `ValueError` (mirrors `defusedxml`'s MRO).
+- **Malformed** input raises the stdlib `xml.etree.ElementTree.ParseError` (or
+  `xml.sax.SAXParseException` for sax) — never a `PureXMLError`.
+- `purexml.common.DefusedXmlException` is a **Stable** alias for `PureXMLError`, so
+  `except DefusedXmlException` migrates verbatim.
 
-## 2. What Counts as a Breaking Change
+### 1.4 Per-record structure
 
-A change is **breaking** (and requires a MAJOR bump) if:
-
-- A stable field / endpoint is removed.
-- A stable field is renamed.
-- A stable field changes type.
-- A stable field's semantic contract changes (e.g. units, encoding,
-  meaning).
-- A required input becomes incompatible (a previously-valid input is now
-  rejected).
-
-A change is **additive** (and ships in a MINOR) if:
-
-- A new field appears alongside the existing ones.
-- A new endpoint / tool / namespace appears.
-- A new optional input is accepted.
-- A field that was always null gains a value (filling nulls is additive —
-  see the schema-bump conventions covered in
-  [`CONVENTIONS.md`](CONVENTIONS.md)).
-
-### 2.1 Deprecation Policy
-
-_Filled at the v1.0 freeze._ The deprecation policy — the intended russalo shape:
-
-> A field destined for removal in v{N+1}.0 must be marked deprecated in at
-> least one full v{N}.MINOR release before removal, with a deprecation
-> warning visible to consumers (in the docs, in the output where possible,
-> in `HISTORY.md`).
-
-### 2.2 Provisional Fields
-
-Fields marked **Provisional** in §1 are **not under the stable contract**.
-They MAY change in any MINOR release. Consumers depending on a provisional
-field should pin to a specific MINOR or be ready to adapt.
-
-The provisional → stable promotion criterion is *settled producing logic +
-evidence of value*. Promotions ship in a MINOR and are recorded in
-[`HISTORY.md`](HISTORY.md) and [`CONVENTIONS.md`](CONVENTIONS.md) §3.1.
-
-The full ladder is `candidate → provisional → stable`. **Candidate** fields
-are tracked outside the manifest (in sweep/instrumentation artifacts), never
-emitted in the public output, and exist to gather evidence cheaply before
-the project commits to a provisional field that carries a contract cost.
-See [`CONVENTIONS.md`](CONVENTIONS.md) §3.1 for the registry.
+purexml returns the **stdlib's** objects, so the field structure is the stdlib's, not
+purexml's — there is no purexml-specific record schema to pin. `security_report()`'s value
+object is **Provisional** (§2.2).
 
 ---
 
-## 3. What Consumers Should NOT Count On
+## 2. What counts as a breaking change
 
-Explicitly **not** under the contract (this holds pre-1.0 and after the freeze):
+A change is **breaking** (requires a MAJOR / 2.0 bump) if it, for a **Stable** item:
+removes or renames it; changes a signature, parameter name/order, or a **default**; changes
+a return type or an exception's identity/MRO position; rejects a previously-valid input
+(over-blocking on the default path); or raises the supported Python floor above 3.10.
 
-- **Internal version axes** (e.g. LOGIC_VERSION) — visible in output for
-  diagnosis, but not a stability commitment. We bump them freely.
-- **Import paths / package layout** — refactors that preserve the public
-  output / API are not contract changes.
-- **Error message wording** — error *codes* are stable, error *messages*
-  are not.
-- **Performance characteristics** — we may change algorithms (workers,
-  caching, sampling) as long as the output is byte-identical.
-- **Ordering of optional fields / iteration order** unless explicitly
-  documented as stable.
+A change is **additive** (ships in a MINOR) if it adds a new symbol/namespace, a new optional
+(keyword) parameter, a new opt-in capability, or lowers the Python floor.
+
+### 2.1 Deprecation policy
+
+A Stable symbol destined for removal in v{N+1}.0 must be marked **deprecated** in at least one
+full v{N}.MINOR release before removal, with the deprecation visible in the docs, in
+`HISTORY.md`/`CHANGELOG.md`, and (where practical) via a `DeprecationWarning`.
+
+### 2.2 Provisional surface
+
+The opt-in defense-in-depth — `Limits` / `RECOMMENDED_LIMITS`, `security_report()` /
+`SecurityReport` + its status vocabulary (`BLOCKED` / `EXPAT_MITIGATED` / `EXPAT_PARTIAL` /
+`OPT_IN` / `LIVE`), and the libexpat version-assertion surface — is **Provisional**: it MAY
+change in a MINOR release. This is deliberate — these track the *moving* libexpat/CPython
+threat landscape, and freezing them would prevent purexml from hardening against new expat
+CVE classes without a 2.0 (strictly worse for a security control). The **default drop-in
+path never touches them.** Consumers depending on a provisional symbol should pin a specific
+MINOR (as file-observer does, recording `RECOMMENDED_LIMITS` + the expat floor in its
+dependency provenance) or be ready to adapt.
+
+The provisional → stable promotion criterion is *settled behavior + evidence of value*;
+promotions ship in a MINOR and are recorded here + in `HISTORY.md`.
 
 ---
 
-## 4. Backward Compatibility Policy
+## 3. What consumers should NOT count on
 
-_Filled at the v1.0 freeze._ The backward-compatibility guarantee — the intended shape:
+Explicitly **not** under the contract:
 
-> Within a MAJOR version, code that works on v{X}.Y will continue to work
-> on v{X}.Z where Z > Y. Tests that pinned to v{X}.Y output will pass on
-> v{X}.Z output for the *stable* fields (additive fields may need new
-> assertions).
+- **Internal version axes** (LOGIC_VERSION) — visible for diagnosis, bumped freely.
+- **Import paths / package layout beyond §1.2** — internal module structure may be
+  refactored as long as the §1.2 public surface is preserved.
+- **Error message *wording*** — the exception *types* are Stable; the message strings are not.
+- **Performance characteristics** — algorithms may change as long as output stays equivalent.
+- **Ordering of anything not documented as stable** (attribute order in the returned tree
+  *is* stable — it is the document order the stdlib preserves).
+- **The Provisional surface** (§2.2).
 
 ---
 
-## 5. Version of This Contract
+## 4. Backward compatibility policy
 
-_Set at the v1.0 freeze_ — the date and release that froze this contract (not yet binding):
+Within a MAJOR version, code that works on v{X}.Y continues to work on v{X}.Z (Z > Y) for the
+**Stable** surface. Additive (MINOR) changes may introduce new symbols/parameters that older
+code simply doesn't use. Tests pinned to v{X}.Y behavior pass on v{X}.Z for Stable items;
+Provisional items may require adaptation across MINORs.
 
-> This contract became binding at v{X.0} (YYYY-MM-DD). See
-> [`HISTORY.md`](HISTORY.md) for the freeze entry.
+---
+
+## 5. Version of this contract
+
+This contract became binding at **v1.0.0 (2026-07-08; ratified 2026-07-07)**. It was ratified by Russell and the
+file-observer steward (see [`docs/v1.0.0_RFC_Specification.md`](docs/v1.0.0_RFC_Specification.md))
+and is guarded by `tests/test_public_contract.py`. See [`HISTORY.md`](HISTORY.md) for the
+1.0.0 entry.
