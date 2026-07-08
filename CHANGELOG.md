@@ -9,6 +9,14 @@ per-release record (RFCs, compliance, internal axes) lives in
 > **v1.0.0:** the public API is **frozen and binding** — see
 > [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md). Install with `pip install purexml`.
 
+## [1.0.1] — 2026-07-08
+### Fixed
+- **PyPI project description.** 1.0.0 was published with the pre-publish README (which still
+  read "not yet published to PyPI / depend on it via git"), and an uploaded release's
+  `long_description` is immutable. 1.0.1 re-uploads with the corrected README — the accurate
+  `pip install purexml` front door + PyPI badges + the russalo byline. **No code change**;
+  parse behavior byte-identical to 1.0.0; the frozen contract is unchanged.
+
 ## [1.0.0] — 2026-07-08
 ### Changed
 - **Public contract frozen + binding.** The `defusedxml`-mirror surface — module
