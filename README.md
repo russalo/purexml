@@ -7,8 +7,9 @@
 
 > Safely parse untrusted XML using only the Python standard library.
 
+[![PyPI](https://img.shields.io/pypi/v/purexml)](https://pypi.org/project/purexml/)
 [![tests](https://img.shields.io/github/actions/workflow/status/russalo/purexml/tests.yml?branch=main&label=tests)](https://github.com/russalo/purexml/actions/workflows/tests.yml)
-![Python 3.10–3.13](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)
+[![Python versions](https://img.shields.io/pypi/pyversions/purexml)](https://pypi.org/project/purexml/)
 ![runtime deps: zero](https://img.shields.io/badge/runtime%20deps-zero-brightgreen)
 ![pure stdlib](https://img.shields.io/badge/pure-stdlib-blue)
 ![coverage ≥90%](https://img.shields.io/badge/coverage-%E2%89%A590%25-brightgreen)
@@ -39,8 +40,11 @@ expects. Migrating is a literal find-and-replace: `s/defusedxml/purexml/`.
 
 ## Install & migrate
 
-Until purexml is published to PyPI, depend on it via a git or path reference. Then the
-only change to your code is the import path:
+```sh
+pip install purexml
+```
+
+Then the only change to your code is the import path:
 
 ```python
 # before:  from defusedxml.ElementTree import fromstring
@@ -102,8 +106,7 @@ won't move under you without a 2.0 (see [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.m
   [`docs/v1.0.0_RFC_Specification.md`](docs/v1.0.0_RFC_Specification.md). The opt-in
   defense-in-depth (`Limits`, `security_report()`) stays **provisional** (it tracks the
   moving libexpat threat landscape).
-- **Not yet published to PyPI**, and the `purexml` name is not yet claimed — distribution
-  is a separate, deliberate step. Depend on it via git/path until then.
+- **On PyPI:** `pip install purexml` — zero runtime dependencies.
 - **License: MIT.**
 
 ## Documentation
@@ -113,12 +116,15 @@ won't move under you without a 2.0 (see [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.m
 - [`COMPATIBILITY.md`](COMPATIBILITY.md) — drop-in compatibility contract + exception edge cases
 - [`LIMITATIONS.md`](LIMITATIONS.md) — what purexml deliberately does **not** do
 - [`SECURITY.md`](SECURITY.md) — security policy and how to report issues
-- [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md) — consumer stability commitments (binds at 1.0)
+- [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md) — consumer stability commitments (binding as of 1.0)
 - [`CHANGELOG.md`](CHANGELOG.md) — release notes · [`HISTORY.md`](HISTORY.md) — full per-release record
 - [`STACK.md`](STACK.md) — language, runtime, dependencies · [`CONVENTIONS.md`](CONVENTIONS.md) — project conventions
 
 ## License
 
 [MIT](LICENSE) — purexml is give-it-away, zero-dependency infrastructure: pure open
-source, maximum reuse. Publishing to PyPI and claiming the `purexml` name remain a
-separate, deliberate call.
+source, maximum reuse.
+
+---
+
+*Built by [**russalo**](https://blog.russalo.com) — more at [blog.russalo.com](https://blog.russalo.com).*

@@ -178,6 +178,5 @@ print(purexml.security_report())        # human-readable; also a frozen value ob
 - [ ] *(optional)* Pass `limits=RECOMMENDED_LIMITS` where you parse untrusted input.
 - [ ] *(optional)* Wire `python -m purexml --check` into CI to pin a libexpat floor.
 
-> **Note on availability.** Until purexml is published to PyPI, depend on it via a git
-> or path reference; the import surface above is already stable. Track the publish +
-> 1.0 status in [`ROADMAP-to-1.0.md`](ROADMAP-to-1.0.md).
+> **Note on availability.** purexml is on PyPI — `pip install purexml` (v1.0.0, the frozen
+> public contract). The import surface above is stable to 2.0 (see `PUBLIC_CONTRACT.md`).

@@ -123,10 +123,10 @@ default-off):
   remote, external-entity local, DTD retrieval; + 2 newer: CVE-2023-52425
   large-tokens/reparse, disproportionate dynamic memory on old expat),
   **version-gated on `pyexpat.EXPAT_VERSION`.** Also ships the version assertion.
-- **G5 — decide deferred items.** Adoption-model **direction is decided: publish
-  first-party** (ratified 2026-06-16; `docs/v1.0_TARGET.md`). Remaining specifics to
-  land by 1.0: PyPI timing, claiming the name, the license, the optional vendorable
-  single-file form.
+- **G5 — decide deferred items — ✅ DONE.** Adoption-model direction decided (publish
+  first-party, ratified 2026-06-16; `docs/v1.0_TARGET.md`); license MIT (2026-06-28);
+  **PyPI publish + name-claim DONE (`pip install purexml` live at v1.0.0, 2026-07-08).**
+  (The optional vendorable single-file form remains open, non-blocking.)
 - **G6 — 1.0 freeze — ✅ DONE (v1.0.0, 2026-07-08).** RFC ratified + promoted
   (`docs/v1.0.0_RFC_Specification.md`), `PUBLIC_CONTRACT.md` filled + binding,
   `tests/test_public_contract.py` guards the frozen surface, version → 1.0.0,
@@ -191,7 +191,7 @@ oracle-gating, falsify-first battery + (960-doc) differential fuzz + committed
 equivalence report, corpus sweep, durability + version awareness + the posture API,
 four-leg apparatus. **No build work remains.** What's left for 1.0:
 - **G1/G2** — file-observer adoption validation (the "validated codebase" gate).
-- **G5** — the deferred adoption-model / packaging / publish decisions (**license DECIDED: MIT**, 2026-06-28; PyPI publish + name-claim still deferred to a strategic call).
+- **G5** — the deferred adoption-model / packaging / publish decisions (**license MIT**, 2026-06-28; **PyPI publish + name-claim DONE — `pip install purexml` live at v1.0.0, 2026-07-08**).
 - **G6** — the freeze ceremony (lock the contract surface, fill `PUBLIC_CONTRACT.md`,
   backward-compat policy). The pre-freeze checklist above is the gate.
 

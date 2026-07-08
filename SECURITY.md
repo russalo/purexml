@@ -49,8 +49,8 @@ constructable failing inputs.
 
 ## Supported versions
 
-The latest **1.x** release is supported; security fixes land there. (purexml is not yet
-published to PyPI — the support window formalizes on publication.)
+The latest **1.x** release is supported; security fixes land there. (`pip install purexml`
+— published on PyPI as of v1.0.0.)
 
 | Version | Supported |
 |---|---|
