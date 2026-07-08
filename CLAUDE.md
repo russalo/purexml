@@ -795,12 +795,13 @@ blame`.
   **Publishing (PyPI publish + name-claim) stays deferred for STRATEGIC TIMING + first-impression
   quality — Russell's call — not for lack of readiness** (license is DECIDED: MIT, v0.14.1).
   Build for the first-impression
-  layer. **Publish-prep progress (as of 2026-06-18):** done — public README candidate
-  (`docs/PUBLIC_README_DRAFT.md`, swaps to README.md at publish), `CHANGELOG.md`,
-  `COMPATIBILITY.md`, `SECURITY.md` CVE/maintenance policy, and an honest CI-gated badge row
-  (python · zero-deps · stdlib · coverage≥90% · ruff · fuzzed). Remaining: `typed`
-  (real annotation work — deferred, not faked), OpenSSF/Codecov (publish-gated), and the
-  strategic calls (name/license/timing/disclosure channel). **Live tracker:
+  layer. **Publish-prep progress (repo PUBLIC 2026-07-08):** README.md is now the single
+  publish-ready front door (the `PUBLIC_README_DRAFT.md` split was RETIRED — absolute
+  raw.githubusercontent image URLs render on GitHub + PyPI, honest live/static badge row
+  wired), `CHANGELOG.md`, `COMPATIBILITY.md`, `SECURITY.md` CVE/maintenance policy; GitHub
+  Actions SHA-pinned (OpenSSF/Scorecard hardening). Remaining (Russell's account/trigger):
+  PyPI publish + name-claim, OpenSSF Best Practices enrollment (→ badge), Codecov (→ live
+  coverage badge). **Live tracker:
   `scratch/publish_prep_checklist.md`**; also `docs/ROADMAP-to-1.0.md` (Reframe note).
 - **Version-assertion enforce-vs-warn: leaning INFORM-by-default** (1.0 decision, not yet
   ratified). `security_report()` informs; `assert_expat_secure()` stays opt-in. A
