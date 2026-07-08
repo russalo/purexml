@@ -191,7 +191,7 @@ oracle-gating, falsify-first battery + (960-doc) differential fuzz + committed
 equivalence report, corpus sweep, durability + version awareness + the posture API,
 four-leg apparatus. **No build work remains.** What's left for 1.0:
 - **G1/G2** — file-observer adoption validation (the "validated codebase" gate).
-- **G5** — the deferred adoption-model / packaging / publish decisions (**license DECIDED: MIT**, 2026-06-28; PyPI publish + name-claim still deferred to a strategic call).
+- **G5** — the deferred adoption-model / packaging / publish decisions (**license MIT**, 2026-06-28; **PyPI publish + name-claim DONE — `pip install purexml` live at v1.0.0, 2026-07-08**).
 - **G6** — the freeze ceremony (lock the contract surface, fill `PUBLIC_CONTRACT.md`,
   backward-compat policy). The pre-freeze checklist above is the gate.
 

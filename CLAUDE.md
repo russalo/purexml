@@ -151,7 +151,7 @@ reframed 2026-06-19**: not the ElementTree slice one adopter needs, but *the mai
 successor that replaces defusedxml across the surface the ecosystem actually imports*
 (measured: ElementTree ✅, minidom ✅, **sax ✅**, expatreader ✅, **xmlrpc ✅ (v0.13)**, common ✅;
 pulldom deferred, lxml excluded on zero-dep identity — see Known/Excluded decisions +
-`docs/ROADMAP-to-1.0.md`). **The measured breadth surface is COMPLETE, and the 1.0 contract is FROZEN + binding (v1.0.0, 2026-07-08 — `PUBLIC_CONTRACT.md` + `docs/v1.0.0_RFC_Specification.md`, ratified with file-observer).** What remains is Russell's separate PyPI-publish + name-claim call. This is a
+`docs/ROADMAP-to-1.0.md`). **The measured breadth surface is COMPLETE, and the 1.0 contract is FROZEN + binding (v1.0.0, 2026-07-08 — `PUBLIC_CONTRACT.md` + `docs/v1.0.0_RFC_Specification.md`, ratified with file-observer).** **PUBLISHED to PyPI 2026-07-08 — `pip install purexml` is live (v1.0.0, Trusted-Publishing/OIDC); name claimed.** This is a
 *security control*, not a format reader — owning it means owning the audit burden,
 which is why the adversarial review leg carries extra weight here. Capability
 north star: [`docs/FO_REQUIRED_COMPATIBILITY.md`](docs/FO_REQUIRED_COMPATIBILITY.md); the

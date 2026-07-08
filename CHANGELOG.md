@@ -7,8 +7,7 @@ per-release record (RFCs, compliance, internal axes) lives in
 [`HISTORY.md`](HISTORY.md).
 
 > **v1.0.0:** the public API is **frozen and binding** — see
-> [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md). purexml is not yet published to PyPI (a
-> separate, deliberate step — depend on it via git/path until then).
+> [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md). Install with `pip install purexml`.
 
 ## [1.0.0] — 2026-07-08
 ### Changed
