@@ -6,12 +6,23 @@ All notable changes to purexml, newest first. Format follows
 per-release record (RFCs, compliance, internal axes) lives in
 [`HISTORY.md`](HISTORY.md).
 
-> **Pre-1.0:** the public API is not yet frozen — minor releases may refine it. The
-> contract binds at **1.0** (see [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md)). Not yet
-> published to PyPI.
+> **v1.0.0:** the public API is **frozen and binding** — see
+> [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md). purexml is not yet published to PyPI (a
+> separate, deliberate step — depend on it via git/path until then).
 
-## [Unreleased]
-- Publish-prep: public README, this changelog, packaging metadata.
+## [1.0.0] — 2026-07-08
+### Changed
+- **Public contract frozen + binding.** The `defusedxml`-mirror surface — module
+  namespaces, function signatures + defaults, the complete exception hierarchy, the
+  `>=3.10` floor, and `__version__` — is now **Stable to 2.0**. The opt-in
+  defense-in-depth (`Limits`, `security_report()`, the version-assertion surface) is
+  **Provisional** by design (freezing it would block hardening against new expat CVE
+  classes without a 2.0). Guarded by `tests/test_public_contract.py`. Ratified by the
+  file-observer steward. See
+  [`docs/v1.0.0_RFC_Specification.md`](docs/v1.0.0_RFC_Specification.md) +
+  [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md).
+- **No parse-or-block behavior change** — 1.0 is a governance/contract freeze, not a
+  feature release. Default parse output stays byte-equivalent to `defusedxml`.
 
 ## [0.14.1] — 2026-06-28
 ### Added

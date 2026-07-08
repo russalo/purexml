@@ -128,7 +128,7 @@ position, so both `except ValueError` and the named excepts transfer unchanged.
 | DOCTYPE seen while `forbid_dtd=True` | `DTDForbidden` | `PureXMLError` → `ValueError` |
 | Unsupported operation (e.g. minidom `parser=`) | `NotSupportedError` | `PureXMLError` → `ValueError` |
 | **Opt-in** structural cap exceeded (see below) | `LimitExceeded` (`DepthExceeded` / `AttributesExceeded` / `SizeExceeded`) | `PureXMLError` → `ValueError` |
-| **Malformed** XML | `xml.etree.ElementTree.ParseError` (or `SAXParseException` for sax) | *stdlib — unchanged* |
+| **Malformed** XML | the stdlib parser error for that surface — `ElementTree.ParseError` (ElementTree), `xml.parsers.expat.ExpatError` (minidom), `xml.sax.SAXParseException` (sax) | *stdlib — unchanged* |
 
 `purexml.common.DefusedXmlException` is an alias for `PureXMLError` (the base of all
 the refusals above except the stdlib malformed error), so it catches any purexml

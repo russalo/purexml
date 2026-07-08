@@ -151,7 +151,7 @@ reframed 2026-06-19**: not the ElementTree slice one adopter needs, but *the mai
 successor that replaces defusedxml across the surface the ecosystem actually imports*
 (measured: ElementTree ✅, minidom ✅, **sax ✅**, expatreader ✅, **xmlrpc ✅ (v0.13)**, common ✅;
 pulldom deferred, lxml excluded on zero-dep identity — see Known/Excluded decisions +
-`docs/ROADMAP-to-1.0.md`). **The measured breadth surface is COMPLETE; next is the 1.0 freeze.** This is a
+`docs/ROADMAP-to-1.0.md`). **The measured breadth surface is COMPLETE, and the 1.0 contract is FROZEN + binding (v1.0.0, 2026-07-08 — `PUBLIC_CONTRACT.md` + `docs/v1.0.0_RFC_Specification.md`, ratified with file-observer).** What remains is Russell's separate PyPI-publish + name-claim call. This is a
 *security control*, not a format reader — owning it means owning the audit burden,
 which is why the adversarial review leg carries extra weight here. Capability
 north star: [`docs/FO_REQUIRED_COMPATIBILITY.md`](docs/FO_REQUIRED_COMPATIBILITY.md); the
@@ -347,6 +347,18 @@ contract LOGIC must hold.
 One-line bullets per version (newest first; copy the shape from
 [`HISTORY.md`](HISTORY.md)):
 
+- **v1.0.0** *(shipped 2026-07-08)* — **THE CONTRACT FREEZE.** The `defusedxml`-mirror surface
+  (module namespaces, function signatures + defaults, the complete exception hierarchy, the
+  `>=3.10` floor, `__version__`) is now **STABLE to 2.0** (`PUBLIC_CONTRACT.md` filled + binding;
+  guarded by `tests/test_public_contract.py`). The opt-in defense-in-depth (`Limits`,
+  `security_report()`, the version-assertion surface) stays **PROVISIONAL** by design — freezing
+  it would block hardening against new expat CVE classes without a 2.0. **Ratified by Russell +
+  the file-observer steward (2026-07-07)** (FO pins `purexml.ElementTree.fromstring`, adopts
+  post-1.0; FO's 6-point contract all inside the frozen surface incl. its floor + `__version__`
+  gap-check). **No parse-or-block change** — a governance/contract freeze, not a feature release;
+  LOGIC unchanged, SCHEMA n/a; Development Status → Production/Stable. PyPI publish + name-claim
+  remain a separate strategic step (repo-side freeze is done; the package is not yet published).
+  [RFC](docs/v1.0.0_RFC_Specification.md) · [compliance](docs/COMPLIANCE-v1.0.md).
 - **v0.14.1** *(shipped 2026-06-28)* — **patch: license = MIT**. Adds `LICENSE` (MIT, © 2026
   Russell Pfister), `license = {text = "MIT"}` + the OSI MIT classifier in `pyproject.toml`
   (table form, not the bare SPDX string — keeps the classifier without the PEP 639 warning on

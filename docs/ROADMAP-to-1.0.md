@@ -4,6 +4,11 @@
 > wf_5ea8ed7c-044 (findings: `scratch/research/2026-06-16_1.0-scope-research.md`,
 > 25/25 claims confirmed vs primary sources). This is the living plan from the
 > shipped v0.10.0 to the 1.0 contract freeze.
+>
+> **✅ 1.0 SHIPPED (2026-07-08) — this doc is now retrospective.** The contract is frozen
+> and binding at v1.0.0; the freeze is [`docs/v1.0.0_RFC_Specification.md`](v1.0.0_RFC_Specification.md)
+> + [`../PUBLIC_CONTRACT.md`](../PUBLIC_CONTRACT.md), guarded by `tests/test_public_contract.py`.
+> What remains is Russell's separate PyPI-publish + name-claim call (G5/B3).
 
 ## What 1.0 means
 Per the russalo version philosophy, **1.0 = a governance declaration on a
@@ -122,7 +127,11 @@ default-off):
   first-party** (ratified 2026-06-16; `docs/v1.0_TARGET.md`). Remaining specifics to
   land by 1.0: PyPI timing, claiming the name, the license, the optional vendorable
   single-file form.
-- **G6 — 1.0 freeze:** see the pre-freeze checklist below.
+- **G6 — 1.0 freeze — ✅ DONE (v1.0.0, 2026-07-08).** RFC ratified + promoted
+  (`docs/v1.0.0_RFC_Specification.md`), `PUBLIC_CONTRACT.md` filled + binding,
+  `tests/test_public_contract.py` guards the frozen surface, version → 1.0.0,
+  Development Status → Production/Stable. PyPI publish + name-claim remain Russell's
+  separate call (B3).
 
 ## Pre-freeze checklist (the 1.0 freeze gate — expands G6)
 
@@ -172,6 +181,9 @@ the freeze*, ordered by cost-of-getting-it-wrong.
 become 2.0-class mistakes if frozen without an explicit decision.
 
 ## Distance estimate
+**100% — 1.0 SHIPPED (contract frozen 2026-07-08).** The remaining distance below is
+retained for the record; all of G1–G6 are resolved except the publish trigger (G5/B3),
+which is Russell's separate strategic call, not a readiness gap. Original estimate:
 **~90% — the build axis is DONE (v0.3 completed the ElementTree family) and the
 opt-in defense-in-depth has shipped (v0.4 `Limits`, v0.5 `security_report()`).**
 Built & proven: the full hardened ElementTree surface, C14N + event-stream

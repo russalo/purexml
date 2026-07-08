@@ -49,14 +49,13 @@ constructable failing inputs.
 
 ## Supported versions
 
-Pre-1.0: the current minor is supported; older is not (please upgrade). At 1.0 this
-becomes a binding policy (the latest minor; security fixes backported per the
-then-published support window).
+The latest **1.x** release is supported; security fixes land there. (purexml is not yet
+published to PyPI — the support window formalizes on publication.)
 
 | Version | Supported |
 |---|---|
-| 0.14.x | Yes (current) |
-| < 0.14 | No (pre-1.0 moves fast; upgrade) |
+| 1.0.x | Yes (current) |
+| 0.x | No (pre-1.0; upgrade to 1.x) |
 
 ## Security advisories & CVE handling
 
