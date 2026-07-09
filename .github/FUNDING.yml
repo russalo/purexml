@@ -1,0 +1,5 @@
+# GitHub "Sponsor" button target — purexml's pay-what-you-want donation link.
+# Created + verified by shop (Stripe, one-time, preset $15 / min $1); attributed to
+# purexml (project=purexml). purexml is give-it-away, zero-dependency infrastructure;
+# support keeps it maintained, MIT-licensed, and independent.
+custom: ["https://donate.stripe.com/fZu7sNgLSgnpf5FbFQ9AA06"]
