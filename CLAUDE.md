@@ -799,9 +799,9 @@ blame`.
   publish-ready front door (the `PUBLIC_README_DRAFT.md` split was RETIRED — absolute
   raw.githubusercontent image URLs render on GitHub + PyPI, honest live/static badge row
   wired), `CHANGELOG.md`, `COMPATIBILITY.md`, `SECURITY.md` CVE/maintenance policy; GitHub
-  Actions SHA-pinned (OpenSSF/Scorecard hardening). Remaining (Russell's account/trigger):
-  PyPI publish + name-claim, OpenSSF Best Practices enrollment (→ badge), Codecov (→ live
-  coverage badge). **Live tracker:
+  Actions SHA-pinned (OpenSSF/Scorecard hardening). **PyPI publish + name-claim DONE
+  (2026-07-08; `pip install purexml` live).** Remaining (Russell's account, optional):
+  OpenSSF Best Practices enrollment (→ badge), Codecov (→ live coverage badge). **Live tracker:
   `scratch/publish_prep_checklist.md`**; also `docs/ROADMAP-to-1.0.md` (Reframe note).
 - **Version-assertion enforce-vs-warn: leaning INFORM-by-default** (1.0 decision, not yet
   ratified). `security_report()` informs; `assert_expat_secure()` stays opt-in. A
@@ -841,11 +841,11 @@ Russell."
   drop-in for `defusedxml.ElementTree`," which *requires* matching defusedxml's
   parameterized signature. The knobs are now **in scope** — see Known decisions.
   Tombstone kept so the reversal is a recorded decision, not a silent regression.
-- **Publishing to PyPI / claiming the `purexml` name** — explicitly held for a deliberate
-  strategic call (timing/first-impression). Free-name status is recorded (re-confirmed
-  2026-06-27), not acted on. **Note: this no longer covers the license** — license is now
-  DECIDED + APPLIED (MIT, v0.14.1); only the publish + name-claim remain held. (Cross-reference:
-  Known decisions, adoption-model bullet.)
+- **Publishing to PyPI / claiming the `purexml` name** — ~~explicitly held for a deliberate
+  strategic call~~ **DONE 2026-07-08** (published on the strategic-timing call; `pip install
+  purexml` is live at v1.0.0, name claimed via OIDC, license MIT). Tombstone kept so the
+  reversal is a recorded decision, not a silent regression — this exclusion is fully lifted.
+  (Cross-reference: Known decisions, adoption-model bullet.)
 - **`defusedxml.lxml` coverage** — **excluded on zero-dep identity** (ratified 2026-06-19).
   `defusedxml.lxml` wraps the third-party `lxml` library; covering it would require depending on
   `lxml`, breaking purexml's stdlib-only, zero-runtime-dependency contract (and it's deprecated

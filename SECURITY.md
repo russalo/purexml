@@ -77,8 +77,9 @@ not purexml. For those, the fix is *upgrade your runtime's expat* — and
 current (see *Maintenance policy*). purexml advisories cover the purexml layer; we surface
 the libexpat dimension rather than claim to fix it.
 
-> [[STRATEGIC: at publish, the private channel below is joined by a public one —
-> GitHub Security Advisories / a `SECURITY` contact — and a concrete disclosure window.]]
+> The repo is public, so **do not** open a public issue for a vulnerability — it would
+> disclose the flaw before a fix ships. Use the private email channel above; the
+> coordinated-disclosure window is described under *Security advisories* below.
 
 ## Maintenance policy
 

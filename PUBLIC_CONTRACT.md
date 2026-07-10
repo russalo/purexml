@@ -8,9 +8,9 @@
 > [`docs/v1.0.0_RFC_Specification.md`](docs/v1.0.0_RFC_Specification.md); it is guarded
 > mechanically by `tests/test_public_contract.py`.
 >
-> **Not the same as publication.** This contract binds the *codebase* at 1.0.0. Distribution
-> (PyPI publication, claiming the `purexml` name) is a separate step; until then, depend on
-> purexml via a git or path reference.
+> **Published.** This contract binds the *codebase* at 1.0.0, and purexml is published on
+> PyPI as of 2026-07-08 (name claimed, Trusted-Publishing/OIDC) — `pip install purexml`
+> installs exactly this frozen surface.
 
 ---
 
