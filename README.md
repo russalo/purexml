@@ -38,6 +38,9 @@ expects. Migrating is a literal find-and-replace: `s/defusedxml/purexml/`.
 - **Opt-in hardening.** Structural-DoS caps and a posture report that `defusedxml`
   lacks — **off by default**, so the drop-in promise is never broken.
 
+> Deciding whether to switch? See **[why switch from `defusedxml`](docs/vs-defusedxml.md)** —
+> the full case, and the honest boundaries (when *not* to).
+
 ## Install & migrate
 
 ```sh
@@ -111,6 +114,7 @@ won't move under you without a 2.0 (see [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.m
 
 ## Documentation
 
+- **[`docs/vs-defusedxml.md`](docs/vs-defusedxml.md)** — why switch from `defusedxml` (and when not to)
 - **[`examples/`](examples/)** — runnable, copy-paste examples for every surface
 - **[`docs/MIGRATING.md`](docs/MIGRATING.md)** — the `s/defusedxml/purexml/` migration guide
 - [`COMPATIBILITY.md`](COMPATIBILITY.md) — drop-in compatibility contract + exception edge cases
