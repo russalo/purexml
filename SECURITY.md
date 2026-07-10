@@ -32,9 +32,12 @@ default-off**, so they never alter the strict-mirror default.
 It is stdlib-only (`xml.parsers.expat` + `xml.etree`) with **zero runtime
 dependencies**, so the host process inherits no third-party parser attack surface.
 As of v0.3.1 this is enforced **structurally**: a CI-gated test (`tests/test_no_io.py`)
-asserts `src/` imports only the stdlib `xml` package — no `socket`/`urllib`/`http`/
-`subprocess`/`os`/… — so purexml cannot reach the network or filesystem at all (the
-behavioral no-fetch proof, now backed by a structural one).
+forbids network/subprocess/ambient-OS imports across `src/` — `socket`/`urllib`/`http`/
+`subprocess`/`os`/… — bar two narrow, audited carve-outs (the `python -m purexml` CLI's
+`argparse`/`json`; the opt-in `xmlrpc` shim's *lazy* `xmlrpc`/`gzip`, where `socket`/`http`
+themselves stay forbidden). So `import purexml` adds no ambient network/exec capability and
+purexml never fetches or reads a resource *referenced by untrusted XML* — the behavioral
+no-fetch proof, now backed by a structural one.
 
 ## Reporting vulnerabilities
 

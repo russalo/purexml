@@ -1,8 +1,11 @@
 # purexml vs `defusedxml` — why switch
 
-purexml is a **behavioral mirror** of `defusedxml` built on the Python standard library
-alone. If `defusedxml` works for you today, purexml does the *same parses* and blocks the
-*same attacks* — validated oracle-gated against `defusedxml` itself, every release. So the
+purexml is a **behavioral mirror** of `defusedxml`'s defaults, built on the Python standard
+library alone. On the surfaces it covers, at `defusedxml`'s default settings, purexml does
+the *same parses* and blocks the *same attacks* — validated oracle-gated against `defusedxml`
+itself, every release. (A few deliberate differences — the opt-in caps, and `minidom(parser=)`
+being refused rather than silently patched — are noted in §5 and [`MIGRATING.md`](MIGRATING.md),
+and apply only if you rely on them.) So the
 honest question isn't "is purexml better at blocking XML attacks" (it's deliberately
 *equivalent*) — it's **"what do I gain by switching?"** Two things `defusedxml` can no
 longer offer:
@@ -44,10 +47,15 @@ the incumbent stopped.**
 ## 2. The dependency case
 
 `defusedxml` is a third-party package in your dependency tree — one more thing to install,
-audit, pin, and trust. purexml is **stdlib-only, zero runtime dependencies**, and that claim
-is enforced *structurally*: a CI-gated test asserts `src/` imports only the standard `xml`
-package — no `socket`, `urllib`, `http`, `subprocess`, or `os` — so purexml cannot reach the
-network or filesystem at all, and adds no third-party parser/native code to your import path.
+audit, pin, and trust. purexml is **stdlib-only, zero runtime dependencies**, and that's
+enforced *structurally*: a CI-gated test (`tests/test_no_io.py`) forbids network, subprocess,
+and ambient-OS imports across `src/` — `socket`, `urllib`, `http`, `subprocess`, `os` — with
+only two narrow, audited carve-outs (the `python -m purexml` posture CLI's `argparse`/`json`,
+and the **opt-in** `xmlrpc` shim's *lazy* `xmlrpc`/`gzip` imports, where `socket`/`http`
+themselves stay forbidden). So `import purexml` adds no ambient network or exec capability,
+purexml never fetches or reads a resource *referenced by untrusted XML* (no XXE file/URL
+retrieval — the core guarantee), and nothing but the standard library enters your import
+path. (Reading a file *you* hand to `parse()` is ordinary caller-directed I/O, not XML-driven.)
 
 For a security-sensitive dependency, "one fewer thing in the supply chain, with no loss of
 protection" is often reason enough on its own.
