@@ -38,9 +38,9 @@ behavioral no-fetch proof, now backed by a structural one).
 
 ## Reporting vulnerabilities
 
-The repo is private (russalo tailnet). Report privately to the maintainer —
-**russalo@gmail.com**. **Do not** open a public issue. Russalo default
-acknowledgement: 48 hours / initial assessment 7 days.
+Report privately to the maintainer — **russalo@gmail.com**. **Do not** open a public
+issue for a vulnerability (the repo is public; a public issue would disclose it before a
+fix ships). Russalo default acknowledgement: 48 hours / initial assessment 7 days.
 
 When reporting, include the **exact input** that triggers the issue (a parse that
 should have been blocked but wasn't, an unexpected fetch/read, a crash/hang, or a
@@ -77,8 +77,9 @@ not purexml. For those, the fix is *upgrade your runtime's expat* — and
 current (see *Maintenance policy*). purexml advisories cover the purexml layer; we surface
 the libexpat dimension rather than claim to fix it.
 
-> [[STRATEGIC: at publish, the private channel below is joined by a public one —
-> GitHub Security Advisories / a `SECURITY` contact — and a concrete disclosure window.]]
+> The repo is public, so **do not** open a public issue for a vulnerability — it would
+> disclose the flaw before a fix ships. Use the private email channel above; the
+> coordinated-disclosure window is described under *Security advisories* below.
 
 ## Maintenance policy
 
