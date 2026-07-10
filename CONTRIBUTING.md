@@ -8,10 +8,11 @@ security library needs. This page is the short version of what that means in pra
 > been blocked, an unexpected fetch/read, or any divergence from `defusedxml`'s blocking is a
 > security report — see [`SECURITY.md`](SECURITY.md).
 
-> **Status: pre-1.0, MIT-licensed.** The public API isn't frozen yet — it binds at 1.0 (the
-> freeze contract is ratified; see [`docs/ROADMAP-to-1.0.md`](docs/ROADMAP-to-1.0.md)). purexml
-> is not yet published to PyPI. For anything beyond a small fix, **open an issue to discuss
-> first** — it saves you from building against a moving target.
+> **Status: 1.0, MIT-licensed, on PyPI** (`pip install purexml`). The public API is **frozen
+> and binding** — the `defusedxml`-mirror surface is stable to 2.0 (see
+> [`PUBLIC_CONTRACT.md`](PUBLIC_CONTRACT.md)); the opt-in defense-in-depth (`Limits`,
+> `security_report()`) stays provisional. For anything beyond a small fix, **open an issue to
+> discuss first** — especially anything touching the frozen surface.
 
 ## The prime directive
 

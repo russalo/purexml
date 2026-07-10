@@ -7,12 +7,11 @@ third-party dependencies), and every one exits 0.
 ## Running them
 
 ```bash
-# From a clone (before purexml is on PyPI):
-pip install -e .            # editable install of purexml into your environment
+pip install purexml
 python examples/01_hardened_parse.py
 
-# Once purexml is published:
-pip install purexml
+# Or, from a clone (to run against your local checkout):
+pip install -e .
 python examples/01_hardened_parse.py
 ```
 

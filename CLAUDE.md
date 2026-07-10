@@ -356,8 +356,9 @@ One-line bullets per version (newest first; copy the shape from
   the file-observer steward (2026-07-07)** (FO pins `purexml.ElementTree.fromstring`, adopts
   post-1.0; FO's 6-point contract all inside the frozen surface incl. its floor + `__version__`
   gap-check). **No parse-or-block change** — a governance/contract freeze, not a feature release;
-  LOGIC unchanged, SCHEMA n/a; Development Status → Production/Stable. PyPI publish + name-claim
-  remain a separate strategic step (repo-side freeze is done; the package is not yet published).
+  LOGIC unchanged, SCHEMA n/a; Development Status → Production/Stable. **PyPI publish + name-claim
+  DONE 2026-07-08** — `pip install purexml` is live (v1.0.0, OIDC); v1.0.1 patch re-uploads the
+  corrected README (the 1.0.0 upload carried the pre-publish text).
   [RFC](docs/v1.0.0_RFC_Specification.md) · [compliance](docs/COMPLIANCE-v1.0.md).
 - **v0.14.1** *(shipped 2026-06-28)* — **patch: license = MIT**. Adds `LICENSE` (MIT, © 2026
   Russell Pfister), `license = {text = "MIT"}` + the OSI MIT classifier in `pyproject.toml`
@@ -720,15 +721,14 @@ blame`.
   same caps/exceptions, default-off so the breadth mirror stays byte-identical). **Rule: any defense-in-depth is OPT-IN, default-OFF — never
   diverge from defusedxml by default.** At 1.0 freeze the mirror surface is STABLE;
   the novel defense-in-depth is PROVISIONAL (it may evolve). See `docs/v0.4.0_RFC_Specification.md`.
-- **Adoption model: DIRECTION decided = publish first-party; LICENSE decided = MIT;
-  PUBLISH SPECIFICS deferred** (direction ratified 2026-06-16; license ratified
-  2026-06-28). purexml is an **ecosystem-adoptable, first-party library** (not vendor-only)
-  — that's the mandate (`docs/v1.0_TARGET.md`). **License is now SET: MIT** (applied
-  v0.14.1; `LICENSE` + pyproject; rationale below). The *remaining* specifics — PyPI
-  publish timing, claiming the `purexml` name (confirmed free 2026-06-15, re-confirmed
-  2026-06-27), the optional vendorable single-file form — stay deferred to a deliberate
-  strategic call. **Until then: do NOT publish or claim the name** — repo-only, consumed via
-  git/path. (The "do NOT set a license" half of this is now SUPERSEDED — license is MIT.)
+- **Adoption model: DIRECTION decided = publish first-party; LICENSE = MIT;
+  PUBLISHED + NAME CLAIMED** (direction ratified 2026-06-16; license 2026-06-28; **published to
+  PyPI 2026-07-08 as `purexml` v1.0.0**, Trusted-Publishing/OIDC). purexml is an
+  **ecosystem-adoptable, first-party library** (not vendor-only) — the mandate
+  (`docs/v1.0_TARGET.md`) is now fully executed: `pip install purexml` is live. **License: MIT**
+  (applied v0.14.1). The only *remaining* adoption specific is the optional vendorable
+  single-file form (non-blocking, open on demand). (Both earlier deferrals — "do NOT set a
+  license", "do NOT publish or claim the name" — are now SUPERSEDED: license MIT, name claimed.)
   - **License = MIT** (Russell, 2026-06-28): give-it-away, zero-dep infrastructure → pure
     OSS, maximum reuse, no commercial-upside concern — the deliberate **opposite** of
     file-observer's AGPL-3.0 + dual-commercial (FO is a leverage product; purexml is not).
@@ -792,8 +792,8 @@ blame`.
   tracking the moving libexpat threat the incumbent doesn't. So **build for a cold security
   engineer evaluating it on publish day** (the first 60 seconds), not for FO's needs. FO is
   the **anchor consumer + first validation track** (G1, alive), NOT the definition of done.
-  **Publishing (PyPI publish + name-claim) stays deferred for STRATEGIC TIMING + first-impression
-  quality — Russell's call — not for lack of readiness** (license is DECIDED: MIT, v0.14.1).
+  **Publishing DONE (2026-07-08): `pip install purexml` is live** (v1.0.0, OIDC; name claimed) —
+  the debut shipped on Russell's strategic-timing call (license MIT, v0.14.1).
   Build for the first-impression
   layer. **Publish-prep progress (repo PUBLIC 2026-07-08):** README.md is now the single
   publish-ready front door (the `PUBLIC_README_DRAFT.md` split was RETIRED — absolute

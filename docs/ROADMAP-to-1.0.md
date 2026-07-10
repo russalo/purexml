@@ -81,8 +81,8 @@ default-off):
 > any one captive consumer. **file-observer is the anchor consumer + first
 > validation track (G1/G2, alive), not the definition of done** — and FO-in-production
 > is itself a credibility signal *for* the debut, so the two compose. Publishing
-> stays deferred for **strategic timing + first-impression quality** (Russell's call),
-> not for lack of readiness. Build target: what a cold security engineer needs in the
+> shipped on Russell's **strategic-timing** call (2026-07-08) — `pip install purexml` is
+> live at v1.0.0. Build target was always: what a cold security engineer needs in the
 > first 60 seconds on publish day.
 
 ## Gates to 1.0
